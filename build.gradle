@@ -1,0 +1,46 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+version = '1.0-SNAPSHOT' 
+
+eclipse {
+    project {
+        name = 'skript-packet'
+    }
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://repo.destroystokyo.com/repository/maven-public/' }
+    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
+    maven { url "https://libraries.minecraft.net" }
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.enginehub.org/repo/' }
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    jcenter()
+    maven {
+        url 'https://jitpack.io'
+    }
+    
+}
+
+jar {
+    archiveBaseName  = 'skript-packet'
+    archiveVersion =  '1.0'
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+dependencies {
+	compile group: 'commons-configuration', name: 'commons-configuration', version: '1.6'
+	implementation 'com.github.SkriptLang:Skript:2.5.3'
+    implementation 'org.spigotmc:spigot-api:1.16.4-R0.1-SNAPSHOT'
+    compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
+    implementation 'com.github.TPGamesNL:skript-reflect:v2.2-alpha2'
+    compile 'com.mojang:datafixerupper:1.0.20'
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.5.0";
+}
