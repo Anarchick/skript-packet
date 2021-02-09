@@ -19,14 +19,16 @@ public class SkriptPacket extends JavaPlugin {
 	
 	public static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
 	
-	public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(4, 4);
+	public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(4, 6, 0);
 	public static final Version PROTOCOLLIB_VERSION =
             new Version(pluginManager.getPlugin("ProtocolLib").getDescription().getVersion());
 	
+	public static final Version MINIMUM_SKRIPT_VERSION = new Version(2, 5, 2);
+	public static final Version SKRIPT_VERSION =
+            new Version(pluginManager.getPlugin("Skript").getDescription().getVersion());
+	
 	@Override
 	public void onEnable() {
-		if(instance != null)
-            throw new IllegalStateException("Plugin initialized twice.");
 		instance = this;
 		addon = Skript.registerAddon(this);
 		
@@ -34,10 +36,17 @@ public class SkriptPacket extends JavaPlugin {
 		isReflectAddon = pluginManager.isPluginEnabled("skript-reflect");
 		if (isReflectAddon) Logging.info("Support of skript-reflect wrapper");
 		
+		if (SKRIPT_VERSION.isSmallerThan(MINIMUM_SKRIPT_VERSION)) {
+            Logging.info("Your version of Skript is " + SKRIPT_VERSION);
+            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_SKRIPT_VERSION.toString() + " of Skript");
+            // Does not disable the plugin, cause some syntaxes can still works
+		}
+		
 		if (PROTOCOLLIB_VERSION.isSmallerThan(MINIMUM_PROTOCOLLIB_VERSION)) {
             Logging.info("Your version of ProtocolLib is " + PROTOCOLLIB_VERSION);
-            Logging.info("Skript-Packet requires that you run at least version 4.4 of ProtocolLib");
-        }
+            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_PROTOCOLLIB_VERSION.toString() + " of ProtocolLib");
+            // Does not disable the plugin, cause some syntaxes can still works
+		}
 		
 		try {
 			addon.loadClasses("fr.anarchick.skriptpacket", "elements");
@@ -46,6 +55,15 @@ public class SkriptPacket extends JavaPlugin {
 			pluginManager.disablePlugin(this);
             return;
 		}
+		
+		int pluginId = 10270; // Gave by bstat
+		Metrics metrics = new Metrics(this, pluginId);
+		metrics.addCustomChart(new Metrics.SimplePie("skript_version", () ->
+			SKRIPT_VERSION.toString()));
+		metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", () ->
+			PROTOCOLLIB_VERSION.toString()));
+		metrics.addCustomChart(new Metrics.SimplePie("skript-reflect_support", () ->
+			String.valueOf(isReflectAddon)));
 		
 		Logging.info("is enable!");
 	}
