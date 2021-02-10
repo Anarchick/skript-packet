@@ -63,7 +63,7 @@ public class ExprPacketField extends SimpleExpression<Object> {
 
 	@Override
 	public String toString(@Nullable Event e, boolean debug) {
-		return "the field " + index.getSingle(e) + " of packet " + packet;
+		return "the field " + index.getSingle(e) + " of packet " + packet.getSingle(e);
 	}
 
 	@Override
