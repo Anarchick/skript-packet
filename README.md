@@ -1,25 +1,25 @@
 # skript-packet
-A skript's packet addon to replace ThatPacketAddon (wich is not updated) with skript2.5.2+
+A Skript packet addon to replace ThatPacketAddon (which is not updated) with Skript 2.5.2+
 
 # Requirements
- - Recent version of skript
+ - Recent version of Skript
  - Stable ProtocolLib dev build (does not works with v-4.5.1)
  - Java8+
  - It's highly recommended to use skript-reflect
 
 # What is a packet
-The Minecraft server and your Minecraft client share informations called "packets".
-Exemple of packet :  
+The Minecraft server and your Minecraft client share information called "packets".
+Example of a packet:  
  - Any movement made by an entity
  - Opening a gui to a player
  - When the player use an item
 
-The interest of manipulation of packet is to send fake information to a specific group of player, like display a fake diamond block (client side) instead of a tnt (server side).
-You can do a lot of things with packet, but it's really hard to understand how to use them ...
+The interest of manipulation of packets is to send fake information to a specific group of players, like display a fake diamond block (client side) instead of a tnt (server side).
+You can do a lot of things with packets, but it's really hard to understand how to use them ...
 
 This link can help you to identify the content of a packet: https://wiki.vg/Protocol
  
-# Exemple of code using skript-packet + skript-reflect ?
+# Example of code using skript-packet + skript-reflect ?
 
 ```applescript
 packet event play_client_held_item_slot:
