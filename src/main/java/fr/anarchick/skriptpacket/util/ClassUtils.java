@@ -8,6 +8,8 @@ import java.util.Map;
 public class ClassUtils {
 
     private static final Map<Class<?>, Class<?>> primitiveWrapperMap = new HashMap<>();
+    private static final Map<Class<?>, Class<?>> wrapperPrimitiveMap = new HashMap<>();
+    
     static {
          primitiveWrapperMap.put(Boolean.TYPE, Boolean.class);
          primitiveWrapperMap.put(Byte.TYPE, Byte.class);
@@ -20,7 +22,6 @@ public class ClassUtils {
          primitiveWrapperMap.put(Void.TYPE, Void.TYPE);
     }
     
-    private static final Map<Class<?>, Class<?>> wrapperPrimitiveMap = new HashMap<>();
     static {
         for (final Map.Entry<Class<?>, Class<?>> entry : primitiveWrapperMap.entrySet()) {
             final Class<?> primitiveClass = entry.getKey();
@@ -34,5 +35,5 @@ public class ClassUtils {
     public static Class<?> wrapperToPrimitive(final Class<?> cls) {
         return wrapperPrimitiveMap.get(cls);
     }
-	
+    
 }

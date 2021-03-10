@@ -16,27 +16,26 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 
-@Name("Send Packet")
-@Description("Sends the specified packet(s) to the specified player(s).")
+@Name("Receive Packet")
+@Description("Makes the server simulate receiving the specified packet(s) from the specified player(s)")
 @Examples({
-    "function unloadChunk(x: number, z: number, players: players):",
-        "\tset {_packet} to new play_server_unload_chunk packet",
-        "\tset field 0 of packet {_packet} to {_x}",
-        "\tset field 1 of packet {_packet} to {_z}",
-        "\tsend {_players::*} packet {_packet}"
+    "function serverSideSlot(players: players, slot: number):",
+        "\tset {_packet} to new play_client_held_item_slot packet",
+        "\tset field 0 of packet {_packet} to {_slot}",
+        "\treceive {_players::*} packet {_packet}"
 })
-@Since("1.0, 1.1 (without calling event)")
+@Since("1.1")
 
-public class EffSendPacket extends Effect{
+public class EffReceivePacket extends Effect{
     
     private Expression<PacketContainer> packets;
     private Expression<Player> players;
     private boolean bypassEvent = false;
     
     static {
-        Skript.registerEffect(EffSendPacket.class, new String[] {
-                "send packet[s] %packets% to %players% [without calling event]",
-                "send %players% packet[s] %packets% [without calling [Skript] event]"
+        Skript.registerEffect(EffReceivePacket.class, new String[] {
+                "rec(ei|ie)ve packet[s] %packets% from %players% [without calling event]",
+                "rec(ei|ie)ve %players% packet[s] %packets% [without calling [Skript] event]"
                 });
     }
     
@@ -54,13 +53,13 @@ public class EffSendPacket extends Effect{
         PacketContainer[] _packets = packets.getAll(e); // Size of 1 in most of cases
         for (PacketContainer packet : _packets) {
             if (bypassEvent) packet.setMeta("bypassEvent", true);
-            PacketManager.sendPacket(packet, players.getAll(e));
+            PacketManager.receivePacket(packet, players.getAll(e));
         }
     }
 
     @Override
     public String toString(Event e, boolean b) {
-        return "send packet " + packets.getAll(e) + " to " + players.getAll(e);
+        return "receive packet " + packets.getAll(e) + " from " + players.getAll(e);
     }
     
 }

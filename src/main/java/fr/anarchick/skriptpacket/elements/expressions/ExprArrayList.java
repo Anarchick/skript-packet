@@ -25,52 +25,55 @@ import fr.anarchick.skriptpacket.SkriptPacket;
 @Name("ArrayList")
 @Description("Create a java ArrayList from objects")
 @Examples({
-	"set {_arraylist} to all players as arraylist"
+    "set {_arrayList} to all players as arraylist",
+    "set {_emptyArrayList} to {_} as arraylist"
 })
 @Since("1.0")
 
 public class ExprArrayList extends SimpleExpression<Object> {
 
-	private Expression<Object> expr;
+    private Expression<Object> expr;
+    
+    static {
+        Skript.registerExpression(ExprArrayList.class, Object.class, ExpressionType.SIMPLE,
+                "%objects% as arraylist");
+    }
 
-	static {
-		Skript.registerExpression(ExprArrayList.class, Object.class, ExpressionType.SIMPLE, "%objects% as arraylist");
-	}
-	
-	@Override
-	public Class<? extends Object> getReturnType() {
-		return Object.class;
-	}
-
-	@Override
-	public boolean isSingle() {
-		return true;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
-		expr = (Expression<Object>) exprs[0];
-		return true;
-	}
-
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "%Objects% as arraylist";
-	}
-
-	@Override
-	@Nullable
-	protected Object[] get(Event e) {
-		ArrayList<Object> Array = new ArrayList<Object>();
-		if (SkriptPacket.isReflectAddon) {
-			for (Object _expr : expr.getAll(e)) {
-				Array.add(ObjectWrapper.unwrapIfNecessary(_expr));
-			}
-		} else {
-			List<Object> list = Arrays.asList(expr.getAll(e));
-			Array.addAll(list);
-		}
-		return CollectionUtils.array(Array);
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+        expr = (Expression<Object>) exprs[0];
+        return true;
+    }
+    
+    @Override
+    @Nullable
+    protected Object[] get(Event e) {
+        ArrayList<Object> Array = new ArrayList<Object>();
+        if (SkriptPacket.isReflectAddon) {
+            for (Object _expr : expr.getAll(e)) {
+                Array.add(ObjectWrapper.unwrapIfNecessary(_expr));
+            }
+        } else {
+            List<Object> list = Arrays.asList(expr.getAll(e));
+            Array.addAll(list);
+        }
+        return CollectionUtils.array(Array);
+    }
+    
+    @Override
+    public boolean isSingle() {
+        return true;
+    }
+    
+    @Override
+    public Class<? extends Object> getReturnType() {
+        return Object.class;
+    }
+    
+    @Override
+    public String toString(@Nullable Event e, boolean debug) {
+        return "%Objects% as arraylist";
+    }
+    
 }

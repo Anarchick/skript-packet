@@ -19,18 +19,34 @@ import ch.njol.util.Kleenean;
 
 @Name("New Packet")
 @Description("Create a new packet from a ProtocolLib's packettype")
-@Examples({
-	"set {_packet} to new play_server_block_break_animation packet"
-})
+@Examples("set {_packet} to new play_server_block_break_animation packet")
 @Since("1.0")
 
 public class ExprNewPacket extends SimpleExpression<PacketContainer> {
-	
-    private Expression<PacketType> packetType;
 
+    private Expression<PacketType> packetType;
+    
     static {
-        Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.SIMPLE, "new %packettype% packet");
- 	}
+        Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.SIMPLE,
+                "new %packettype% packet");
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean init(Expression<?>[] exprs, int i, Kleenean isDelayed, ParseResult parser) {
+        packetType = (Expression<PacketType>) exprs[0];
+        return true;
+    }
+    
+    @Override
+    protected PacketContainer[] get(Event e) {
+        return new PacketContainer[]{ProtocolLibrary.getProtocolManager().createPacket(packetType.getSingle(e))};
+    }
+    
+    @Override
+    public boolean isSingle() {
+        return true;
+    }
     
     @Override
     public Class<? extends PacketContainer> getReturnType() {
@@ -38,25 +54,8 @@ public class ExprNewPacket extends SimpleExpression<PacketContainer> {
     }
 
     @Override
-    public boolean isSingle() {
-        return true;
-    }
-
-    @SuppressWarnings("unchecked")
-	@Override
-    public boolean init(Expression<?>[] exprs, int i, Kleenean isDelayed, ParseResult parser) {
-        packetType = (Expression<PacketType>) exprs[0];
-        return true;
-    }
-
-    @Override
     public String toString(Event e, boolean debug) {
         return "new " + packetType.toString(e, debug) + "packet";
     }
-
-    @Override
-    protected PacketContainer[] get(Event e) {
-        return new PacketContainer[]{ProtocolLibrary.getProtocolManager().createPacket(packetType.getSingle(e))};
-    }
-
+    
 }

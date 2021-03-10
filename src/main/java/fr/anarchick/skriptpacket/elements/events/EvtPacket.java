@@ -22,54 +22,89 @@ import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 
 @Name("Packet Event")
-@Description("Event called when a packet is send or receive by the server")
+@Description("Called when a packet of one of the specified types is being sent or"
+        + " received. You can optionally specify a priority; triggers with higher"
+        + " priority will be called later (so high priority will come after low"
+        + " priority, and monitor priority will come last)."
+        + " By default, the priority is normal.")
 @Examples({
-	"packet event play_server_entity_equipments:",
-	    "\tbroadcast \"equipment changed\""
+    "packet event play_server_entity_equipments:",
+        "\tbroadcast \"equipment changed\""
 })
-@Since("1.0")
+@Since("1.0, 1.1 (priority)")
 
 public class EvtPacket extends SkriptEvent{
 
-	static {
-	    Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class, "packet event %packettype%");
-	    // event-packet
-	    EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<PacketContainer, BukkitPacketEvent>() {
-			@Override
-			public PacketContainer get(final BukkitPacketEvent e) {
-				return e.getPacket();
-			}
-		}, 0);
-	    // event-player
-	    EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, new Getter<Player, BukkitPacketEvent>() {
-			@Override
-			public Player get(final BukkitPacketEvent e) {
-				return e.getPlayer();
-			}
-		}, 0);
-	}
-	
-	private Literal<PacketType> packetType;
-	
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Literal<?>[] literal, int matchedPattern, ParseResult parser) {
-		packetType = (Literal<PacketType>) literal[0];
-		SkriptPacketEventListener.addPacketTypes(packetType.getAll(), ListenerPriority.NORMAL);
-		return true;
-	}
+    private int mark;
+    private Literal<PacketType> packetType;
+    private ListenerPriority priority;
+    
+    static {
+        Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
+                "packet event %packettype% [with (1¦lowest|2¦low|3¦normal|4¦high|5¦highest|6¦monitor) priority]");
+        // event-packet
+        EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<PacketContainer, BukkitPacketEvent>() {
+            @Override
+            public PacketContainer get(final BukkitPacketEvent e) {
+                return e.getPacket();
+            }
+        }, 0);
+        // event-player
+        EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, new Getter<Player, BukkitPacketEvent>() {
+            @Override
+            public Player get(final BukkitPacketEvent e) {
+                return e.getPlayer();
+            }
+        }, 0);
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean init(Literal<?>[] literal, int matchedPattern, ParseResult parser) {
+        mark = parser.mark;
+        packetType = (Literal<PacketType>) literal[0];
+        switch (mark) {
+            case 1:
+                priority = ListenerPriority.LOWEST;
+                break;
+            case 2:
+                priority = ListenerPriority.LOW;
+                break;
+            case 3:
+                priority = ListenerPriority.NORMAL;
+                break;
+            case 4:
+                priority = ListenerPriority.HIGH;
+                break;
+            case 5:
+                priority = ListenerPriority.HIGHEST;
+                break;
+            case 6:
+                priority = ListenerPriority.MONITOR;
+                break;
+            default:
+                priority = ListenerPriority.NORMAL;
+        }
+        
+        SkriptPacketEventListener.addPacketTypes(packetType.getAll(), priority);
+        return true;
+    }
 
-	@Override
-	public boolean check(Event event) {
-		if (event instanceof BukkitPacketEvent) {
-            return packetType.getSingle(event) == ((BukkitPacketEvent) event).getPacketType();
-		}
+    @Override
+    public boolean check(Event event) {
+        if (event instanceof BukkitPacketEvent) {
+            BukkitPacketEvent e = (BukkitPacketEvent) event;
+            if (packetType.getSingle(event) == e.getPacketType() && priority == e.getPriority()) {
+                PacketContainer packet = e.getPacket();
+                return !packet.getMeta("bypassEvent").isPresent();
+            }
+        }
         return false;
-	}
-	
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "packet event " + packetType.toString(e, debug);
-	}
-	
+    }
+    
+    @Override
+    public String toString(@Nullable Event e, boolean debug) {
+        return "packet event " + packetType.toString(e, debug);
+    }
+    
 }

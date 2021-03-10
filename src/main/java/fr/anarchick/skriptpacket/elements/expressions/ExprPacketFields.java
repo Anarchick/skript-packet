@@ -21,69 +21,59 @@ import fr.anarchick.skriptpacket.util.Converter;
 
 @Name("Packet Fields")
 @Description("Get all packet fields, can't be set")
-@Examples({
-	"set {_fields::*} to all fields of packet event-packet",
-})
+@Examples("set {_fields::*} to all fields of packet event-packet")
 @Since("1.0")
 
 public class ExprPacketFields extends SimpleExpression<Object> {
-	private static Expression<PacketContainer> packet;
-	
-	static {
-       Skript.registerExpression(ExprPacketFields.class, Object.class, ExpressionType.SIMPLE, "[all] fields of [packet] %packet%");
-	}
-	
-	@Override
-	public Class<? extends Object> getReturnType() {
-		return Object.class;
-	}
+    
+    private static Expression<PacketContainer> packet;
+    
+    static {
+       Skript.registerExpression(ExprPacketFields.class, Object.class, ExpressionType.SIMPLE,
+               "[all] fields of [packet] %packet%");
+    }
+    
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+        packet = (Expression<PacketContainer>) exprs[0];
+        return true;
+    }
+    
+    @Override
+    @Nullable
+    protected Object[] get(Event e) {
+        PacketContainer _packet = packet.getSingle(e);
+        if (_packet != null) {
+            StructureModifier<Object> modifier = _packet.getModifier();
+            int size = modifier.getValues().size();
+            Object[] values = new Object[size];
+            for (int i = 0; i < size ; i++) {
+                Object field = modifier.readSafely(i);
+                if (field.getClass().isArray()) {
+                    values[i]  = ArrayUtils.unknownToObject(field);
+                } else {
+                    values[i] = Converter.toObject(field);
+                }
+            }
+            return values;
+        }
+        return null;
+    }
+    
+    @Override
+    public boolean isSingle() {
+        return false;
+    }
+    
+    @Override
+    public Class<? extends Object> getReturnType() {
+        return Object.class;
+    }
 
-	@Override
-	public boolean isSingle() {
-		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
-		packet = (Expression<PacketContainer>) exprs[0];
-		return true;
-	}
-
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "all fields of packet " + packet;
-	}
-
-	@Override
-	@Nullable
-	protected Object[] get(Event e) {
-		PacketContainer _packet = packet.getSingle(e);
-		if (_packet != null) {
-			StructureModifier<Object> modifier = _packet.getModifier();
-			int size = modifier.getValues().size();
-			Object[] values = new Object[size];
-			for (int i = 0; i < size ; i++) {
-				Object field = modifier.readSafely(i);
-				if (field.getClass().isArray()) {
-					values[i]  = ArrayUtils.unknownToObject(field);
-				} else {
-					values[i] = Converter.toObject(field);
-				}
-			}
-			/*
-			int i = 0;
-			for (Object field : values) {
-				if (field.getClass().isArray()) {
-					values[i++]  = ArrayUtils.unknownToObject(field);
-				} else {
-					values[i++] = new Object[] {Converter.toObject(field)};
-				}
-			}
-			*/
-			return values;
-		}
-		return null;
-	}
-	
+    @Override
+    public String toString(@Nullable Event e, boolean debug) {
+        return "all fields of packet " + packet;
+    }
+    
 }

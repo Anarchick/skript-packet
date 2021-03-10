@@ -11,10 +11,10 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 
 public class BukkitPacketEvent extends Event implements Cancellable {
-	private static final HandlerList handlers = new HandlerList();
-
-    public final PacketEvent packetEvent;
-    public final ListenerPriority priority;
+    
+    private static final HandlerList handlers = new HandlerList();
+    private final PacketEvent packetEvent;
+    private final ListenerPriority priority;
 
     public BukkitPacketEvent(PacketEvent event, ListenerPriority priority) {
         this.packetEvent = event;
@@ -23,6 +23,10 @@ public class BukkitPacketEvent extends Event implements Cancellable {
 
     public PacketType getPacketType() {
         return packetEvent.getPacketType();
+    }
+    
+    public ListenerPriority getPriority() {
+        return priority;
     }
 
     public PacketContainer getPacket() {

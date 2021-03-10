@@ -13,62 +13,57 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
+import ch.njol.util.coll.CollectionUtils;
 import fr.anarchick.skriptpacket.util.NumberUtils;
 
 @Name("Number As")
-@Description({
-	"Convert a %number% to int/float/long/double/short/byte",
-	"Support conversion to array"
-})
-@Examples({
-	"set {_byte} to 5 as byte",
-	"set {_byte::*} to 5, 3, 1 as short array"
-})
+@Description("Convert a %number% to int/float/long/double/short/byte")
+@Examples("set {_byte} to 5 as byte")
 @Since("1.0")
 
 public class ExprNumberAs extends SimpleExpression<Number> {
 
-	private Expression<Object> expr;
-	private int mark;
-	private boolean isArray = false;
+    private Expression<Number> expr;
+    private int mark;
 
-	static {
-		String[] patterns = new String[] {
-			"%number% as (0¦int|1¦float|2¦long|3¦double|4¦short|5¦byte)",
-			"%numbers% as (0¦int|1¦float|2¦long|3¦double|4¦short|5¦byte) array"
-		};
-		Skript.registerExpression(ExprNumberAs.class, Number.class, ExpressionType.SIMPLE, patterns);
-	}
-	
-	@Override
-	public Class<? extends Number> getReturnType() {
-		return Number.class;
-	}
+    static {
+        String[] patterns = new String[] {
+                "%number% as [primitive] (0¦Int[eger]|1¦Float|2¦Long|3¦Double|4¦Short|5¦Byte)"
+        };
+        Skript.registerExpression(ExprNumberAs.class, Number.class, ExpressionType.SIMPLE, patterns);
+    }
+    
+    @Override
+    public boolean isSingle() {
+        return true;
+    }
+    
+    @Override
+    public Class<? extends Number> getReturnType() {
+        return Number.class;
+    }
 
-	@Override
-	public boolean isSingle() {
-		return !isArray;
-	}
+    @Override
+    @SuppressWarnings("unchecked")
+    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+        expr = (Expression<Number>) exprs[0];
+        mark = parser.mark;
+        return true;
+    }
+    
+    @Override
+    @Nullable
+    protected Number[] get(Event e) {
+        Number _expr = (Number) expr.getSingle(e);
+        if (_expr == null) return null;
+        return CollectionUtils.array(
+                NumberUtils.toSingle(NumberUtils.OBJECT_NUMBER.get(mark), _expr)
+        );
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
-		expr = (Expression<Object>) exprs[0];
-		mark = parser.mark;
-		isArray = (matchedPattern == 1);
-		return true;
-	}
-
-	@Override
-	public String toString(@Nullable Event e, boolean debug) {
-		return "parse " + expr.getSingle(e) + " as " + NumberUtils.PRIMITIVE_NUMBER.get(mark).getName();
-	}
-
-	@Override
-	@Nullable
-	protected Number[] get(Event e) {
-		Number[] _expr = (Number[]) expr.getAll(e);
-		if (_expr == null) return null;
-		return NumberUtils.convert(NumberUtils.PRIMITIVE_NUMBER.get(mark), isArray, _expr);
-	}
+    @Override
+    public String toString(@Nullable Event e, boolean debug) {
+        return expr.getSingle(e) + " as " + NumberUtils.OBJECT_NUMBER.get(mark).getName();
+    }
+    
 }

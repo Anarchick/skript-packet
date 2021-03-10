@@ -42,15 +42,15 @@ public class ArrayUtils {
     // ----------------------------------------------------------------------
     
     public static Object[] unknownToObject(final Object array) {
-    	if (array instanceof boolean[]) return toObject((boolean[]) array);
-    	if (array instanceof int[]) return toObject((int[]) array);
-    	if (array instanceof byte[]) return toObject((byte[]) array);
-    	if (array instanceof float[]) return toObject((float[]) array);
-    	if (array instanceof short[]) return toObject((short[]) array);
-    	if (array instanceof double[]) return toObject((double[]) array);
-    	if (array instanceof long[]) return toObject((long[]) array);
-    	if (array instanceof char[]) return toObject((char[]) array);
-    	return (Object[]) array; // Not primitive
+        if (array instanceof boolean[]) return toObject((boolean[]) array);
+        if (array instanceof int[]) return toObject((int[]) array);
+        if (array instanceof byte[]) return toObject((byte[]) array);
+        if (array instanceof float[]) return toObject((float[]) array);
+        if (array instanceof short[]) return toObject((short[]) array);
+        if (array instanceof double[]) return toObject((double[]) array);
+        if (array instanceof long[]) return toObject((long[]) array);
+        if (array instanceof char[]) return toObject((char[]) array);
+        return (Object[]) array; // Not primitive
     }
     
     public static Boolean[] toObject(final boolean[] array) {

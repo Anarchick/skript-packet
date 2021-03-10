@@ -12,76 +12,82 @@ import ch.njol.skript.registrations.Classes;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 
 public class Types {
-	
-	static {
-		Classes.registerClass(new ClassInfo<>(PacketType.class, "packettype")
-				.user("packet ?types?")
+    
+    static {
+        Classes.registerClass(new ClassInfo<>(PacketType.class, "packettype")
+                .user("packet ?types?")
                 .name("PacketType")
                 .since("1.0")
                 .description("Represents the type of a packet from ProtocolLib")
                 //.examples("")
                 .parser(new Parser<PacketType>() {
-                	
-                	@Override
-					@Nullable
-                	public PacketType parse(final String name, final ParseContext context) {
-                		return PacketManager.getPacketType(name);
-                	}
-                	
-                	@Override
-					public boolean canParse(final ParseContext context) {
-						return true;
-					}
-                	
-					@Override
-					public String getVariableNamePattern() {
-						return "[a-zA-Z_]+";
-					}
+                    
+                    @Override
+                    public boolean canParse(final ParseContext context) {
+                        return true;
+                    }
+                    
+                    @Override
+                    @Nullable
+                    public PacketType parse(final String name, final ParseContext context) {
+                        return PacketManager.getPacketType(name);
+                    }
+                    
+                    @Override
+                    public String getVariableNamePattern() {
+                        return "[a-zA-Z_]+";
+                    }
 
-					@Override
-					public String toString(PacketType packettype, int flags) {
-						return PacketManager.getPacketName(packettype);
-					}
-
-					@Override
-					public String toVariableNameString(PacketType packettype) {
-						return PacketManager.getPacketName(packettype);
-					}
-					
+                    @Override
+                    public String toVariableNameString(PacketType packettype) {
+                        return PacketManager.getPacketName(packettype);
+                    }
+                    
+                    @Override
+                    public String toString(PacketType packettype, int flags) {
+                        return PacketManager.getPacketName(packettype);
+                    }
+                    
                 })
         );
-		
-		Classes.registerClass(new ClassInfo<>(PacketContainer.class, "packet")
-				.user("packets?")
+        
+        Classes.registerClass(new ClassInfo<>(PacketContainer.class, "packet")
+                .user("packets?")
                 .name("Packet")
                 .since("1.0")
                 .description("Represents a packet from ProtocolLib")
                 //.examples("")
                 .parser(new Parser<PacketContainer>() {
-                	
-                	@Override
-					@Nullable
-                	public PacketContainer parse(final String packet, final ParseContext context) {
-                		return null;
-                	}
-                	
-					@Override
-					public String getVariableNamePattern() {
-						return "PacketContainer\\[.*\\]";
-					}
+                    
+                    @Override
+                    public boolean canParse(final ParseContext context) {
+                        return false;
+                    }
+                    
+                    @Override
+                    @Nullable
+                    public PacketContainer parse(final String packet, final ParseContext context) {
+                        return null;
+                    }
+                    
+                    @Override
+                    public String getVariableNamePattern() {
+                        return "PacketContainer\\[.*\\]";
+                    }
 
-					@Override
-					public String toString(PacketContainer packet, int flags) {
-						packet.getAttributeCollectionModifier().getValues();
-						return packet.toString();
-					}
-
-					@Override
-					public String toVariableNameString(PacketContainer packet) {
-						return packet.toString();
-					}
-					
+                    @Override
+                    public String toVariableNameString(PacketContainer packet) {
+                        return packet.toString();
+                    }
+                    
+                    @Override
+                    public String toString(PacketContainer packet, int flags) {
+                        packet.getAttributeCollectionModifier().getValues();
+                        return packet.toString();
+                    }
+                    
                 })
         );
-	}
+    }
+    
 }
