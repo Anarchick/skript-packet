@@ -68,7 +68,8 @@ function FOV(p: players, x: number):
     loop {_p::*}:
         set {_player} to loop-value
         set {%{_player}%::FOV} to {_x}
-        send {_player} packet {_packet}```
+        send {_player} packet {_packet}
+```
 
 
 ```applescript
