@@ -19,7 +19,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 
 @Name("Packet Update Entity")
-@Description("Force the update of an entity to a specific set of players")
+@Description("Force the update of an entity to a specific player(s)")
 @Examples("packet update {_entity} for all players in world of {_entity}")
 @Since("1.1")
 

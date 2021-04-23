@@ -23,7 +23,7 @@ import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 
 @Name("Packet Event")
 @Description("Called when a packet of one of the specified types is being sent or"
-        + " received. You can optionally specify a priority; triggers with higher"
+        + " received. You can optionally specify a priority triggers with higher"
         + " priority will be called later (so high priority will come after low"
         + " priority, and monitor priority will come last)."
         + " By default, the priority is normal.")
@@ -94,7 +94,7 @@ public class EvtPacket extends SkriptEvent{
     public boolean check(Event event) {
         if (event instanceof BukkitPacketEvent) {
             BukkitPacketEvent e = (BukkitPacketEvent) event;
-            if (packetType.getSingle(event) == e.getPacketType() && priority == e.getPriority()) {
+            if ( packetType.getSingle(event).equals(e.getPacketType()) && priority.equals(e.getPriority()) ) {
                 PacketContainer packet = e.getPacket();
                 return !packet.getMeta("bypassEvent").isPresent();
             }

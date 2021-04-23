@@ -42,5 +42,7 @@ dependencies {
     compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
     implementation 'com.github.TPGamesNL:skript-reflect:v2.2-alpha2'
     compile 'com.mojang:datafixerupper:1.0.20'
+    compile 'com.mojang:authlib:1.5.21'
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.6.0";
+    implementation group: 'io.netty', name: 'netty-all', version: '4.0.4.Final'
 }

@@ -65,10 +65,10 @@ public class SkriptPacket extends JavaPlugin {
         metrics.addCustomChart(new Metrics.SimplePie("skript-reflect_support", () ->
             String.valueOf(isReflectAddon)));
         
-        Logging.info("is enable!");
+        Logging.info("is enable! Enjoy packets :D");
     }
     
-    static public SkriptPacket getInstance( ) {
+    static public SkriptPacket getInstance() {
         return INSTANCE;
     }
     

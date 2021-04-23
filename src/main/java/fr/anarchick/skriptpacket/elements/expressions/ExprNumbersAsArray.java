@@ -21,8 +21,8 @@ import fr.anarchick.skriptpacket.util.NumberUtils;
     "Support conversion to primitive array"
 })
 @Examples({
-    "set {_int::*} to 5, 3, 1 as primitive int array # Return int[]",
-    "set {_integer::*} to 5, 3, 1 as int array # Return Integer[]"
+    "set {_int::*} to 5, 3 and 1 as primitive int array # Return int[]",
+    "set {_integer::*} to 5, 3 and 1 as int array # Return Integer[]"
 })
 @Since("1.1")
 

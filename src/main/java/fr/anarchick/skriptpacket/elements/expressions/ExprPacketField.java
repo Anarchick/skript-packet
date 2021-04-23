@@ -25,7 +25,7 @@ import fr.anarchick.skriptpacket.util.Converter;
 @Description({
     "Get or set a packet field",
     "Field id start from 0 and increase by 1 for each existent field",
-    "This expression has an auto-converter for %number% to [primitive] int/float/long/double/short/byte [array]"
+    "This expression has an auto-converter for %numbers% to [primitive] int/float/long/double/short/byte [array]"
 })
 @Examples({
     "set field 0 of packet {_packet} to 5",
@@ -37,7 +37,7 @@ public class ExprPacketField extends SimpleExpression<Object> {
 
     private Expression<Integer> indexExpr;
     private Expression<PacketContainer> packetExpr;
-    private Class<?> classField;
+    private boolean isSingle = true;
     
     static {
        Skript.registerExpression(ExprPacketField.class, Object.class, ExpressionType.SIMPLE,
@@ -64,8 +64,8 @@ public class ExprPacketField extends SimpleExpression<Object> {
             if ((i >= 0 ) && (i < size)) {
                 Object field = modifier.readSafely(i);
                 if (field == null) return null;
-                classField = field.getClass();
-                if (classField.isArray()) {
+                if (field.getClass().isArray()) {
+                    isSingle = false;
                     return ArrayUtils.unknownToObject(field);
                 }
                 return new Object[] {Converter.toObject(field)};
@@ -77,7 +77,7 @@ public class ExprPacketField extends SimpleExpression<Object> {
     @Override
     @Nullable
     public Class<?>[] acceptChange(final ChangeMode mode) {
-        if (mode == ChangeMode.SET) {
+        if ( mode == ChangeMode.SET ) {
             return new Class[] {Number[].class, Object[].class};
         }
         return null;
@@ -94,7 +94,7 @@ public class ExprPacketField extends SimpleExpression<Object> {
     
     @Override
     public boolean isSingle() {
-        return classField.isArray();
+        return isSingle;
     }
     
     @Override

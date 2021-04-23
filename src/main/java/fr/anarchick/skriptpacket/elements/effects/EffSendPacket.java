@@ -36,7 +36,7 @@ public class EffSendPacket extends Effect{
     static {
         Skript.registerEffect(EffSendPacket.class, new String[] {
                 "send packet[s] %packets% to %players% [without calling event]",
-                "send %players% packet[s] %packets% [without calling [Skript] event]"
+                "send %players% packet[s] %packets% [without calling event]"
                 });
     }
     

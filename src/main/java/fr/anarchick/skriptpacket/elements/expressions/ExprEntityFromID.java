@@ -21,7 +21,7 @@ import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 
 @Name("Entity From ID")
-@Description("Get the entity related to his ID in specific world")
+@Description("Get the entity related to his ID in specified world")
 @Examples("set {_entity} to entity from id 39 in world of player")
 @Since("1.1")
 
