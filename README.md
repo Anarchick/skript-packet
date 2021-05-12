@@ -18,6 +18,7 @@ The interest of manipulation of packets is to send fake information to a specifi
 You can do a lot of things with packets, but it's really hard to understand how to use them ...
 
 This link can help you to identify the content of a packet: https://wiki.vg/Protocol
+This link can help you to identify the arguments of a packet: https://minidigger.github.io/MiniMappingViewer/
  
 # Example of code using skript-packet + skript-reflect (FOR 1.16.x)
 
