@@ -9,10 +9,6 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
 
 import ch.njol.skript.Skript;
-import ch.njol.skript.doc.Description;
-import ch.njol.skript.doc.Examples;
-import ch.njol.skript.doc.Name;
-import ch.njol.skript.doc.Since;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
@@ -20,18 +16,6 @@ import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
-
-@Name("Packet Event")
-@Description("Called when a packet of one of the specified types is being sent or"
-        + " received. You can optionally specify a priority triggers with higher"
-        + " priority will be called later (so high priority will come after low"
-        + " priority, and monitor priority will come last)."
-        + " By default, the priority is normal.")
-@Examples({
-    "packet event play_server_entity_equipments:",
-        "\tbroadcast \"equipment changed\""
-})
-@Since("1.0, 1.1 (priority)")
 
 public class EvtPacket extends SkriptEvent{
 
@@ -41,7 +25,15 @@ public class EvtPacket extends SkriptEvent{
     
     static {
         Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
-                "packet event %packettype% [with (1奸owest|2奸ow|3好ormal|4多igh|5多ighest|6妃onitor) priority]");
+                "packet event %packettype% [with (1奸owest|2奸ow|3好ormal|4多igh|5多ighest|6妃onitor) priority]")
+        .description("Called when a packet of one of the specified types is being sent or"
+                + " received. You can optionally specify a priority triggers with higher"
+                + " priority will be called later (so high priority will come after low"
+                + " priority, and monitor priority will come last)."
+                + " By default, the priority is normal.")
+        .examples("packet event play_server_entity_equipments:",
+                "\tbroadcast \"equipment changed\"")
+        .since("1.0, 1.1 (priority)");
         // event-packet
         EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<PacketContainer, BukkitPacketEvent>() {
             @Override
