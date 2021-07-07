@@ -1,5 +1,7 @@
 package fr.anarchick.skriptpacket.elements.expressions;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -7,6 +9,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.Event;
 import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
+
+import com.comphenix.protocol.utility.MinecraftReflection;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
@@ -28,7 +32,7 @@ import fr.anarchick.skriptpacket.util.Converter;
     "set {_nms} to nms of tool of player",
     "set {_nms} to nms of event-entity"
 })
-@Since("1.0")
+@Since("1.0, 1.2 (nbt)")
 
 public class ExprNMS extends SimpleExpression<Object> {
 
@@ -38,6 +42,7 @@ public class ExprNMS extends SimpleExpression<Object> {
     private Expression<ItemStack> itemstackExpr;
     private Expression<World> worldExpr;
     private Expression<Chunk> chunkExpr;
+    private Expression<String> stringExpr;
     private int pattern;
     private final static String[] patterns;
 
@@ -48,7 +53,8 @@ public class ExprNMS extends SimpleExpression<Object> {
                 "NMS block from %itemtype%",
                 "NMS [itemstack] of %itemstack%",
                 "NMS [world] of %world%",
-                "NMS [chunk] of %chunk%"
+                "NMS [chunk] of %chunk%",
+                "NMS [nbt] of %string%"
         };
         Skript.registerExpression(ExprNMS.class, Object.class, ExpressionType.SIMPLE, patterns);
     }
@@ -76,6 +82,9 @@ public class ExprNMS extends SimpleExpression<Object> {
             case 5:
                 chunkExpr = (Expression<Chunk>) exprs[0];
                 break;
+            case 6:
+                stringExpr = (Expression<String>) exprs[0];
+                break;
             default:
                 return false;
         }
@@ -85,6 +94,19 @@ public class ExprNMS extends SimpleExpression<Object> {
     @Override
     @Nullable
     protected Object[] get(Event e) {
+        if (pattern == 6) {
+            String nbt = stringExpr.getSingle(e);
+            if (nbt == null || nbt.isEmpty()) return null;
+            Object nms = null;
+            Class<?> clazz = MinecraftReflection.getMinecraftClass("MojangsonParser");
+            try {
+                nms = clazz.getMethod("parse", String.class).invoke(null, nbt);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                    | NoSuchMethodException | SecurityException e1) {
+                Skript.exception(e1);
+            }
+            return CollectionUtils.array(nms);
+        }
         return CollectionUtils.array(Converter.auto((getExpr(e))));
     }
     
@@ -105,20 +127,20 @@ public class ExprNMS extends SimpleExpression<Object> {
     
     private Object[] getExpr(Event e) {
         switch (pattern) {
-        case 0:
-            return entityExpr.getAll(e);
-        case 1:
-            return blockExpr.getAll(e);
-        case 2:
-            return itemtypeExpr.getAll(e);
-        case 3:
-            return itemstackExpr.getAll(e);
-        case 4:
-            return worldExpr.getAll(e);
-        case 5:
-            return chunkExpr.getAll(e);
-        default:
-            return null;
+            case 0:
+                return entityExpr.getAll(e);
+            case 1:
+                return blockExpr.getAll(e);
+            case 2:
+                return itemtypeExpr.getAll(e);
+            case 3:
+                return itemstackExpr.getAll(e);
+            case 4:
+                return worldExpr.getAll(e);
+            case 5:
+                return chunkExpr.getAll(e);
+            default:
+                return null;
         }
     }
     

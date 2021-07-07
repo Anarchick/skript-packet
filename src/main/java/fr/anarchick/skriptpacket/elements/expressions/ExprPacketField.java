@@ -6,6 +6,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.classes.Changer.ChangeMode;
 import ch.njol.skript.doc.Description;
@@ -16,7 +17,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
+import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.util.ArrayUtils;
 import fr.anarchick.skriptpacket.util.Converter;
@@ -31,7 +34,7 @@ import fr.anarchick.skriptpacket.util.Converter;
     "set field 0 of packet {_packet} to 5",
     "set field 1 of packet {_packet} to id of player"
 })
-@Since("1.0")
+@Since("1.0, 1.2 (optional packet)")
 
 public class ExprPacketField extends SimpleExpression<Object> {
 
@@ -41,21 +44,34 @@ public class ExprPacketField extends SimpleExpression<Object> {
     
     static {
        Skript.registerExpression(ExprPacketField.class, Object.class, ExpressionType.SIMPLE,
-               "[packet] field %number% of %packet%");
+               "[object] [packet] field %number% [of %-packet%]");
     }
     
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
         indexExpr = (Expression<Integer>) exprs[0];
-        packetExpr = (Expression<PacketContainer>) exprs[1];
+        if (exprs[1] != null) {
+            packetExpr = (Expression<PacketContainer>) exprs[1];
+            return true;
+        // TODO ScriptLoader must be replaced with getLoad() with Skript 2.6+
+        }
+        if (!ScriptLoader.isCurrentEvent(BukkitPacketEvent.class)) {
+            Skript.error("A field expression can only be used with a packet", ErrorQuality.SEMANTIC_ERROR);
+            return false;
+        }
         return true;
     }
     
     @Override
     @Nullable
     protected Object[] get(Event e) {
-        PacketContainer packet = packetExpr.getSingle(e);
+        PacketContainer packet;
+        if (packetExpr == null) {
+            packet = ((BukkitPacketEvent) e).getPacket();
+        } else {
+            packet = packetExpr.getSingle(e);
+        }
         Number index = indexExpr.getSingle(e);
         if ((packet != null) && (index != null)) {
             int i = index.intValue();
@@ -84,8 +100,13 @@ public class ExprPacketField extends SimpleExpression<Object> {
     }
     
     @Override
-    public void change(Event e, Object[] delta, ChangeMode mode){
-        PacketContainer packet = packetExpr.getSingle(e);
+    public void change(Event e, Object[] delta, ChangeMode mode) {
+        PacketContainer packet;
+        if (packetExpr == null) {
+            packet = ((BukkitPacketEvent) e).getPacket();
+        } else {
+            packet = packetExpr.getSingle(e);
+        }
         Number index = indexExpr.getSingle(e);
         if ((packet != null) && (index != null)) {
             PacketManager.setField(packet, index.intValue(), delta);

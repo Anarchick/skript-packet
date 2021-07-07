@@ -34,8 +34,8 @@ public class ExprNMSBlockPosition extends SimpleExpression<Object> {
 
     static {
         patterns = new String[] {
-                "NMS block position from %location%",
-                "NMS block position from %vector%"
+                "NMS block[ ]position from %location%",
+                "NMS block[ ]position from %vector%"
         };
         Skript.registerExpression(ExprNMSBlockPosition.class, Object.class, ExpressionType.SIMPLE, patterns);
     }

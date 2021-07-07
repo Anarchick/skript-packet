@@ -1,7 +1,7 @@
 name: Skript-Packet
 author: Anarchick
 description: A skript addon for packets
-version: 1.1
+version: 1.2
 main: fr.anarchick.skriptpacket.SkriptPacket
 depend: [Skript, ProtocolLib]
 softdepend: [skript-reflect]

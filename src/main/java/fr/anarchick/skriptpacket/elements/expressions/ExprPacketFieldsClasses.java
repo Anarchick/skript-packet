@@ -7,6 +7,7 @@ import org.eclipse.jdt.annotation.Nullable;
 
 import com.comphenix.protocol.events.PacketContainer;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.doc.Description;
 import ch.njol.skript.doc.Examples;
@@ -16,7 +17,9 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
+import ch.njol.skript.log.ErrorQuality;
 import ch.njol.util.Kleenean;
+import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 
 @Name("Packet Fields Classes")
 @Description({
@@ -32,30 +35,49 @@ import ch.njol.util.Kleenean;
 
 public class ExprPacketFieldsClasses extends SimpleExpression<String> {
 
-    private static Expression<PacketContainer> packet;
+    private static Expression<PacketContainer> packetExpr;
     
     static {
        Skript.registerExpression(ExprPacketFieldsClasses.class, String.class, ExpressionType.SIMPLE,
-               "[all] fields class[es] of [packet] %packet%");
+               "[all] [packet] fields class[es] [of %-packet%]");
     }
     
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
-        packet = (Expression<PacketContainer>) exprs[0];
+        if (exprs[0] != null) {
+            packetExpr = (Expression<PacketContainer>) exprs[0];
+            return true;
+        }
+         // TODO ScriptLoader must be replaced with getLoad() with Skript 2.6+
+        if (!ScriptLoader.isCurrentEvent(BukkitPacketEvent.class)) {
+            Skript.error("A field expression can only be used with a packet", ErrorQuality.SEMANTIC_ERROR);
+            return false;
+        }
         return true;
     }
     
     @Override
     @Nullable
     protected String[] get(Event e) {
-        PacketContainer _packet = packet.getSingle(e);
-        List<Object> fields = _packet.getModifier().getValues();
+        PacketContainer packet;
+        if (packetExpr == null) {
+            packet = ((BukkitPacketEvent) e).getPacket();
+        } else {
+            packet = packetExpr.getSingle(e);
+        }
+        if (packet == null) return null;
+        List<Object> fields = packet.getModifier().getValues();
         String[] classNames = new String[fields.size()];
         for (int i = 0; i < fields.size() ; i++) {
-            classNames[i] = fields.get(i).getClass().getName();
+            Object field = fields.get(i);
+            if (field != null) {
+                classNames[i] = field.getClass().getName();
+            } else {
+                classNames[i] = "null";
+            }
         }
-        return (classNames != null) ? classNames : null;
+        return classNames;
     }
     
     @Override
@@ -70,7 +92,7 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "all packets fields classes from " + packet;
+        return "all packets fields classes of " + packetExpr.toString(e, debug);
     }
     
 }

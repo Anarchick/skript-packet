@@ -10,17 +10,15 @@ public class Logging {
     private static final Logger LOGGER = SkriptPacket.getInstance().getLogger();
     
     public static void info(String msg) {
-        LOGGER.info(ChatColor.BLUE + name + ChatColor.RESET + msg);
-        
+        System.out.println(ChatColor.BLUE + name + ChatColor.RESET + msg);
     }
     
     public static void warn(String msg) {
-        LOGGER.warning(ChatColor.YELLOW + name + ChatColor.RESET + msg);
-        
+        LOGGER.warning(msg);
     }
 
     public static void exception(Exception e) {
-        LOGGER.severe(ChatColor.RED + name + e.toString());
+        LOGGER.severe(e.toString());
     }
 
 }

@@ -17,7 +17,7 @@ import ch.njol.skript.util.Getter;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 
-public class EvtPacket extends SkriptEvent{
+public class EvtPacket extends SkriptEvent {
 
     private int mark;
     private Literal<PacketType> packetType;
@@ -34,6 +34,7 @@ public class EvtPacket extends SkriptEvent{
         .examples("packet event play_server_entity_equipments:",
                 "\tbroadcast \"equipment changed\"")
         .since("1.0, 1.1 (priority)");
+        
         // event-packet
         EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<PacketContainer, BukkitPacketEvent>() {
             @Override

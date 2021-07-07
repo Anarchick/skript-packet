@@ -74,7 +74,7 @@ public class Types {
                     public String getVariableNamePattern() {
                         return "PacketContainer\\[.*\\]";
                     }
-
+                    
                     @Override
                     public String toVariableNameString(PacketContainer packet) {
                         return packet.toString();
