@@ -1,3 +1,5 @@
+[![SkriptHubViewTheDocs](http://skripthub.net/static/addon/ViewTheDocsButton.png)](http://skripthub.net/docs/?addon=skript-packet)
+
 # skript-packet
 A Skript packet addon to replace ThatPacketAddon (which is not updated) with Skript 2.5.2+
 
@@ -30,7 +32,6 @@ on packet event play_server_chat:
     cancel event if "%field 0 of event-packet%" contain "block.minecraft.set_spawn"
 ```
 
-
 ```applescript
 function packetSearch(s: string):
     loop all packettypes:
@@ -38,7 +39,6 @@ function packetSearch(s: string):
         {_packettype} contain {_s}
         send formatted "<suggest command:%{_packettype}%>%{_packettype}%" to all players
 ```
-
 
 ```applescript
 function fakeBlock(loc: location, toBlock: itemtype, players: players):
@@ -48,7 +48,6 @@ function fakeBlock(loc: location, toBlock: itemtype, players: players):
     send {_players::*} packet {_packet}
 ```
 
-
 ```applescript
 function unloadChunk(x: number, z: number, players: players):
     set {_packet} to new play_server_unload_chunk packet
@@ -57,11 +56,18 @@ function unloadChunk(x: number, z: number, players: players):
     send {_players::*} packet {_packet}
 ```
 
+```applescript
+on packet event play_client_steer_vehicle:
+    set {_sideways} to field 0
+    set {_forward} to field 1
+    set {_jump} to field 2
+    set {_unmount} to field 3
+```
 
 ```applescript
 # DO NOT CHANGE FOV WHEN PLAYER WALK/FLY SPEED IS MODIFIED
 on packet event play_server_abilities:
-    set field 5 of event-packet to {%event-player%::FOV}
+    set field 5 to {%event-player%::FOV}
 
 function FOV(p: players, x: number):
     set {_packet} to new play_server_abilities packet
@@ -72,6 +78,13 @@ function FOV(p: players, x: number):
         send {_player} packet {_packet}
 ```
 
+```applescript
+function packetActionBar(text: text, receivers: players):
+    set {_packet} to new play_server_chat packet
+    set field 2 of {_packet} of {_packet} to basecomponent from text {_text}
+    set field 3 of {_packet} to enum "GAME_INFO" from nms class "ChatMessageType"
+    send packet {_packet} to {_receivers::*} without calling event
+```
 
 ```applescript
 # Use : packet update {_entity} for all players in world of {_entity}
@@ -108,7 +121,6 @@ effect show block break animation [[stage] %-number%] of %block% for %players%:
         send {_players::*} packet {_packet}
 ```
 
-
 ```applescript
 import:
     net.minecraft.server.v1_16_R3.PacketPlayOutGameStateChange$a
@@ -131,11 +143,7 @@ effect change client weather of %players% to level %number%:
         send packet {_packet} to expression-1 without calling event
 ```
 
-
 ```applescript
-import:
-    net.minecraft.server.v1_16_R3.EnumItemSlot
-
 effect change client side equipment %string% of %entity% to %itemstack% for %players%:
     trigger:
         set {_slot} to expression-1 in upper case
@@ -148,13 +156,12 @@ effect change client side equipment %string% of %entity% to %itemstack% for %pla
         set {_players::*} to expression-4
         set {_packet} to new play_server_entity_equipment packet
         set field 0 of {_packet} to id of {_entity}
-        set {_itemSlot} to EnumItemSlot.valueOf({_slot})
+        set {_itemSlot} to enum {_slot} from nms class "EnumItemSlot"
         set {_pair} to pair {_itemSlot} with {_nmsItem}
         set {_data} to {_pair} as arraylist
         set field 1 of {_packet} to {_data}
         send {_players::*} packet {_packet}
 ```
-
 
 ```applescript
 function BiomeStorage(biome: biome) :: object:
@@ -202,4 +209,25 @@ on packet event play_server_map_chunk:
     set field 4 of event-packet to BiomeStorage({biome})
     #cancel event
     #send packet event-packet to event-player without calling event
+```
+
+```applescript
+effect change client side gamemode of %players% to %gamemode%:
+    trigger:
+        set {_packet} to new play_server_game_state_change packet
+        set field 1 of {_packet} to 0 if "%expression-2%" is "survival"
+        set field 1 of {_packet} to 1 if "%expression-2%" is "creative"
+        set field 1 of {_packet} to 2 if "%expression-2%" is "adventure"
+        set field 1 of {_packet} to 3 if "%expression-2%" is "spectator" 
+        set field 0 of {_packet} to new a(3) # reason
+        send packet {_packet} to expression-1 without calling event
+```
+
+```applescript
+effect change client weather of %players% to level %number%:
+    trigger:
+        set {_packet} to new play_server_game_state_change packet
+        set field 0 of {_packet} to new a(7) # reason
+        set field 1 of {_packet} to expression-2
+        send packet {_packet} to expression-1 without calling event
 ```
