@@ -23,7 +23,7 @@ public class ExprEntityID extends SimplePropertyExpression<Entity, Number>{
 
     @Override
     public Number convert(Entity ent) {
-        return ent.getEntityId();
+        return Integer.valueOf(ent.getEntityId()).longValue();
     }
     
     @Override
