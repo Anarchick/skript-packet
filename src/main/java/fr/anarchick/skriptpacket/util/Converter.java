@@ -1,6 +1,7 @@
 package fr.anarchick.skriptpacket.util;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -17,7 +18,10 @@ import com.comphenix.protocol.injector.BukkitUnwrapper;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.WrappedBlockData;
 
+import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.util.slot.Slot;
+import ch.njol.util.coll.CollectionUtils;
 import fr.anarchick.skriptpacket.SkriptPacket;
 
 public class Converter {
@@ -35,6 +39,14 @@ public class Converter {
     
     public static Object auto(Object[] array) {
         if (array == null || array.length == 0) return null;
+
+        if (array instanceof Slot[]) {
+            return MinecraftReflection.getMinecraftItemStack(((Slot) array[0]).getItem());
+        }
+        
+        if (MinecraftReflection.isCraftItemStack(array[0])) {
+            return MinecraftReflection.getMinecraftItemStack(MinecraftReflection.getBukkitItemStack(array[0]));
+        }
         
         if (array instanceof ItemType[]) {
             Material material = ((ItemType[]) array)[0].getMaterial();
@@ -43,6 +55,10 @@ public class Converter {
             } else {
                 return null;
             }
+        }
+        
+        if (array instanceof Location[]) {
+            return toNMSBlockPosition((Location) array[0]);
         }
         
         if (array instanceof Block[]) {
@@ -56,8 +72,6 @@ public class Converter {
         if (array instanceof Player[] ||
                 array instanceof Entity[] ||
                 array instanceof World[] ||
-                array instanceof Block[] ||
-                array instanceof ItemStack[] ||
                 array instanceof Chunk[]) {
             BukkitUnwrapper unwrapper = new BukkitUnwrapper();
             Object nmsObject = unwrapper.unwrapItem(array[0]);
@@ -122,6 +136,19 @@ public class Converter {
         } catch (Exception e) {
             throw new RuntimeException("Cannot construct BlockPosition.", e);
         }
+    }
+    
+    public static Object toNMSNBTTagCompound(String nbt) {
+        if (nbt == null || nbt.isEmpty()) return null;
+        Object nms = null;
+        Class<?> clazz = MinecraftReflection.getMinecraftClass("MojangsonParser");
+        try {
+            nms = clazz.getMethod("parse", String.class).invoke(null, nbt);
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e1) {
+            Skript.exception(e1);
+        }
+        return CollectionUtils.array(nms);
     }
     
 }
