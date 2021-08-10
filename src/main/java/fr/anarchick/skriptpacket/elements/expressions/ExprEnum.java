@@ -74,7 +74,10 @@ public class ExprEnum extends SimpleExpression<Object> {
                 }
                 break;
             case 1:
-                clazz = MinecraftReflection.getNullableNMS(className);
+                String aliases[] = className.split("\\.");
+                try {
+                    clazz = MinecraftReflection.getMinecraftClass(className, aliases[aliases.length -1]);
+                } catch (RuntimeException e1) {}
                 if (clazz == null) Skript.error("Failed to find NMS class '" + className + "'");
                 break;
             case 2:
