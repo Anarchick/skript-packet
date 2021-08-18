@@ -20,27 +20,29 @@ import ch.njol.util.Kleenean;
 @Name("New Packet")
 @Description("Create a new packet from a ProtocolLib's packettype")
 @Examples("set {_packet} to new play_server_block_break_animation packet")
-@Since("1.0")
+@Since("1.0, 1.3 (default)")
 
 public class ExprNewPacket extends SimpleExpression<PacketContainer> {
 
-    private Expression<PacketType> packetType;
+    private Expression<PacketType> packetTypeExpr;
+    private boolean hasDefault = false;
     
     static {
         Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.SIMPLE,
-                "new %packettype% packet");
+                "new %packettype% packet [(1¦with default values)]");
     }
     
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int i, Kleenean isDelayed, ParseResult parser) {
-        packetType = (Expression<PacketType>) exprs[0];
+        packetTypeExpr = (Expression<PacketType>) exprs[0];
+        hasDefault = (parser.mark == 1);
         return true;
     }
     
     @Override
     protected PacketContainer[] get(Event e) {
-        return new PacketContainer[]{ProtocolLibrary.getProtocolManager().createPacket(packetType.getSingle(e))};
+        return new PacketContainer[]{ProtocolLibrary.getProtocolManager().createPacket(packetTypeExpr.getSingle(e), hasDefault)};
     }
     
     @Override
@@ -55,7 +57,9 @@ public class ExprNewPacket extends SimpleExpression<PacketContainer> {
 
     @Override
     public String toString(Event e, boolean debug) {
-        return "new " + packetType.toString(e, debug) + "packet";
+        String str = "new " + packetTypeExpr.toString(e, debug) + "packet";
+        if (hasDefault) str += " with default values";
+        return str;
     }
     
 }
