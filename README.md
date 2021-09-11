@@ -26,7 +26,7 @@ You can do a lot of things with packets, but it's really hard to understand how 
 - This link can help you to identify the arguments of a packet: https://minidigger.github.io/MiniMappingViewer/
 - The wiki is a good start : https://github.com/Anarchick/skript-packet/wiki/Examples
  
-# Example of code using skript-packet + skript-reflect (FOR 1.16.x)
+# Example of code using skript-packet
 
 ```applescript
 packet event play_client_held_item_slot:
