@@ -30,7 +30,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 dependencies {
-	implementation (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6-beta2') {
+	implementation (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6-beta3') {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
@@ -44,7 +44,7 @@ dependencies {
 
 jar {
     archiveBaseName  = 'skript-packet'
-    archiveVersion =  '2.0'
+    archiveVersion =  '2.0.1'
     exclude('fr/anarchick/skriptpacket/elements/deprecated/**')
     configurations.shade.each { dep ->
         from(project.zipTree(dep)){

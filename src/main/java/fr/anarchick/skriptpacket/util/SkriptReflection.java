@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 /**
  * Original from skript-reflect
+ * Works with Skript 2.6+
  * ( https://github.com/TPGamesNL/skript-reflect/blob/2.x/src/main/java/com/btk5h/skriptmirror/util/SkriptReflection.java )
  */
 

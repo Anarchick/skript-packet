@@ -1,4 +1,4 @@
-package fr.anarchick.skriptpacket.elements.sections;
+package fr.anarchick.skriptpacket.sections;
 
 import java.util.List;
 

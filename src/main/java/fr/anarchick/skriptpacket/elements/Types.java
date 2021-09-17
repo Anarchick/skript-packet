@@ -93,7 +93,7 @@ public class Types {
         if (Classes.getClassInfoNoError("datawatcher") == null) Classes.registerClass(new ClassInfo<>(DataWatcher.class, "datawatcher")
                 .user("datawatchers?")
                 .name("Datawatcher")
-                .since("1.3")
+                .since("2.0")
                 .description("A data watcher is a list of index (=integer) associate with a value (=object)")
                 //.examples("")
                 .parser(new Parser<DataWatcher>() {

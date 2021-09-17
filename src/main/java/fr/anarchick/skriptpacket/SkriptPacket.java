@@ -20,7 +20,6 @@ import ch.njol.skript.config.Config;
 import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.util.Version;
-import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 import fr.anarchick.skriptpacket.util.Scheduling;
 import fr.anarchick.skriptpacket.util.Utils;
@@ -60,7 +59,6 @@ public class SkriptPacket extends JavaPlugin implements Listener {
             Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_SKRIPT_VERSION.toString() + " of Skript");
             // Does not disable the plugin, cause some syntaxes can still works
         }
-        
         if (PROTOCOLLIB_VERSION.isSmallerThan(MINIMUM_PROTOCOLLIB_VERSION)) {
             Logging.info("Your version of ProtocolLib is " + PROTOCOLLIB_VERSION);
             Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_PROTOCOLLIB_VERSION.toString() + " of ProtocolLib");
@@ -71,6 +69,9 @@ public class SkriptPacket extends JavaPlugin implements Listener {
             if (Skript.isAcceptRegistrations()) {
                 ADDON = Skript.registerAddon(this);
                 ADDON.loadClasses("fr.anarchick.skriptpacket", "elements");
+                if (SKRIPT_VERSION.isLargerThan(SKRIPT_2_6)) {
+                    ADDON.loadClasses("fr.anarchick.skriptpacket", "sections");
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -132,32 +133,20 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     @SuppressWarnings({ "deprecation", "unchecked" })
     public static boolean isCurrentEvent(String error, Class<? extends Event>... clazz) {
         boolean result;
-        if (SKRIPT_2_6.isLargerThan(SKRIPT_VERSION)) {
-            result = ParserInstance.get().isCurrentEvent(clazz);
-        } else {
+        try {
             result = ScriptLoader.isCurrentEvent(clazz);
+        } catch (Exception e) {
+            result = ParserInstance.get().isCurrentEvent(clazz);
         }
         if (!result) Skript.error(error);
         return result;
     }
     
-    @SuppressWarnings("deprecation")
     public static Config getCurrentScript() {
-        Config result;
-        if (SKRIPT_2_6.isLargerThan(SKRIPT_VERSION)) {
-            result = ParserInstance.get().getCurrentScript();
-        } else {
-            result = ScriptLoader.getCurrentScript();
-        }
-        return result;
-    }
-    
-    @SuppressWarnings("deprecation")
-    public static void setHasDelayBefore(boolean value) {
-        if (SKRIPT_2_6.isLargerThan(SKRIPT_VERSION)) {
-            ParserInstance.get().setHasDelayBefore(Kleenean.get(value));
-        } else {
-            ScriptLoader.setHasDelayBefore(Kleenean.get(value));
+        try {
+            return (Config) ScriptLoader.class.getDeclaredField("currentScript").get(null);
+        } catch (Exception e) {
+            return  ParserInstance.get().getCurrentScript();
         }
     }
     
