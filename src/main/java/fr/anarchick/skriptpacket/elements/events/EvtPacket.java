@@ -29,7 +29,7 @@ public class EvtPacket extends SkriptEvent {
     
     static {
         Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
-                "[(sync|async)] packet event %packettype% [with (1¦lowest|2¦low|3¦normal|4¦high|5¦highest|6¦monitor) priority]")
+                "[(sync|async)] packet event %packettype% [with (1Â¦lowest|2Â¦low|3Â¦normal|4Â¦high|5Â¦highest|6Â¦monitor) priority]")
         .description("Called when a packet of one of the specified types is being sent or"
                 + " received. You can optionally specify a priority triggers with higher"
                 + " priority will be called later (so high priority will come after low"
