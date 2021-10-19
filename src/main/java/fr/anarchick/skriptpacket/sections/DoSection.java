@@ -34,9 +34,9 @@ public class DoSection extends Section {
     private TriggerSection trigger;
     private int pattern;
     private static final String[] patterns = new String[] {
-            "(async|do in background) [(1¦and wait)]",
-            "(sync|do) [(1¦and wait)]",
-            "(parallel|do in parallel) [(1¦and wait)]"
+            "(async|do in background) [(1Â¦and wait)]",
+            "(sync|do) [(1Â¦and wait)]",
+            "(parallel|do in parallel) [(1Â¦and wait)]"
     };
     private static final Type[] types = Type.values();
     

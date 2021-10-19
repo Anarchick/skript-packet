@@ -35,8 +35,8 @@ public class ExprNumbersAsArray extends SimpleExpression<Object> {
 
     static {
         String[] patterns = new String[] {
-                "%numbers% as (0¦Int[eger]|1¦Float|2¦Long|3¦Double|4¦Short|5¦Byte) array",
-                "%numbers% as primitive (0¦int|1¦float|2¦long|3¦double|4¦short|5¦byte) array"
+                "%numbers% as (0Â¦Int[eger]|1Â¦Float|2Â¦Long|3Â¦Double|4Â¦Short|5Â¦Byte) array",
+                "%numbers% as primitive (0Â¦int|1Â¦float|2Â¦long|3Â¦double|4Â¦short|5Â¦byte) array"
         };
         Skript.registerExpression(ExprNumbersAsArray.class, Object.class, ExpressionType.SIMPLE, patterns);
     }

@@ -22,7 +22,7 @@ public class ExprPacketClone extends SimplePropertyExpression<PacketContainer, P
     private String pattern;
     
     static {
-        register(ExprPacketClone.class, PacketContainer.class, "[packet] (0¦deep|1¦shallow) (clone|copy)", "packet");
+        register(ExprPacketClone.class, PacketContainer.class, "[packet] (0Â¦deep|1Â¦shallow) (clone|copy)", "packet");
     }
     
     @Override

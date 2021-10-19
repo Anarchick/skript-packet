@@ -28,7 +28,7 @@ public class ExprNumberAs extends SimpleExpression<Number> {
 
     static {
         String[] patterns = new String[] {
-                "%number% as [primitive] (0¦Int[eger]|1¦Float|2¦Long|3¦Double|4¦Short|5¦Byte)"
+                "%number% as [primitive] (0Â¦Int[eger]|1Â¦Float|2Â¦Long|3Â¦Double|4Â¦Short|5Â¦Byte)"
         };
         Skript.registerExpression(ExprNumberAs.class, Number.class, ExpressionType.SIMPLE, patterns);
     }

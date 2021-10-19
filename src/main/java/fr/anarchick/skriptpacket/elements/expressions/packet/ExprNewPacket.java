@@ -29,7 +29,7 @@ public class ExprNewPacket extends SimpleExpression<PacketContainer> {
     
     static {
         Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.SIMPLE,
-                "new %packettype% packet [(1¦with default values)]");
+                "new %packettype% packet [(1Â¦with default values)]");
     }
     
     @Override
