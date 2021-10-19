@@ -27,7 +27,8 @@ public class ExprReadableJson extends SimpleExpression<String> {
     private Expression<String> jsonExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprReadableJson.class, String.class, ExpressionType.SIMPLE, "json %string% as readable text");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprReadableJson.class, String.class, ExpressionType.SIMPLE,
+                "json %string% as readable text");
     }
     
     @Override

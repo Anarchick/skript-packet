@@ -30,7 +30,8 @@ public class ExprBukkitChunk extends SimpleExpression<Chunk> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitChunk.class, Chunk.class, ExpressionType.SIMPLE, "chunk from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitChunk.class, Chunk.class, ExpressionType.SIMPLE,
+                "chunk from NMS %object%");
     }
     
     @Override

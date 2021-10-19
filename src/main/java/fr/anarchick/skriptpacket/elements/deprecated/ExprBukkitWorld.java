@@ -30,7 +30,8 @@ public class ExprBukkitWorld extends SimpleExpression<World> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitWorld.class, World.class, ExpressionType.SIMPLE, "world from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitWorld.class, World.class, ExpressionType.SIMPLE,
+                "world from NMS %object%");
     }
     
     @Override

@@ -31,7 +31,8 @@ public class ExprLocationFromNMS extends SimpleExpression<Location> {
     private Expression<World> worldExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprLocationFromNMS.class, Location.class, ExpressionType.SIMPLE, "location from NMS %object% in %world%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprLocationFromNMS.class, Location.class, ExpressionType.SIMPLE,
+                "location from NMS %object% in %world%");
     }
     
     @Override

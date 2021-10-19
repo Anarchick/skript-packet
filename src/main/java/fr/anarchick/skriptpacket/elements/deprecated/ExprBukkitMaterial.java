@@ -31,7 +31,8 @@ public class ExprBukkitMaterial extends SimpleExpression<Material> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitMaterial.class, Material.class, ExpressionType.SIMPLE, "material from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitMaterial.class, Material.class, ExpressionType.SIMPLE,
+                "material from NMS %object%");
     }
     
     @Override

@@ -28,7 +28,8 @@ public class ExprBukkitChatComponent extends SimpleExpression<String> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitChatComponent.class, String.class, ExpressionType.SIMPLE, "chatcomponent from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitChatComponent.class, String.class, ExpressionType.SIMPLE,
+                "chatcomponent from NMS %object%");
     }
     
     @Override

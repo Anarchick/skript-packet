@@ -28,7 +28,8 @@ public class ExprBukkitItemStack extends SimpleExpression<ItemStack> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitItemStack.class, ItemStack.class, ExpressionType.SIMPLE, "itemstack from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitItemStack.class, ItemStack.class, ExpressionType.SIMPLE,
+                "itemstack from NMS %object%");
     }
     
     @Override

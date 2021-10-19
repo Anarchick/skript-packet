@@ -31,7 +31,8 @@ public class ExprBukkitEntity extends SimpleExpression<Entity> {
     private Expression<Object> nmsExpr;
 
     static {
-        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitEntity.class, Entity.class, ExpressionType.SIMPLE, "entity from NMS %object%");
+        if (SkriptPacket.enableDeprecated) Skript.registerExpression(ExprBukkitEntity.class, Entity.class, ExpressionType.SIMPLE,
+                "entity from NMS %object%");
     }
     
     @Override
