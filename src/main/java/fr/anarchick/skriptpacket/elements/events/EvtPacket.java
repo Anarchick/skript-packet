@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements.events;
 
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
@@ -51,6 +52,13 @@ public class EvtPacket extends SkriptEvent {
             @Override
             public Player get(final BukkitPacketEvent e) {
                 return e.getPlayer();
+            }
+        }, 0);
+        // event-world
+        EventValues.registerEventValue(BukkitPacketEvent.class, World.class, new Getter<World, BukkitPacketEvent>() {
+            @Override
+            public World get(final BukkitPacketEvent e) {
+                return e.getPlayer().getWorld();
             }
         }, 0);
     }
