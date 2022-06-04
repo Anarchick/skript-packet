@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements.expressions.utility;
 
+import fr.anarchick.skriptpacket.util.NumberEnums;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -13,7 +14,8 @@ import ch.njol.skript.lang.ExpressionType;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
-import fr.anarchick.skriptpacket.util.NumberUtils;
+
+import java.util.Arrays;
 
 @Name("Number As Array")
 @Description({
@@ -31,7 +33,7 @@ public class ExprNumbersAsArray extends SimpleExpression<Object> {
     private Expression<Number> expr;
     private int mark;
     private boolean toPrimitive = false;
-    Class<?> type;
+    private NumberEnums numberEnum;
 
     static {
         String[] patterns = new String[] {
@@ -47,23 +49,18 @@ public class ExprNumbersAsArray extends SimpleExpression<Object> {
         expr = (Expression<Number>) exprs[0];
         mark = parser.mark;
         toPrimitive = (matchedPattern == 1);
-        if (toPrimitive) {
-            type = NumberUtils.PRIMITIVE_NUMBER_ARRAY.get(mark);
-        } else {
-            type = NumberUtils.OBJECT_NUMBER_ARRAY.get(mark);
-        }
+        numberEnum = NumberEnums.get(mark);
         return true;
     }
     
     @Override
     @Nullable
     protected Object[] get(Event e) {
-        Number[] _expr = (Number[]) expr.getAll(e);
-        if (_expr == null) return null;
+        Number[] _expr = expr.getAll(e);
         if (toPrimitive) {
-            return new Object[] {NumberUtils.toPrimitiveArray(type, _expr)};
+            return new Object[] {numberEnum.toPrimitiveArray(_expr)};
         } else {
-            return new Object[] {NumberUtils.toArray(type, _expr)};
+            return new Object[] {numberEnum.toArray(_expr)};
         }
     }
     
@@ -74,12 +71,13 @@ public class ExprNumbersAsArray extends SimpleExpression<Object> {
     
     @Override
     public Class<?> getReturnType() {
-        return type;
+        return (toPrimitive) ? numberEnum.primitiveArrayClass : numberEnum.objectArrayClass;
     }
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return expr.getAll(e) + " as " + type.getName() + " array";
+        String str = (toPrimitive) ? " as primitive " : " as ";
+        return Arrays.toString(expr.getAll(e)) + str + numberEnum.name() + " array";
     }
     
 }

@@ -72,7 +72,7 @@ public class ExprDataWatcherIndex extends SimpleExpression<Object> {
     }
 
     @Override
-    public Class<? extends Object> getReturnType() {
+    public Class<?> getReturnType() {
         return Object.class;
     }
 

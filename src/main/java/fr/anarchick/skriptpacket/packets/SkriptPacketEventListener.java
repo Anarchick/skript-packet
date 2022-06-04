@@ -8,46 +8,18 @@ import com.comphenix.protocol.events.ListenerPriority;
 
 import ch.njol.skript.config.Config;
 import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
-import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.PacketManager.Mode;
 
 public class SkriptPacketEventListener {
-    
-    static class Manager {
-        
-        private String scriptName;
-        private Mode mode;
-        private PacketType packetType;
-        private ListenerPriority priority;
-        
-        private Manager(final String scriptName, final Mode mode, final PacketType packetType, ListenerPriority priority) {
-            this.scriptName = scriptName;
-            this.mode = mode;
-            this.packetType = packetType;
-            this.priority = priority;
-        }
-        
-        private String getScriptName() {
-            return this.scriptName;
-        }
-        
-        private Mode getMode() {
-            return this.mode;
-        }
-        
-        private PacketType getPacketType() {
-            return this.packetType;
-        }
-        
-        private ListenerPriority getPriority() {
-            return this.priority;
-        }
-        
+
+    record Manager(String scriptName, Mode mode,
+                   PacketType packetType, ListenerPriority priority) {
+
         private boolean equals(final Manager manager) {
-            return (manager.getScriptName().equals(getScriptName()) &&
-                    manager.getMode().equals(getMode()) &&
-                    manager.getPacketType().equals(getPacketType()) &&
-                    manager.getPriority().equals(getPriority()));
+            return (manager.scriptName().equals(scriptName()) &&
+                    manager.mode().equals(mode()) &&
+                    manager.packetType().equals(packetType()) &&
+                    manager.priority().equals(priority()));
         }
     }
     
@@ -66,20 +38,19 @@ public class SkriptPacketEventListener {
         simpleListeners.clear();
         // Create simpleListeners
         for (Manager listener : listeners) {
-            Mode mode = listener.getMode();
-            PacketType packetType = listener.getPacketType();
-            ListenerPriority priority = listener.getPriority();
+            Mode mode = listener.mode();
+            PacketType packetType = listener.packetType();
+            ListenerPriority priority = listener.priority();
             Manager manager = new Manager("", mode, packetType, priority);
             add(simpleListeners, manager);
         }
         
         for (Manager listener : simpleListeners) {
-            Mode mode = listener.getMode();
-            PacketType packetType = listener.getPacketType();
-            ListenerPriority priority = listener.getPriority();
-            PacketManager.onPacketEvent(packetType, priority, mode, SkriptPacket.getInstance());
+            Mode mode = listener.mode();
+            PacketType packetType = listener.packetType();
+            ListenerPriority priority = listener.priority();
+            PacketManager.onPacketEvent(packetType, priority, mode);
         }
-        
     }
     
     private static boolean contains(List<Manager> list, Manager manager) {
@@ -90,19 +61,23 @@ public class SkriptPacketEventListener {
     }
     
     private static boolean add(List<Manager> list, Manager manager) {
-        return !contains(list, manager) ? list.add(manager) : false;
+        if (contains(list, manager)) return false;
+        return list.add(manager);
     }
     
+    // Called once time for /sk reload scripts or /reload confirm
     public static void onReload(PreScriptLoadEvent e) {
-        PacketManager.removeListeners(SkriptPacket.getInstance());
+        PacketManager.removeListeners();
         List<Manager> removes = new ArrayList<>();
         for (Config config : e.getScripts()) {
             String scriptName = config.getFileName();
             for (Manager listener : listeners) {
-                if (listener.getScriptName().equals(scriptName)) removes.add(listener);
+                if (listener.scriptName().equals(scriptName))
+                        removes.add(listener);
             }
         }
         listeners.removeAll(removes);
+        update();
     }
     
 }

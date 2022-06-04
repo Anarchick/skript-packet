@@ -8,17 +8,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import fr.anarchick.skriptpacket.util.*;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.Plugin;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.utility.MinecraftReflection;
@@ -26,21 +24,18 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 import ch.njol.skript.Skript;
 import fr.anarchick.skriptpacket.Logging;
 import fr.anarchick.skriptpacket.SkriptPacket;
-import fr.anarchick.skriptpacket.util.Converter;
 import fr.anarchick.skriptpacket.util.Converter.Auto;
-import fr.anarchick.skriptpacket.util.NumberUtils;
-import fr.anarchick.skriptpacket.util.Scheduling;
-import fr.anarchick.skriptpacket.util.Utils;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 public class PacketManager {
     
     public enum Mode {
-        SYNC, ASYNC, DEFAULT;
+        SYNC, ASYNC, DEFAULT
     }
     
-    private static Map<String, PacketType> packetTypesByName = new HashMap<>();
-    private static Map<PacketType, String> packetTypesToName = new HashMap<>();
+    private static final Map<String, PacketType> packetTypesByName;
+    private static final Map<PacketType, String> packetTypesToName = new HashMap<>();
     public static final PacketType[] PACKETTYPES;
     public static final ProtocolManager PROTOCOL_MANAGER = ProtocolLibrary.getProtocolManager();
     
@@ -80,79 +75,32 @@ public class PacketManager {
     
     
     
-    
+    private static final JavaPlugin PLUGIN = SkriptPacket.getInstance();
     
     public static PacketType getPacketType(String name) {
         String _name = name.toUpperCase();
-        return (packetTypesByName.containsKey(_name)) ? packetTypesByName.get(_name) : null;
+        return packetTypesByName.getOrDefault(_name, null);
     }
     
     public static String getPacketName(PacketType packettype) {
         return packetTypesToName.get(packettype);
     }
     
-    public static void onPacketEvent(PacketType packetType, ListenerPriority priority, Mode mode, Plugin plugin) {
+    public static void onPacketEvent(PacketType packetType, ListenerPriority priority, Mode mode) {
         switch (mode) {
-            case ASYNC:
-                PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new PacketAdapter(plugin, priority, packetType) {
-                    private final boolean isServer = packetType.isServer();
-                    
-                    @Override
-                    public void onPacketSending(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && isServer) SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, true));
-                    }
-                    
-                    @Override
-                    public void onPacketReceiving(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && !isServer) SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, true));
-                    }
-                    
-                }).start();
-                return;
-            case SYNC:
-                PROTOCOL_MANAGER.addPacketListener(new PacketAdapter(plugin, priority, packetType) {
-                    private final boolean isServer = packetType.isServer();
-                    
-                    @Override
-                    public void onPacketSending(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && isServer) SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, false));
-                    }
-                    
-                    @Override
-                    public void onPacketReceiving(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && !isServer)
-                            Scheduling.sync(() -> SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, false)));
-                    }
-                    
-                });
-                return;
-            default:
-                PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new PacketAdapter(plugin, priority, packetType) {
-                    private final boolean isServer = packetType.isServer();
-                    
-                    @Override
-                    public void onPacketSending(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && isServer) SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, false));
-                    }
-                    
-                    @Override
-                    public void onPacketReceiving(PacketEvent event) {
-                        if (event.getPacketType().equals(packetType) && !isServer) SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, false));
-                    }
-                    
-                }).syncStart();
-                return;
+            case ASYNC -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new SPPacketAdapter(priority, packetType, mode)).start();
+            case SYNC -> PROTOCOL_MANAGER.addPacketListener(new SPPacketAdapter(priority, packetType, mode));
+            default -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new SPPacketAdapter(priority, packetType, mode)).syncStart();
         }
     }
     
-    public static boolean removeListeners(Plugin plugin) {
+    public static void removeListeners() {
         for (PacketListener listener : PROTOCOL_MANAGER.getPacketListeners()) {
-            if (listener.getPlugin().equals(plugin)) {
-                PROTOCOL_MANAGER.removePacketListeners(plugin);
-                return true;
+            if (listener.getPlugin().equals(PLUGIN)) {
+                PROTOCOL_MANAGER.removePacketListeners(PLUGIN);
+                return;
             }
         }
-        return false;
     }
 
     public static void sendPacket(PacketContainer packet, Player[] players) {
@@ -182,19 +130,17 @@ public class PacketManager {
             return null;
         }
         Class<?> fieldClass = modifier.getField(i).getType();
-            
+
         if (fieldClass.isInstance(delta[0])) {
             return modifier.writeSafely(i, delta[0]);
         }
 
-        if (NumberUtils.isNumber(fieldClass)) {
-            
-            if (delta instanceof Number[]) {
-                return modifier.writeSafely(i, NumberUtils.convert(fieldClass, (Number[]) delta));
-            }
-            if (delta[0] instanceof Entity) {
-                final Entity ent = (Entity) delta[0];
-                return modifier.writeSafely(i, ent.getEntityId());
+        if (NumberEnums.isNumber(fieldClass)) {
+            if (delta instanceof Number[] numbers) {
+                return modifier.writeSafely(i, NumberEnums.convert(fieldClass, numbers));
+            } else if (delta instanceof Entity[] entities) {
+                final Number[] ids = Utils.EntitiesIDs(entities);
+                return modifier.writeSafely(i, NumberEnums.convert(fieldClass, ids));
             }
         }
         

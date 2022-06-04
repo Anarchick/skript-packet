@@ -49,8 +49,7 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     }
     
     @Override
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public Iterator iterator(Event event) {
+    public Iterator<Integer> iterator(Event event) {
         DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
         if (dataWatcher == null) {
             return new EmptyIterator<>();

@@ -44,7 +44,6 @@ public class EffUpdateEntity extends Effect{
     @Override
     protected void execute(Event e) {
         Player[] players = playersExpr.getAll(e);
-        if (players == null) return;
         List<Player> list = Arrays.asList(players);
         for (Entity entity : entitiesExpr.getAll(e)) {
             ProtocolLibrary.getProtocolManager().updateEntity(entity, list);
@@ -53,7 +52,7 @@ public class EffUpdateEntity extends Effect{
 
     @Override
     public String toString(Event e, boolean b) {
-        return "packet update " + entitiesExpr.getAll(e) + " to " + playersExpr.getAll(e);
+        return "packet update " + Arrays.toString(entitiesExpr.getAll(e)) + " to " + Arrays.toString(playersExpr.getAll(e));
     }
     
 }

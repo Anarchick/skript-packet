@@ -48,7 +48,7 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
             return true;
         }
         // ScriptLoader must be replaced with getParser() with Skript 2.6+
-        return SkriptPacket.isCurrentEvent("A field expression can only be used with a packet", BukkitPacketEvent.class);
+        return SkriptPacket.isCurrentEvent(this, "A field expression can only be used with a packet", BukkitPacketEvent.class);
     }
     
     @Override

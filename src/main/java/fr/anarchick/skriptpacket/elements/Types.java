@@ -21,7 +21,7 @@ public class Types {
                 .since("1.0")
                 .description("Represents the type of a packet from ProtocolLib")
                 //.examples("")
-                .parser(new Parser<PacketType>() {
+                .parser(new Parser<>() {
                     
                     @Override
                     public boolean canParse(final ParseContext context) {
@@ -58,7 +58,7 @@ public class Types {
                 .since("1.0")
                 .description("Represents a packet from ProtocolLib")
                 //.examples("")
-                .parser(new Parser<PacketContainer>() {
+                .parser(new Parser<>() {
                     
                     @Override
                     public boolean canParse(final ParseContext context) {
@@ -96,7 +96,7 @@ public class Types {
                 .since("2.0")
                 .description("A data watcher is a list of index (=integer) associate with a value (=object)")
                 //.examples("")
-                .parser(new Parser<DataWatcher>() {
+                .parser(new Parser<>() {
                     
                     @Override
                     public boolean canParse(final ParseContext context) {
@@ -120,7 +120,7 @@ public class Types {
                     }
                     
                     @Override
-                    public String toString(DataWatcher data, int flags) {;
+                    public String toString(DataWatcher data, int flags) {
                         return data.toJSON().toString();
                     }
                     

@@ -1,14 +1,12 @@
 plugins {
     id 'java'
     id 'eclipse'
-    id 'com.github.johnrengelman.shadow' version '5.2.0'
 }
 
 configurations {
     shade
     compile.extendsFrom shade
 }
-
 
 eclipse {
     project {
@@ -22,29 +20,35 @@ repositories {
     maven { url 'https://mvnrepository.com/artifact/org.json/json' } // DataWatcher
     maven { url "https://libraries.minecraft.net" }
     maven { url 'https://jitpack.io' } // Skript
+    maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
-    jcenter()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = '17.PREVIEW'
+targetCompatibility = '17.PREVIEW'
+
+def mcVersion = '1.17'
+def subVersion = ''
 
 dependencies {
-	implementation (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6-beta3') {
+	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6-beta3') {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
-    implementation group: 'org.spigotmc', name: 'spigot-api', version: '1.17.1-R0.1-SNAPSHOT'
-    implementation group: 'com.github.TPGamesNL', name: 'skript-reflect', version: 'v2.2-alpha2'
-    implementation group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
-    implementation group: 'com.mojang', name: 'datafixerupper', version: '1.0.20' // ExprPair
-    implementation group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.7.0"
+    compileOnly group: 'net.md-5', name: 'bungeecord-api', version: mcVersion + '-R0.1-SNAPSHOT'
+    compileOnly group: 'org.spigotmc', name: 'spigot-api', version: mcVersion + subVersion + '-R0.1-SNAPSHOT'
+    compileOnly group: 'com.github.TPGamesNL', name: 'skript-reflect', version: 'v2.2-alpha2'
+    compileOnly group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
+    compileOnly group: 'com.mojang', name: 'datafixerupper', version: '1.0.20' // ExprPair
+    compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: "4.8.0"
+    //compileOnly group: 'it.unimi.dsi', name: 'fastutil-core', version: '8.5.8' //IntList
+    compileOnly group: 'org.json', name: 'json', version: '20210307'
     shade (group: 'org.json', name: 'json', version: '20210307')
+    //shade (group: 'it.unimi.dsi', name: 'fastutil-core', version: '8.5.8') // Support for mc <1.16
 }
 
 jar {
-    archiveBaseName  = 'skript-packet'
-    archiveVersion =  '2.0.1'
+    archivesBaseName  = 'skript-packet-2.1.0'
     exclude('fr/anarchick/skriptpacket/elements/deprecated/**')
     configurations.shade.each { dep ->
         from(project.zipTree(dep)){
@@ -53,3 +57,28 @@ jar {
         }
     }
 }
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+task export() {
+    group = "SP"
+    description = "build gradle into external folder"
+    doLast {
+        copy {
+            from jar // here it automatically reads jar file produced from jar task
+            into "C:/Users/aeim/Documents/minecraft/eclipse1.17/plugins"
+        }
+        copy {
+            from jar // here it automatically reads jar file produced from jar task
+            into "C:/Users/aeim/Documents/minecraft/eclipse1.18/plugins"
+        }
+        copy {
+            from jar // here it automatically reads jar file produced from jar task
+            into "C:/Users/aeim/Documents/minecraft/btooom/server/plugins"
+        }
+    }
+}
+
+build.finalizedBy export

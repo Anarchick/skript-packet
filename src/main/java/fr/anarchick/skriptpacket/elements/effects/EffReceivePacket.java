@@ -16,6 +16,8 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 
+import java.util.Arrays;
+
 @Name("Receive Packet")
 @Description("Makes the server simulate receiving the specified packet(s) from the specified player(s)")
 @Examples({
@@ -33,10 +35,8 @@ public class EffReceivePacket extends Effect{
     private boolean bypassEvent = false;
     
     static {
-        Skript.registerEffect(EffReceivePacket.class, new String[] {
-                "rec(ei|ie)ve packet[s] %packets% from %players% [without calling event]",
-                "rec(ei|ie)ve %players% packet[s] %packets% [without calling event]"
-                });
+        Skript.registerEffect(EffReceivePacket.class, "rec(ei|ie)ve packet[s] %packets% from %players% [without calling event]",
+                "rec(ei|ie)ve %players% packet[s] %packets% [without calling event]");
     }
     
     @Override
@@ -59,7 +59,7 @@ public class EffReceivePacket extends Effect{
 
     @Override
     public String toString(Event e, boolean b) {
-        return "receive packet " + packets.getAll(e) + " from " + players.getAll(e);
+        return "receive packet " + Arrays.toString(packets.getAll(e)) + " from " + Arrays.toString(players.getAll(e));
     }
     
 }

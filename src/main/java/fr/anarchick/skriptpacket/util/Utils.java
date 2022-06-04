@@ -3,6 +3,8 @@ package fr.anarchick.skriptpacket.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.bukkit.entity.Entity;
+
 import ch.njol.skript.Skript;
 
 public class Utils {
@@ -24,7 +26,7 @@ public class Utils {
         Object[] values = new Object[0];
         try {
             values = (Object[]) clazz.getDeclaredMethod("values").invoke(null);
-        } catch (Exception ex) {}
+        } catch (Exception ignored) {}
         if (values.length == 0) return "";
         if (values.length > 1) {
             StringBuilder builder = new StringBuilder();
@@ -44,8 +46,26 @@ public class Utils {
         Matcher m = p.matcher(matcher);
         if (!m.find()) return "";
         int count = m.groupCount();
-        if (count == 0 || group <= 0 || group > count) return "";
+        if (group <= 0 || group > count) return "";
         return m.group(group);
+    }
+    
+    public static Number[] EntitiesIDs(Entity[] entities) {
+        Number[] ids = new Number[entities.length];
+        for (int i = 0 ; i < entities.length ; i++ ) {
+            final Entity ent = entities[i];
+            ids[i] = ent.getEntityId();
+        }
+        return ids;
+    }
+    
+    public static boolean classExist(String clazz) {
+        try {
+            Class.forName(clazz);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
     }
 
 }

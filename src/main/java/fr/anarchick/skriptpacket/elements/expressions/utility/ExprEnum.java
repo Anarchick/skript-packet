@@ -68,7 +68,7 @@ public class ExprEnum extends SimpleExpression<Object> {
                 .distinct()
                 .forEach(packages::add);
             jar.close();
-        } catch (Exception ex) {}
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ExprEnum extends SimpleExpression<Object> {
                 break;
             case 1:
                 String className = original.replaceFirst("net\\.minecraft", "");
-                String aliases[] = className.split("\\.");
+                String[] aliases = className.split("\\.");
                 String alias = aliases[aliases.length -1];
                 try {
                     clazz = MinecraftReflection.getMinecraftClass(className, alias);
@@ -117,7 +117,7 @@ public class ExprEnum extends SimpleExpression<Object> {
                                 Skript.error("You should replace '"+original+"' by '"+path+"' for better performances");
                                 break;
                             }
-                        } catch (RuntimeException e2) {}   
+                        } catch (RuntimeException ignored) {}
                     }
                 }
                 if (clazz == null) Skript.error("Failed to find NMS class '" + className + "'");
@@ -139,7 +139,7 @@ public class ExprEnum extends SimpleExpression<Object> {
     }
     
     @Override
-    public Class<? extends Object> getReturnType() {
+    public Class<?> getReturnType() {
         return Object.class;
     }
     

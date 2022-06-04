@@ -47,9 +47,9 @@ public class ExprPair extends SimpleExpression<Object>{
         Object _first = first.getSingle(e);
         Object _second = second.getSingle(e);
         if (SkriptPacket.isReflectAddon) {
-            return new Object[] {new Pair<Object, Object>(ObjectWrapper.unwrapIfNecessary(_first), ObjectWrapper.unwrapIfNecessary(_second))};
+            return new Object[] {new Pair<>(ObjectWrapper.unwrapIfNecessary(_first), ObjectWrapper.unwrapIfNecessary(_second))};
         }
-        return new Object[] {new Pair<Object, Object>(_first, _second)};
+        return new Object[] {new Pair<>(_first, _second)};
     }
     
     @Override
@@ -58,7 +58,7 @@ public class ExprPair extends SimpleExpression<Object>{
     }
     
     @Override
-    public Class<? extends Object> getReturnType() {
+    public Class<?> getReturnType() {
         return Object.class;
     }
 

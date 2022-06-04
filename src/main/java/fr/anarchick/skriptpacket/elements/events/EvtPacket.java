@@ -15,7 +15,6 @@ import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
-import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.PacketManager.Mode;
@@ -41,21 +40,21 @@ public class EvtPacket extends SkriptEvent {
         .since("1.0, 1.1 (priority), 2.0 (sync/async)");
         
         // event-packet
-        EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<PacketContainer, BukkitPacketEvent>() {
+        EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<>() {
             @Override
             public PacketContainer get(final BukkitPacketEvent e) {
                 return e.getPacket();
             }
         }, 0);
         // event-player
-        EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, new Getter<Player, BukkitPacketEvent>() {
+        EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, new Getter<>() {
             @Override
             public Player get(final BukkitPacketEvent e) {
                 return e.getPlayer();
             }
         }, 0);
         // event-world
-        EventValues.registerEventValue(BukkitPacketEvent.class, World.class, new Getter<World, BukkitPacketEvent>() {
+        EventValues.registerEventValue(BukkitPacketEvent.class, World.class, new Getter<>() {
             @Override
             public World get(final BukkitPacketEvent e) {
                 return e.getPlayer().getWorld();
@@ -69,26 +68,13 @@ public class EvtPacket extends SkriptEvent {
         mark = parser.mark;
         packetTypeExpr = (Literal<PacketType>) literal[0];
         switch (mark) {
-            case 1:
-                priority = ListenerPriority.LOWEST;
-                break;
-            case 2:
-                priority = ListenerPriority.LOW;
-                break;
-            case 3:
-                priority = ListenerPriority.NORMAL;
-                break;
-            case 4:
-                priority = ListenerPriority.HIGH;
-                break;
-            case 5:
-                priority = ListenerPriority.HIGHEST;
-                break;
-            case 6:
-                priority = ListenerPriority.MONITOR;
-                break;
-            default:
-                priority = ListenerPriority.NORMAL;
+            case 1 -> priority = ListenerPriority.LOWEST;
+            case 2 -> priority = ListenerPriority.LOW;
+            case 4 -> priority = ListenerPriority.HIGH;
+            case 5 -> priority = ListenerPriority.HIGHEST;
+            case 6 -> priority = ListenerPriority.MONITOR;
+            // include case 3
+            default -> priority = ListenerPriority.NORMAL;
         }
         PacketType packetType = packetTypeExpr.getSingle();
         if (parser.expr.startsWith("async")) {
@@ -109,20 +95,19 @@ public class EvtPacket extends SkriptEvent {
             Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' is not supported by your server");
             return false;
         }
-        String scriptName = SkriptPacket.getCurrentScript().getFileName();
+        String scriptName = getParser().getCurrentScript().getFileName();
         SkriptPacketEventListener.addPacketTypes(packetTypeExpr.getAll(), priority, mode, scriptName);
         return true;
     }
 
     @Override
     public boolean check(Event event) {
-        if (event instanceof BukkitPacketEvent) {
-            BukkitPacketEvent e = (BukkitPacketEvent) event;
+        if (event instanceof BukkitPacketEvent e) {
             if ( packetTypeExpr.getSingle(event).equals(e.getPacketType())
                     && priority.equals(e.getPriority())
                     && mode.equals(e.getMode()) ) {
                 PacketContainer packet = e.getPacket();
-                return !packet.getMeta("bypassEvent").isPresent();
+                return packet.getMeta("bypassEvent").isEmpty();
             }
         }
         return false;

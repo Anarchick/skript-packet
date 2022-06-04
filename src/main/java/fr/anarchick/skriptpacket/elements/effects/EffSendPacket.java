@@ -16,6 +16,8 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 
+import java.util.Arrays;
+
 @Name("Send Packet")
 @Description("Sends the specified packet(s) to the specified player(s).")
 @Examples({
@@ -34,10 +36,8 @@ public class EffSendPacket extends Effect{
     private boolean bypassEvent = false;
     
     static {
-        Skript.registerEffect(EffSendPacket.class, new String[] {
-                "(dispatch|send) packet[s] %packets% to %players% [without calling event]",
-                "(dispatch|send) %players% packet[s] %packets% [without calling event]"
-                });
+        Skript.registerEffect(EffSendPacket.class, "(dispatch|send) packet[s] %packets% to %players% [without calling event]",
+                "(dispatch|send) %players% packet[s] %packets% [without calling event]");
     }
     
     @Override
@@ -60,7 +60,7 @@ public class EffSendPacket extends Effect{
 
     @Override
     public String toString(Event e, boolean b) {
-        return "send packet " + packets.getAll(e) + " to " + players.getAll(e);
+        return "send packet " + Arrays.toString(packets.getAll(e)) + " to " + Arrays.toString(players.getAll(e));
     }
     
 }

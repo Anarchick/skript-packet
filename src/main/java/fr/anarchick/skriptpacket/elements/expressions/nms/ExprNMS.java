@@ -44,7 +44,7 @@ public class ExprNMS extends SimpleExpression<Object> {
     @Override
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
         pattern = matchedPattern;
-        expr = (Expression<?>) exprs[0];
+        expr = exprs[0];
         return true;
     }
     
@@ -75,7 +75,7 @@ public class ExprNMS extends SimpleExpression<Object> {
     }
     
     @Override
-    public Class<? extends Object> getReturnType() {
+    public Class<?> getReturnType() {
         return (result == null) ? Object.class : result.getClass();
     }
 

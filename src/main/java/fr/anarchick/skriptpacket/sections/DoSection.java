@@ -26,7 +26,7 @@ import fr.anarchick.skriptpacket.util.SkriptReflection;
 public class DoSection extends Section {
     
     private enum Type {
-        ASYNC, SYNC, PARALLEL;
+        ASYNC, SYNC, PARALLEL
     }
     
     private boolean shouldWait = false;
@@ -53,7 +53,7 @@ public class DoSection extends Section {
         trigger = new TriggerSection(sectionNode) {
             @Override
             public String toString(@Nullable Event e, boolean debug) {
-                return this.toString(e, debug);
+                return e.toString();
             }
             
             @Override
@@ -104,17 +104,11 @@ public class DoSection extends Section {
 
     private void runTask(Runnable runnable, Type type) {
         switch (type) {
-        case ASYNC:
-            Scheduling.async(runnable);
-            break;
-        case SYNC:
-            Scheduling.sync(runnable);
-            break;
-        case PARALLEL:
-            runnable.run();
-            break;
-        default:
-            break;
+            case ASYNC -> Scheduling.async(runnable);
+            case SYNC -> Scheduling.sync(runnable);
+            case PARALLEL -> runnable.run();
+            default -> {
+            }
         }
     }
 }

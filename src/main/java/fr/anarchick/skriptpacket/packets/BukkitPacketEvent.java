@@ -15,7 +15,7 @@ public class BukkitPacketEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private final PacketEvent packetEvent;
     private final ListenerPriority priority;
-    private PacketManager.Mode mode;
+    private final PacketManager.Mode mode;
     
     public BukkitPacketEvent(PacketEvent event, ListenerPriority priority, PacketManager.Mode mode, boolean async) {
         super(async);
@@ -48,7 +48,7 @@ public class BukkitPacketEvent extends Event implements Cancellable {
     public HandlerList getHandlers() {
         return handlers;
     }
-
+    
     public static HandlerList getHandlerList() {
         return handlers;
     }

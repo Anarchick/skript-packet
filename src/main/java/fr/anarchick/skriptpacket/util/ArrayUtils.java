@@ -41,7 +41,7 @@ public class ArrayUtils {
         Class<?> clazz = items[0].getClass();
         T[] array = (T[]) Array.newInstance(clazz, items.length);
         for (int i = 0; i<items.length; i++) {
-            if (clazz.isInstance(items[i])) array[i] = (T) items[i];
+            if (clazz.isInstance(items[i])) array[i] = items[i];
         }
         return array;
     }
@@ -88,7 +88,7 @@ public class ArrayUtils {
         }
         final Byte[] result = new Byte[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Byte.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -101,7 +101,7 @@ public class ArrayUtils {
         }
         final Character[] result = new Character[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Character.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
      }
@@ -114,7 +114,7 @@ public class ArrayUtils {
         }
         final Double[] result = new Double[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Double.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -127,7 +127,7 @@ public class ArrayUtils {
         }
         final Float[] result = new Float[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Float.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -140,7 +140,7 @@ public class ArrayUtils {
         }
         final Integer[] result = new Integer[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Integer.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -153,7 +153,7 @@ public class ArrayUtils {
         }
         final Long[] result = new Long[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Long.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -166,7 +166,7 @@ public class ArrayUtils {
         }
         final Short[] result = new Short[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = Short.valueOf(array[i]);
+            result[i] = array[i];
         }
         return result;
     }
@@ -218,7 +218,7 @@ public class ArrayUtils {
         }
         final boolean[] result = new boolean[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].booleanValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -231,7 +231,7 @@ public class ArrayUtils {
         }
         final byte[] result = new byte[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].byteValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -244,7 +244,7 @@ public class ArrayUtils {
         }
         final char[] result = new char[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].charValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -257,7 +257,7 @@ public class ArrayUtils {
         }
         final double[] result = new double[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].doubleValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -270,7 +270,7 @@ public class ArrayUtils {
         }
         final float[] result = new float[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].floatValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -283,7 +283,7 @@ public class ArrayUtils {
         }
         final int[] result = new int[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].intValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -296,7 +296,7 @@ public class ArrayUtils {
         }
         final long[] result = new long[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].longValue();
+            result[i] = array[i];
         }
         return result;
     }
@@ -309,7 +309,7 @@ public class ArrayUtils {
         }
         final short[] result = new short[array.length];
         for (int i = 0; i < array.length; i++) {
-            result[i] = array[i].shortValue();
+            result[i] = array[i];
         }
         return result;
     }

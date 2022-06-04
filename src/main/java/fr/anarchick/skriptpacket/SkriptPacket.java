@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import ch.njol.skript.lang.Expression;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -13,12 +14,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import ch.njol.skript.config.Config;
 import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
-import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.util.Version;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 import fr.anarchick.skriptpacket.util.Scheduling;
@@ -30,7 +28,6 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     private static SkriptAddon ADDON;
     
     public static boolean isReflectAddon = false;
-    public static final boolean old_nms = !Skript.isRunningMinecraft(1, 17);
     
     public static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
     
@@ -40,8 +37,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     public static final Version MINIMUM_SKRIPT_VERSION = new Version(2, 5, 2);
     public static Version SKRIPT_VERSION;
-    
-    private static final Version SKRIPT_2_6 = new Version(2, 6);
+    public static Version VERSION;
     
     // You have to fork Skript-Packet to enable this !!
     public static boolean enableDeprecated = false;
@@ -49,6 +45,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     @Override
     public void onEnable() {
         INSTANCE = this;
+        VERSION = new Version(getDescription().getVersion());
         
         PluginManager pluginManager = Bukkit.getPluginManager();
         isReflectAddon = pluginManager.isPluginEnabled("skript-reflect");
@@ -56,12 +53,12 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         SKRIPT_VERSION = Skript.getVersion();
         if (SKRIPT_VERSION.isSmallerThan(MINIMUM_SKRIPT_VERSION)) {
             Logging.info("Your version of Skript is " + SKRIPT_VERSION);
-            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_SKRIPT_VERSION.toString() + " of Skript");
+            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_SKRIPT_VERSION + " of Skript");
             // Does not disable the plugin, cause some syntaxes can still works
         }
         if (PROTOCOLLIB_VERSION.isSmallerThan(MINIMUM_PROTOCOLLIB_VERSION)) {
             Logging.info("Your version of ProtocolLib is " + PROTOCOLLIB_VERSION);
-            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_PROTOCOLLIB_VERSION.toString() + " of ProtocolLib");
+            Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_PROTOCOLLIB_VERSION + " of ProtocolLib");
             // Does not disable the plugin, cause some syntaxes can still works
         }
 
@@ -69,9 +66,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
             if (Skript.isAcceptRegistrations()) {
                 ADDON = Skript.registerAddon(this);
                 ADDON.loadClasses("fr.anarchick.skriptpacket", "elements");
-                if (SKRIPT_VERSION.isLargerThan(SKRIPT_2_6)) {
-                    ADDON.loadClasses("fr.anarchick.skriptpacket", "sections");
-                }
+                //ADDON.loadClasses("fr.anarchick.skriptpacket", "sections");
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,8 +80,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         Metrics metrics = new Metrics(this, pluginId);
         metrics.addCustomChart(new Metrics.SimplePie("skript_version", () ->
             SKRIPT_VERSION.toString()));
-        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", () ->
-            PROTOCOLLIB_VERSION.toString()));
+        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", PROTOCOLLIB_VERSION::toString));
         metrics.addCustomChart(new Metrics.SimplePie("skript-reflect_support", () ->
             String.valueOf(isReflectAddon)));
         
@@ -96,10 +90,6 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     public static SkriptPacket getInstance() {
         return INSTANCE;
-    }
-    
-    public static SkriptAddon getAddonInstance() {
-        return ADDON;
     }
     
     private static void checkUpdate() {
@@ -114,14 +104,14 @@ public class SkriptPacket extends JavaPlugin implements Listener {
                     if (inputLine.startsWith("version:")) {
                         String str = Utils.regexGroup("([\\d\\.]+)", inputLine, 1);
                         Version lastVersion = new Version(str);
-                        if (lastVersion.isLargerThan(SKRIPT_VERSION))
+                        if (lastVersion.isLargerThan(VERSION))
                             Logging.warn("A new update is available ("+lastVersion+")");
                         break;
                     }
                 }
                 in.close();
                 connection.disconnect();
-            } catch (Exception ex) {}
+            } catch (Exception ignored) {}
         });
     }
     
@@ -130,24 +120,11 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         SkriptPacketEventListener.onReload(e);
     }
     
-    @SuppressWarnings({ "deprecation", "unchecked" })
-    public static boolean isCurrentEvent(String error, Class<? extends Event>... clazz) {
-        boolean result;
-        try {
-            result = ScriptLoader.isCurrentEvent(clazz);
-        } catch (Exception e) {
-            result = ParserInstance.get().isCurrentEvent(clazz);
-        }
+    @SuppressWarnings({"unchecked" })
+    public static boolean isCurrentEvent(Expression expr, String error, Class<? extends Event>... clazz) {
+        boolean result = expr.getParser().isCurrentEvent(clazz);
         if (!result) Skript.error(error);
         return result;
-    }
-    
-    public static Config getCurrentScript() {
-        try {
-            return (Config) ScriptLoader.class.getDeclaredField("currentScript").get(null);
-        } catch (Exception e) {
-            return  ParserInstance.get().getCurrentScript();
-        }
     }
     
 }
