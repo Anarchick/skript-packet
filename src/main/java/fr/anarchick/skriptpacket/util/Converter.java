@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
+import com.comphenix.protocol.wrappers.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -22,13 +23,6 @@ import org.bukkit.util.Vector;
 import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.injector.BukkitUnwrapper;
 import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.BlockPosition;
-import com.comphenix.protocol.wrappers.BukkitConverters;
-import com.comphenix.protocol.wrappers.ComponentConverter;
-import com.comphenix.protocol.wrappers.WrappedBlockData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 
@@ -282,7 +276,21 @@ public class Converter {
             public Object convert(final Object array) {
                 return (array instanceof ArrayList) ? array : Collections.singletonList(array);
             }
+        },
+
+        PROTOCOLLIB_VECTOR3F{ // -> Bukkit vector
+            @Override
+            public Object convert(final Object single) {
+                if (single instanceof Vector3F vec) {
+                    float x = vec.getX();
+                    float y = vec.getY();
+                    float z = vec.getZ();
+                    return new Vector(x, y, z);
+                }
+                return single;
+            }
         };
+
         abstract public Object convert(final Object single);
     }
     
@@ -365,6 +373,8 @@ public class Converter {
         } else {
             if (single instanceof IntList) {
                 converter = Auto.INTLIST;
+            } else if (single instanceof Vector3F) {
+                converter = Auto.PROTOCOLLIB_VECTOR3F;
             }
         }
         if (converter != null) return converter.convert(single);
@@ -432,91 +442,78 @@ public class Converter {
             return null;
         }
     }
-    
-    private static Number getBiomeID(Biome biome) {
+
+    /**
+     * Updated for mc 1.19
+     * @param biome
+     * @return
+     */
+    public static Number getBiomeID(Biome biome) {
         return switch (biome) {
-            case OCEAN -> 0;
+            case THE_VOID -> 0;
             case PLAINS -> 1;
-            case DESERT -> 2;
-            case MOUNTAINS -> 3;
-            case FOREST -> 4;
-            case TAIGA -> 5;
+            case SUNFLOWER_PLAINS -> 2;
+            case SNOWY_PLAINS -> 3;
+            case ICE_SPIKES -> 4;
+            case DESERT -> 5;
             case SWAMP -> 6;
-            case RIVER -> 7;
-            case NETHER_WASTES -> 8;
-            case THE_END -> 9;
-            case FROZEN_OCEAN -> 10;
-            case FROZEN_RIVER -> 11;
-            case SNOWY_TUNDRA -> 12;
-            case SNOWY_MOUNTAINS -> 13;
-            case MUSHROOM_FIELDS -> 14;
-            case MUSHROOM_FIELD_SHORE -> 15;
-            case BEACH -> 16;
-            case DESERT_HILLS -> 17;
-            case WOODED_HILLS -> 18;
-            case TAIGA_HILLS -> 19;
-            case MOUNTAIN_EDGE -> 20;
-            case JUNGLE -> 21;
-            case JUNGLE_HILLS -> 22;
-            case JUNGLE_EDGE -> 23;
-            case DEEP_OCEAN -> 24;
-            case STONE_SHORE -> 25;
-            case SNOWY_BEACH -> 26;
-            case BIRCH_FOREST -> 27;
-            case BIRCH_FOREST_HILLS -> 28;
-            case DARK_FOREST -> 29;
-            case SNOWY_TAIGA -> 30;
-            case SNOWY_TAIGA_HILLS -> 31;
-            case GIANT_TREE_TAIGA -> 32;
-            case GIANT_TREE_TAIGA_HILLS -> 33;
-            case WOODED_MOUNTAINS -> 34;
-            case SAVANNA -> 35;
-            case SAVANNA_PLATEAU -> 36;
-            case BADLANDS -> 37;
-            case WOODED_BADLANDS_PLATEAU -> 38;
-            case BADLANDS_PLATEAU -> 39;
-            case SMALL_END_ISLANDS -> 40;
-            case END_MIDLANDS -> 41;
-            case END_HIGHLANDS -> 42;
-            case END_BARRENS -> 43;
-            case WARM_OCEAN -> 44;
-            case LUKEWARM_OCEAN -> 45;
-            case COLD_OCEAN -> 46;
-            case DEEP_WARM_OCEAN -> 47;
-            case DEEP_LUKEWARM_OCEAN -> 48;
-            case DEEP_COLD_OCEAN -> 49;
-            case DEEP_FROZEN_OCEAN -> 50;
-            case THE_VOID -> 127;
-            case SUNFLOWER_PLAINS -> 129;
-            case DESERT_LAKES -> 130;
-            case GRAVELLY_MOUNTAINS -> 131;
-            case FLOWER_FOREST -> 132;
-            case TAIGA_MOUNTAINS -> 133;
-            case SWAMP_HILLS -> 134;
-            case ICE_SPIKES -> 140;
-            case MODIFIED_JUNGLE -> 149;
-            case MODIFIED_JUNGLE_EDGE -> 151;
-            case TALL_BIRCH_FOREST -> 155;
-            case TALL_BIRCH_HILLS -> 156;
-            case DARK_FOREST_HILLS -> 157;
-            case SNOWY_TAIGA_MOUNTAINS -> 158;
-            case GIANT_SPRUCE_TAIGA -> 160;
-            case GIANT_SPRUCE_TAIGA_HILLS -> 161;
-            case MODIFIED_GRAVELLY_MOUNTAINS -> 162;
-            case SHATTERED_SAVANNA -> 163;
-            case SHATTERED_SAVANNA_PLATEAU -> 164;
-            case ERODED_BADLANDS -> 165;
-            case MODIFIED_WOODED_BADLANDS_PLATEAU -> 166;
-            case MODIFIED_BADLANDS_PLATEAU -> 167;
-            case BAMBOO_JUNGLE -> 168;
-            case BAMBOO_JUNGLE_HILLS -> 169;
-            case SOUL_SAND_VALLEY -> 170;
-            case CRIMSON_FOREST -> 171;
-            case WARPED_FOREST -> 172;
-            case BASALT_DELTAS -> 173;
-            case DRIPSTONE_CAVES -> 174;
-            case LUSH_CAVES -> 175;
-            case CUSTOM -> null;
+            case MANGROVE_SWAMP -> 7;
+            case FOREST -> 8;
+            case FLOWER_FOREST -> 9;
+            case BIRCH_FOREST -> 10;
+            case DARK_FOREST -> 11;
+            case OLD_GROWTH_BIRCH_FOREST -> 12;
+            case OLD_GROWTH_PINE_TAIGA -> 13;
+            case OLD_GROWTH_SPRUCE_TAIGA -> 14;
+            case TAIGA -> 15;
+            case SNOWY_TAIGA -> 16;
+            case SAVANNA -> 17;
+            case SAVANNA_PLATEAU -> 18;
+            case WINDSWEPT_HILLS -> 19;
+            case WINDSWEPT_GRAVELLY_HILLS -> 20;
+            case WINDSWEPT_FOREST -> 21;
+            case WINDSWEPT_SAVANNA -> 22;
+            case JUNGLE -> 23;
+            case SPARSE_JUNGLE -> 24;
+            case BAMBOO_JUNGLE -> 25;
+            case BADLANDS -> 26;
+            case ERODED_BADLANDS -> 27;
+            case WOODED_BADLANDS -> 28;
+            case MEADOW -> 29;
+            case GROVE -> 30;
+            case SNOWY_SLOPES -> 31;
+            case FROZEN_PEAKS -> 32;
+            case JAGGED_PEAKS -> 33;
+            case STONY_PEAKS -> 34;
+            case RIVER -> 35;
+            case FROZEN_RIVER -> 36;
+            case BEACH -> 37;
+            case SNOWY_BEACH -> 38;
+            case STONY_SHORE -> 39;
+            case WARM_OCEAN -> 40;
+            case LUKEWARM_OCEAN -> 41;
+            case DEEP_LUKEWARM_OCEAN -> 42;
+            case OCEAN -> 43;
+            case DEEP_OCEAN -> 44;
+            case COLD_OCEAN -> 45;
+            case DEEP_COLD_OCEAN -> 46;
+            case FROZEN_OCEAN -> 47;
+            case DEEP_FROZEN_OCEAN -> 48;
+            case MUSHROOM_FIELDS -> 49;
+            case DRIPSTONE_CAVES -> 50;
+            case LUSH_CAVES -> 51;
+            case DEEP_DARK -> 52;
+            case NETHER_WASTES -> 53;
+            case WARPED_FOREST -> 54;
+            case CRIMSON_FOREST -> 55;
+            case SOUL_SAND_VALLEY -> 56;
+            case BASALT_DELTAS -> 57;
+            case THE_END -> 58;
+            case END_HIGHLANDS -> 59;
+            case END_MIDLANDS -> 60;
+            case SMALL_END_ISLANDS -> 61;
+            case END_BARRENS -> 62;
+            default -> null;
         };
         //Logging.warn("Missing biome id for '" +biome+"'. You should create an issue on Github.");
     }

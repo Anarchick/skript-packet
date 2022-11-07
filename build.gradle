@@ -1,6 +1,9 @@
+import org.gradle.api.JavaVersion
+import org.gradle.api.tasks.compile.JavaCompile
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+
 plugins {
     id 'java'
-    id 'eclipse'
 }
 
 configurations {
@@ -8,30 +11,27 @@ configurations {
     compile.extendsFrom shade
 }
 
-eclipse {
-    project {
-        name = 'skript-packet'
-    }
-}
-
 repositories {
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots' } // Spigot
     maven { url "https://repo.dmulloy2.net/nexus/repository/public/" }
     maven { url 'https://mvnrepository.com/artifact/org.json/json' } // DataWatcher
     maven { url "https://libraries.minecraft.net" }
-    maven { url 'https://jitpack.io' } // Skript
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://repo.skriptlang.org/releases' }
     maven { url = 'https://oss.sonatype.org/content/repositories/snapshots' }
     mavenCentral()
 }
 
-sourceCompatibility = '17.PREVIEW'
-targetCompatibility = '17.PREVIEW'
+group = 'Skript-Packet'
+version = '2.2'
 
-def mcVersion = '1.17'
+def mcVersion = '1.19'
 def subVersion = ''
 
+def targetJavaVersion = 17
+
 dependencies {
-	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6-beta3') {
+	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6.3') {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
@@ -47,8 +47,16 @@ dependencies {
     //shade (group: 'it.unimi.dsi', name: 'fastutil-core', version: '8.5.8') // Support for mc <1.16
 }
 
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
 jar {
-    archivesBaseName  = 'skript-packet-2.1.0'
     exclude('fr/anarchick/skriptpacket/elements/deprecated/**')
     configurations.shade.each { dep ->
         from(project.zipTree(dep)){
@@ -58,8 +66,19 @@ jar {
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
 }
 
 task export() {

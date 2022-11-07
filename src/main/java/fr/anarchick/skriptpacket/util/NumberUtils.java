@@ -33,7 +33,6 @@ public class NumberUtils {
             Short.TYPE,
             Byte.TYPE});
     
-    @SuppressWarnings("rawtypes")
     public static final List<Class<? extends Number[]>> OBJECT_NUMBER_ARRAY = Arrays.asList(new Class[] {
             Integer[].class,
             Float[].class,

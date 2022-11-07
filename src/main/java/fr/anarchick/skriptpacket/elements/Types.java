@@ -33,11 +33,6 @@ public class Types {
                     public PacketType parse(final String name, final ParseContext context) {
                         return PacketManager.getPacketType(name);
                     }
-                    
-                    @Override
-                    public String getVariableNamePattern() {
-                        return "[a-zA-Z_]+";
-                    }
 
                     @Override
                     public String toVariableNameString(PacketType packettype) {
@@ -72,11 +67,6 @@ public class Types {
                     }
                     
                     @Override
-                    public String getVariableNamePattern() {
-                        return "PacketContainer\\[.*\\]";
-                    }
-                    
-                    @Override
                     public String toVariableNameString(PacketContainer packet) {
                         return packet.toString();
                     }
@@ -107,11 +97,6 @@ public class Types {
                     @Nullable
                     public DataWatcher parse(final String data, final ParseContext context) {
                         return null;
-                    }
-                    
-                    @Override
-                    public String getVariableNamePattern() {
-                        return "^{.*}$";
                     }
                     
                     @Override
