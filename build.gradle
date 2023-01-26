@@ -97,6 +97,10 @@ task export() {
             from jar // here it automatically reads jar file produced from jar task
             into "C:/Users/aeim/Documents/minecraft/btooom/server/plugins"
         }
+        copy {
+            from jar // here it automatically reads jar file produced from jar task
+            into "C:/Users/aeim/Documents/minecraft/law/server/survie/plugins"
+        }
     }
 }
 

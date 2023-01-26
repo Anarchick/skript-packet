@@ -23,29 +23,29 @@ public class SkriptPacketEventListener {
         }
     }
     
-    private static final List<Manager> listeners = new ArrayList<>();
-    private static final List<Manager> simpleListeners = new ArrayList<>();
+    private static final List<Manager> LISTENERS = new ArrayList<>();
+    private static final List<Manager> SIMPLE_LISTENERS = new ArrayList<>();
     
     public static void addPacketTypes(PacketType[] packetTypes, ListenerPriority priority, Mode mode, String scriptName) {
         for (PacketType packetType : packetTypes) {
             Manager manager = new Manager(scriptName, mode, packetType, priority);
-            add(listeners, manager);
+            add(LISTENERS, manager);
         }
         update();
     }
     
     public static void update() {
-        simpleListeners.clear();
+        SIMPLE_LISTENERS.clear();
         // Create simpleListeners
-        for (Manager listener : listeners) {
+        for (Manager listener : LISTENERS) {
             Mode mode = listener.mode();
             PacketType packetType = listener.packetType();
             ListenerPriority priority = listener.priority();
             Manager manager = new Manager("", mode, packetType, priority);
-            add(simpleListeners, manager);
+            add(SIMPLE_LISTENERS, manager);
         }
         
-        for (Manager listener : simpleListeners) {
+        for (Manager listener : SIMPLE_LISTENERS) {
             Mode mode = listener.mode();
             PacketType packetType = listener.packetType();
             ListenerPriority priority = listener.priority();
@@ -71,12 +71,12 @@ public class SkriptPacketEventListener {
         List<Manager> removes = new ArrayList<>();
         for (Config config : e.getScripts()) {
             String scriptName = config.getFileName();
-            for (Manager listener : listeners) {
+            for (Manager listener : LISTENERS) {
                 if (listener.scriptName().equals(scriptName))
                         removes.add(listener);
             }
         }
-        listeners.removeAll(removes);
+        LISTENERS.removeAll(removes);
         update();
     }
     

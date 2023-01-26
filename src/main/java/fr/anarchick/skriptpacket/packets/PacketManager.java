@@ -87,20 +87,17 @@ public class PacketManager {
     }
     
     public static void onPacketEvent(PacketType packetType, ListenerPriority priority, Mode mode) {
+        final SPPacketAdapter SPPacketAdapter = new SPPacketAdapter(priority, packetType, mode);
         switch (mode) {
-            case ASYNC -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new SPPacketAdapter(priority, packetType, mode)).start();
-            case SYNC -> PROTOCOL_MANAGER.addPacketListener(new SPPacketAdapter(priority, packetType, mode));
-            default -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(new SPPacketAdapter(priority, packetType, mode)).syncStart();
+            case ASYNC -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(SPPacketAdapter).start();
+            case SYNC -> PROTOCOL_MANAGER.addPacketListener(SPPacketAdapter);
+            default -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(SPPacketAdapter).syncStart();
         }
     }
     
     public static void removeListeners() {
-        for (PacketListener listener : PROTOCOL_MANAGER.getPacketListeners()) {
-            if (listener.getPlugin().equals(PLUGIN)) {
-                PROTOCOL_MANAGER.removePacketListeners(PLUGIN);
-                return;
-            }
-        }
+        PROTOCOL_MANAGER.removePacketListeners(PLUGIN);
+        PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
     }
 
     public static void sendPacket(PacketContainer packet, Player[] players) {

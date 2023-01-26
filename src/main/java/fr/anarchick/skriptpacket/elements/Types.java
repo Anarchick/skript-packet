@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements;
 
+import fr.anarchick.skriptpacket.SkriptPacket;
 import org.eclipse.jdt.annotation.Nullable;
 
 import com.comphenix.protocol.PacketType;
@@ -73,8 +74,13 @@ public class Types {
                     
                     @Override
                     public String toString(PacketContainer packet, int flags) {
-                        packet.getAttributeCollectionModifier().getValues();
-                        return packet.toString();
+                        String str;
+                        try {
+                            str = packet.toString();
+                        } catch (Exception e) {
+                            str = "PacketContainer[type=" + packet.getType() + ", structureModifier=INVALID_DATA]";
+                        }
+                        return str;
                     }
                     
                 })

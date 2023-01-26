@@ -40,4 +40,5 @@ public class SPPacketAdapter extends PacketAdapter {
                 SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, isAsync));
             }
     }
+
 }
