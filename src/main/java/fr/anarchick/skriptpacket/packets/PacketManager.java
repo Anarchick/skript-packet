@@ -17,7 +17,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
 import com.comphenix.protocol.utility.MinecraftReflection;
 
@@ -106,7 +105,7 @@ public class PacketManager {
                 PROTOCOL_MANAGER.sendServerPacket(player, packet);
             }
         } catch (InvocationTargetException e) {
-            Logging.exception(e);
+            e.printStackTrace();
         }
     }
     
@@ -116,7 +115,7 @@ public class PacketManager {
                 PROTOCOL_MANAGER.recieveClientPacket(player, packet);
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
-            Logging.exception(e);
+            e.printStackTrace();
         }
     }
 
@@ -126,8 +125,8 @@ public class PacketManager {
             Skript.error("Available indexes for the packketype '"+PacketManager.getPacketName(packet.getType())+"' are from 0 to "+(modifier.size() -1));
             return null;
         }
-        Class<?> fieldClass = modifier.getField(i).getType();
 
+        Class<?> fieldClass = modifier.getField(i).getType();
         if (fieldClass.isInstance(delta[0])) {
             return modifier.writeSafely(i, delta[0]);
         }
@@ -140,15 +139,15 @@ public class PacketManager {
                 return modifier.writeSafely(i, NumberEnums.convert(fieldClass, ids));
             }
         }
-        
+
         if (MinecraftReflection.getBlockPositionClass().equals(fieldClass)) {
             return modifier.writeSafely(i, Auto.LOCATION.convert(delta[0]));
         }
-        
+
         if (fieldClass.equals(UUID.class)) {
             return modifier.writeSafely(i, Auto.TO_UUID.convert(delta[0]));
         }
-        
+
         if (delta instanceof String[]) {
             String str = Optional.ofNullable((String)delta[0]).orElse("");
             if (fieldClass.equals(BaseComponent[].class)) {
@@ -161,7 +160,7 @@ public class PacketManager {
                 return modifier.writeSafely(i, Auto.STRING_TO_ICHATBASECOMPONENT.convert(str));
             }
         }
-        
+
         Object unwrap = Converter.unwrap(delta);
         if (fieldClass.equals(List.class)) {
             return modifier.writeSafely(i, Auto.ARRAYLIST.convert(unwrap));

@@ -5,26 +5,27 @@ import java.util.logging.Logger;
 import org.bukkit.Bukkit;
 
 import net.md_5.bungee.api.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 
 public class Logging {
 
-    private static final String name = ChatColor.BLUE + "[Skript-Packet] ";
-    private static final Logger LOGGER = Bukkit.getLogger(); // Allow colored name
+    private static final String name = "&7[&bSkript-Packet&7] ";
+    private static final ConsoleCommandSender LOGGER = Bukkit.getConsoleSender(); // Allow colored messages
     
     public static void info(String msg) {
-        LOGGER.info(name +ChatColor.GRAY + msg);
+        LOGGER.sendMessage(colored(name + "&7" + msg));
     }
     
     public static void warn(String msg) {
-        LOGGER.warning(name + ChatColor.YELLOW + msg);
+        LOGGER.sendMessage(colored(name + "&e" + msg));
     }
 
     public static void severe(String msg) {
-        LOGGER.severe(name + ChatColor.RED + msg);
+        LOGGER.sendMessage(colored(name + "&c" + msg));
     }
-    
-    public static void exception(Exception e) {
-        LOGGER.severe(name + ChatColor.RED + e.toString());
+
+    private static String colored(String input) {
+        return ChatColor.translateAlternateColorCodes('&', input);
     }
 
 }
