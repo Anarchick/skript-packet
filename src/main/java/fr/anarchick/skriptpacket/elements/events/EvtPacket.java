@@ -1,5 +1,9 @@
 package fr.anarchick.skriptpacket.elements.events;
 
+import ch.njol.skript.config.Config;
+import ch.njol.skript.lang.parser.ParserInstance;
+import ch.njol.skript.util.Version;
+import fr.anarchick.skriptpacket.SkriptPacket;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
@@ -19,6 +23,9 @@ import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.PacketManager.Mode;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class EvtPacket extends SkriptEvent {
 
@@ -95,9 +102,29 @@ public class EvtPacket extends SkriptEvent {
             Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' is not supported by your server");
             return false;
         }
-        String scriptName = getParser().getCurrentScript().getFileName();
+        String scriptName = getScriptName();
         SkriptPacketEventListener.addPacketTypes(packetTypeExpr.getAll(), priority, mode, scriptName);
         return true;
+    }
+
+    /**
+     * Since Skript 2.7.0-beta1 , getCurrentScript return Script instead of Config
+     * https://github.com/SkriptLang/Skript/pull/4108
+     */
+    private String getScriptName() {
+        if (SkriptPacket.SKRIPT_VERSION.isSmallerThan(new Version("2.6.5"))) {
+            Config config = null;
+            try {
+                Method configMethod = ParserInstance.class.getDeclaredMethod("getCurrentScript");
+                config = (Config) configMethod.invoke(getParser());
+                return config.getFileName();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "UNKNOWN";
+        } else {
+            return getParser().getCurrentScript().getConfig().getFileName();
+        }
     }
 
     @Override

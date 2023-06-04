@@ -436,7 +436,7 @@ public class SkriptReflection {
       if (CURRENT_SCRIPT != null) {
         return (Config) CURRENT_SCRIPT.get(null);
       } else {
-        return ParserInstance.get().getCurrentScript();
+        return ParserInstance.get().getCurrentScript().getConfig();
       }
     } catch (IllegalAccessException e) {
       throw new RuntimeException(e);

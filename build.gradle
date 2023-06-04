@@ -1,7 +1,3 @@
-import org.gradle.api.JavaVersion
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.jvm.toolchain.JavaLanguageVersion
-
 plugins {
     id 'java'
 }
@@ -23,7 +19,7 @@ repositories {
 }
 
 group = 'Skript-Packet'
-version = '2.1.1'
+version = '2.1.2'
 
 def mcVersion = '1.19'
 def subVersion = ''
@@ -31,7 +27,7 @@ def subVersion = ''
 def targetJavaVersion = 17
 
 dependencies {
-	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: '2.6.3') {
+	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: '2.7.0-beta2') {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
@@ -81,25 +77,23 @@ processResources {
     }
 }
 
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
 task export() {
     group = "SP"
     description = "build gradle into external folder"
     doLast {
         copy {
             from jar // here it automatically reads jar file produced from jar task
-            into "C:/Users/aeim/Documents/minecraft/eclipse1.17/plugins"
+            into "C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.17/plugins"
         }
         copy {
             from jar // here it automatically reads jar file produced from jar task
-            into "C:/Users/aeim/Documents/minecraft/eclipse1.18/plugins"
+            into "C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.18/plugins"
         }
         copy {
             from jar // here it automatically reads jar file produced from jar task
-            into "C:/Users/aeim/Documents/minecraft/btooom/server/plugins"
-        }
-        copy {
-            from jar // here it automatically reads jar file produced from jar task
-            into "C:/Users/aeim/Documents/minecraft/law/server/survie/plugins"
+            into "C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.19/plugins"
         }
     }
 }
