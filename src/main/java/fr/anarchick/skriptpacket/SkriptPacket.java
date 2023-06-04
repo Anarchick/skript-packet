@@ -75,12 +75,12 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         }
         
         pluginManager.registerEvents(this, this);
-        
+
         int pluginId = 10270;
         Metrics metrics = new Metrics(this, pluginId);
         metrics.addCustomChart(new Metrics.SimplePie("skript_version", () ->
             SKRIPT_VERSION.toString()));
-        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", PROTOCOLLIB_VERSION::toString));
+        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", () -> Utils.regexGroup("^((\\d+\\.?)+(-\\w+)?)", PROTOCOLLIB_VERSION.toString(), 1)));
         metrics.addCustomChart(new Metrics.SimplePie("skript-reflect_support", () ->
             String.valueOf(isReflectAddon)));
         
@@ -95,14 +95,14 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     private static void checkUpdate() {
         Scheduling.async(() -> {
             try {
-                HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/Anarchick/skript-packet/main/src/main/resources/plugin.yml").openConnection();
+                HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/Anarchick/skript-packet/main/build.gradle").openConnection();
                 connection.connect();
                 BufferedReader in = new BufferedReader(new InputStreamReader(
                         connection.getInputStream()));
                 String inputLine;
                 while ((inputLine = in.readLine()) != null) {
-                    if (inputLine.startsWith("version:")) {
-                        String str = Utils.regexGroup("([\\d\\.]+)", inputLine, 1);
+                    if (inputLine.startsWith("version = ")) {
+                        String str = Utils.regexGroup("((\\d+\\.?)+)", inputLine, 1);
                         Version lastVersion = new Version(str);
                         if (lastVersion.isLargerThan(VERSION))
                             Logging.warn("A new update is available ("+lastVersion+")");
