@@ -75,7 +75,7 @@ public enum NumberEnums {
             case 1 -> (T) new float[length];
             case 2 -> (T) new long[length];
             case 3 -> (T) new double[length];
-            case 4 -> (T) new Short[length];
+            case 4 -> (T) new short[length];
             case 5 -> (T) new byte[length];
             default -> null;
         };
