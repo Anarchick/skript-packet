@@ -1,7 +1,9 @@
+/*
 package fr.anarchick.skriptpacket.sections;
 
 import java.util.List;
 
+import com.btk5h.skriptmirror.util.SkriptReflection;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.eclipse.jdt.annotation.Nullable;
@@ -18,7 +20,6 @@ import ch.njol.skript.lang.TriggerItem;
 import ch.njol.skript.lang.TriggerSection;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.util.Scheduling;
-import fr.anarchick.skriptpacket.util.SkriptReflection;
 
 // This is experimental
 
@@ -112,3 +113,4 @@ public class DoSection extends Section {
         }
     }
 }
+*/
