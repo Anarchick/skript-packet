@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements.expressions.packet;
 
+import fr.anarchick.skriptpacket.util.converters.ConverterLogic;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -19,25 +20,27 @@ import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.util.ArrayUtils;
-import fr.anarchick.skriptpacket.util.Converter;
 
 @Name("Packet Fields")
 @Description("Get all packet fields, can't be set")
 @Examples("set {_fields::*} to all fields of event-packet")
-@Since("1.0")
+@Since("1.0, 2.2.0(wrap option)")
 
 public class ExprPacketFields extends SimpleExpression<Object> {
     
     private static Expression<PacketContainer> packetExpr;
+    private boolean shouldWrap;
     
     static {
        Skript.registerExpression(ExprPacketFields.class, Object.class, ExpressionType.SIMPLE,
-               "[all] [packet] fields [of %-packet%]");
+               "[all] [packet] fields [of %-packet%]",
+               "[all] (convert|wrap) [packet] fields [of %-packet%]");
     }
     
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+        shouldWrap = ( matchedPattern == 1 );
         if (exprs[0] != null) {
             packetExpr = (Expression<PacketContainer>) exprs[0];
             return true;
@@ -66,8 +69,13 @@ public class ExprPacketFields extends SimpleExpression<Object> {
                 } else if (field.getClass().isArray()) {
                     values[i]  = ArrayUtils.unknownToObject(field);
                 } else {
-                    values[i] = Converter.toObject(field);
+                    values[i] = ConverterLogic.toObject(field);
                 }
+
+                if (shouldWrap) {
+                    values[i] = ConverterLogic.toBukkit(values[i]);
+                }
+
             }
             return values;
         }
@@ -86,7 +94,13 @@ public class ExprPacketFields extends SimpleExpression<Object> {
 
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "all packet fields of " + packetExpr.toString(e, debug);
+
+        if (shouldWrap) {
+            return "all wrap packet fields of " + packetExpr.toString(e, debug);
+        } else {
+            return "all packet fields of " + packetExpr.toString(e, debug);
+        }
+
     }
     
 }
