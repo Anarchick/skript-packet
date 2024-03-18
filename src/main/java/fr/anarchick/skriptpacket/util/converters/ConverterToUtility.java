@@ -1,23 +1,81 @@
 package fr.anarchick.skriptpacket.util.converters;
 
 import ch.njol.skript.Skript;
+import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.wrappers.ComponentConverter;
+import com.comphenix.protocol.wrappers.MinecraftKey;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import fr.anarchick.skriptpacket.SkriptPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
+import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.entity.Entity;
+import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 
 public enum ConverterToUtility implements Converter {
 
+    HIMSELF {
+        @Override
+        public Object convert(final Object single) {
+            return single;
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Object.class;
+        }
+    },
+
+    SKRIPTMIRROR_UNWRAPPER {
+        @Override
+        public Object convert(final Object single) {
+            if (SkriptPacket.isReflectAddon && single != null) {
+                return ObjectWrapper.unwrapIfNecessary(single);
+            }
+            return single;
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Object.class;
+        }
+    },
+
     INTLIST_TO_INTEGER_ARRAY {
         @Override
-        public Object convert(final Object array) {
-            return ((IntList)array).toIntArray();
+        public boolean returnArray() {
+            return true;
+        }
+
+        @Override
+        public Object convert(final Object single) {
+            if (single instanceof IntList intList) {
+                Integer[] array = new Integer[intList.size()];
+                for (int i = 0; i < intList.size(); i++) {
+                    array[i] = intList.getInt(i);
+                }
+            }
+            return new Integer[0];
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Integer[].class;
+        }
+    },
+
+    OBJECT_TO_OPTIONAL {
+        @Override
+        public Object convert(final Object single) {
+            return Optional.of(single);
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Optional.class;
         }
     },
 
@@ -36,12 +94,52 @@ public enum ConverterToUtility implements Converter {
             }
             return single;
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return UUID.class;
+        }
     },
 
     OBJECT_TO_LIST {
         @Override
-        public Object convert(final Object array) {
-            return (array instanceof ArrayList) ? array : Collections.singletonList(array);
+        public boolean isArrayInput() {
+            return true;
+        }
+
+        @Override
+        public Object convert(final Object single) {
+            final ArrayList<Object> list = new ArrayList<>();
+            if (single instanceof Object[] array) {
+                Collections.addAll(list, array);
+            }
+            return list;
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return ArrayList.class;
+        }
+    },
+
+    OBJECT_TO_SET {
+        @Override
+        public boolean isArrayInput() {
+            return true;
+        }
+
+        @Override
+        public Object convert(final Object single) {
+            final HashSet<Object> set = new HashSet<>();
+            if (single instanceof Object[] array) {
+                Collections.addAll(set, array);
+            }
+            return set;
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return HashSet.class;
         }
     },
 
@@ -49,7 +147,7 @@ public enum ConverterToUtility implements Converter {
     STRING_TO_MOJANGSON {
         @Override
         public Object convert(@Nonnull final Object single) {
-            String nbt = (String) single;
+            final String nbt = Optional.ofNullable((String)single).orElse("");
             Object nms = null;
             try {
                 nms = ConverterLogic.MojangsonClass.getMethod("parse", String.class).invoke(null, nbt);
@@ -58,19 +156,30 @@ public enum ConverterToUtility implements Converter {
             }
             return nms;
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return ConverterLogic.MojangsonClass;
+        }
     },
+
     // TODO check
     NMS_CHATCOMPONENTTEXT_TO_STRING {
         @Override
         public Object convert(final Object single) {
             return WrappedChatComponent.fromHandle(single).getJson();
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return String.class;
+        }
     },
 
-    STRING_TO_MD5BASECOMPONENT{
+    STRING_TO_MD5_BASECOMPONENT {
         @Override
         public Object convert(@Nonnull final Object single) {
-            String json = (String)single;
+            final String json = Optional.ofNullable((String)single).orElse("");
             WrappedChatComponent wrapper;
             if (json.startsWith("{") && json.endsWith("}")) {
                 wrapper = WrappedChatComponent.fromJson(json);
@@ -79,6 +188,23 @@ public enum ConverterToUtility implements Converter {
             }
             return ComponentConverter.fromWrapper(wrapper);
         }
-    };
+
+        @Override
+        public Class<?> getReturnType() {
+            return BaseComponent.class;
+        }
+    },
+
+    NMS_MINECRAFTKEY_TO_STRING {
+        @Override
+        public Object convert(final Object single) {
+            return MinecraftKey.getConverter().getSpecific(single).getKey();
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return String.class;
+        }
+    }
 
 }

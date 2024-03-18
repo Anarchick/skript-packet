@@ -1,15 +1,21 @@
 package fr.anarchick.skriptpacket.util.converters;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.regex.Pattern;
-
-import com.comphenix.protocol.wrappers.*;
-import fr.anarchick.skriptpacket.util.converters.Converter;
-import fr.anarchick.skriptpacket.util.converters.ConverterToBukkit;
-import fr.anarchick.skriptpacket.util.converters.ConverterToNMS;
-import fr.anarchick.skriptpacket.util.converters.ConverterToUtility;
+import ch.njol.skript.Skript;
+import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.util.slot.Slot;
+import com.btk5h.skriptmirror.ObjectWrapper;
+import com.comphenix.protocol.injector.BukkitUnwrapper;
+import com.comphenix.protocol.utility.MinecraftReflection;
+import com.comphenix.protocol.wrappers.Vector3F;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedWatchableObject;
+import com.comphenix.protocol.wrappers.nbt.NbtCompound;
+import com.comphenix.protocol.wrappers.nbt.NbtFactory;
+import fr.anarchick.skriptpacket.SkriptPacket;
+import it.unimi.dsi.fastutil.ints.IntList;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
@@ -18,31 +24,81 @@ import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
-import com.btk5h.skriptmirror.ObjectWrapper;
-import com.comphenix.protocol.injector.BukkitUnwrapper;
-import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.nbt.NbtCompound;
-import com.comphenix.protocol.wrappers.nbt.NbtFactory;
-
-import ch.njol.skript.Skript;
-import ch.njol.skript.aliases.ItemType;
-import ch.njol.skript.util.slot.Slot;
-import fr.anarchick.skriptpacket.SkriptPacket;
-import it.unimi.dsi.fastutil.ints.IntList;
+import javax.annotation.Nonnull;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ConverterLogic {
 
-    protected static final Pattern regexUUID = Pattern.compile("^[\\da-f]{8}-([\\da-f]{4}-){3}[\\da-f]{12}$", Pattern.CASE_INSENSITIVE);
-    protected static final Class<?> MojangsonClass = MinecraftReflection.getMinecraftClass("MojangsonParser", "nbt.MojangsonParser");
-    protected static final Constructor<?> blockPositionConstructor;
+    public static final Pattern regexUUID = Pattern.compile("^[\\da-f]{8}-([\\da-f]{4}-){3}[\\da-f]{12}$", Pattern.CASE_INSENSITIVE);
+    public static final Class<?> MojangsonClass = MinecraftReflection.getMinecraftClass("MojangsonParser", "nbt.MojangsonParser");
+    public static final Constructor<?> blockPositionConstructor;
+    public static final Class<?> NBTTagCompoundClass = MinecraftReflection.getNBTCompoundClass();
+    public static final Class<?> IChatBaseComponentClass = MinecraftReflection.getIChatBaseComponentClass();
+    public static final Class<?> ItemStackClass = MinecraftReflection.getItemStackClass();
+    public static final Class<?> BlockPositionClass = MinecraftReflection.getBlockPositionClass();
+    public static final Class<?> MinecraftKeyClass = MinecraftReflection.getMinecraftKeyClass();
+    public static final Class<?> EntityTypesClass = MinecraftReflection.getEntityTypes();
+    public static final Class<?> IBlockDataClass = MinecraftReflection.getIBlockDataClass();
+    public static final Class<?> BlockClass = MinecraftReflection.getBlockClass();
+    public static final Class<?> Vec3DClass = MinecraftReflection.getVec3DClass();
+    public static final Class<?> WorldServerClass = MinecraftReflection.getWorldServerClass();
+    public static final Class<?> EntityClass = MinecraftReflection.getEntityClass();
+    protected static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    private static final Map<Class<?>, Converter> TO_BUKKIT = new HashMap<>();
+    private static final ClassLoader classLoader = SkriptPacket.getInstance().getClass().getClassLoader();
 
 
     static {
+
         try {
             blockPositionConstructor = MinecraftReflection.getBlockPositionClass()
                     .getConstructor(int.class, int.class, int.class);
         } catch (Exception e) {
             throw new RuntimeException("Cannot find block position constructor.", e);
+        }
+
+        // If an Exception happens, just replace by Strings
+        registerToBukkitConverter(ConverterToUtility.SKRIPTMIRROR_UNWRAPPER, "com.btk5h.skriptmirror.ObjectWrapper");
+        registerToBukkitConverter(ConverterToBukkit.NMS_ITEMSTACK_TO_BUKKIT_ITEMSTACK, ItemStackClass);
+        registerToBukkitConverter(ConverterToBukkit.NMS_BLOCKPOSITION_TO_BUKKIT_LOCATION, BlockPositionClass);
+        registerToBukkitConverter(ConverterToBukkit.NMS_IBLOCKDATA_TO_BUKKIT_BLOCKDATA,IBlockDataClass);
+        // registerToBukkitConverter("MovingObjectPositionBlock", ConverterToBukkit.TODO);
+        registerToBukkitConverter(ConverterToBukkit.NMS_BLOCK_TO_BUKKIT_MATERIAL, BlockClass);
+        registerToBukkitConverter(ConverterToBukkit.NMS_CHUNK_TO_BUKKIT_CHUNK, "Chunk");
+        registerToBukkitConverter(ConverterToBukkit.NMS_WORLD_TO_BUKKIT_WORLD, WorldServerClass);
+        registerToBukkitConverter(ConverterToBukkit.NMS_ENTITY_TO_BUKKIT_ENTITY, EntityClass);
+        registerToBukkitConverter(ConverterToUtility.NMS_CHATCOMPONENTTEXT_TO_STRING, "network.chat.ChatComponentText", "network.chat.TextComponent", "ChatComponentText");
+        registerToBukkitConverter(ConverterToBukkit.NMS_VEC3D_TO_BUKKIT_VECTOR, Vec3DClass);
+        registerToBukkitConverter(ConverterToUtility.INTLIST_TO_INTEGER_ARRAY, IntList.class);
+        registerToBukkitConverter(ConverterToBukkit.PROTOCOLLIB_VECTOR3F_TO_BUKKIT_VECTOR, Vector3F.class);
+        registerToBukkitConverter(ConverterToUtility.NMS_MINECRAFTKEY_TO_STRING, MinecraftKeyClass);
+    }
+
+    public static void registerToBukkitConverter(@Nonnull Converter converter, String... classNames) {
+        Class<?> clazz = null;
+
+        for (String className : classNames) {
+            try {
+                clazz = MinecraftReflection.getMinecraftClass(className);
+                break;
+            } catch (Exception ignored) {
+                try {
+                    clazz = Class.forName(className, false, classLoader);
+                    break;
+                } catch (ClassNotFoundException ignored2) {}
+            }
+        }
+
+        registerToBukkitConverter(converter, clazz);
+    }
+
+    public static void registerToBukkitConverter(@Nonnull Converter converter, Class<?> clazz) {
+        if (clazz != null) {
+            TO_BUKKIT.put(clazz, converter);
         }
     }
     
@@ -53,7 +109,6 @@ public class ConverterLogic {
         Converter converter = null;
         if (!MinecraftReflection.isMinecraftObject(single)) {
             if (single instanceof Entity
-                    || single instanceof ItemStack
                     || single instanceof World) {
                 converter = ConverterToNMS.HANDLE;
             } else if (single instanceof Location) {
@@ -64,6 +119,10 @@ public class ConverterLogic {
                 converter = ConverterToNMS.BUKKIT_BLOCKDATA_TO_NMS_IBLOCKDATA;
             } else if (single instanceof ItemType) {
                 converter = ConverterToNMS.SKRIPT_ITEMTYPE_TO_NMS_IBLOCKDATA;
+            } else if (single instanceof ItemStack) {
+                converter = ConverterToNMS.BUKKIT_ITEMSTACK_TO_NMS_ITEMSTACK;
+            } else if (single instanceof Material) {
+                converter = ConverterToNMS.BUKKIT_MATERIAL_TO_NMS_ITEMSTACK;
             } else if (single instanceof Slot) {
                 converter = ConverterToNMS.SKRIPT_SLOT_TO_NMS_ITEMSTACK;
             } else if (single instanceof WrappedWatchableObject) {
@@ -84,45 +143,38 @@ public class ConverterLogic {
         }
         return (array.length > 1) ? array : single;
     }
-    
+
+    @Nonnull
+    public static Converter getConverterToBukkit(Class<?> nmsClass) {
+        Converter converter = TO_BUKKIT.get(nmsClass);
+
+        if (converter == null) {
+
+            for (Class<?> aClass : TO_BUKKIT.keySet()) {
+
+                if (aClass.isAssignableFrom(nmsClass)) {
+                    converter = TO_BUKKIT.get(aClass);
+                    break;
+                }
+
+            }
+
+        }
+
+        return (converter == null) ? ConverterToUtility.HIMSELF : converter;
+    }
+
     @SafeVarargs
     public static <T> Object toBukkit(T... array) {
-        if (array == null || array.length == 0) return array;
-        Object single = array[0];
-        Converter converter = null;
-        if (MinecraftReflection.isMinecraftObject(single)) {
-            if (MinecraftReflection.isItemStack(single) || MinecraftReflection.isCraftItemStack(single)) {
-                converter = ConverterToBukkit.NMS_ITEMSTACK_TO_BUKKIT_ITEMSTACK;
-            } else if (MinecraftReflection.isBlockPosition(single) ) {
-                converter = ConverterToBukkit.NMS_BLOCKPOSITION_TO_BUKKIT_LOCATION;
-            } else if (MinecraftReflection.isMinecraftObject(single, "IBlockData") ) {
-                converter = ConverterToBukkit.NMS_IBLOCKDATA_TO_BUKKIT_MATERIAL;
-            } else if (MinecraftReflection.isMinecraftObject(single, "Block") ) {
-                converter = ConverterToBukkit.NMS_BLOCK_TO_BUKKIT_MATERIAL;
-            } else if (MinecraftReflection.isMinecraftObject(single, "Chunk") ) {
-                converter = ConverterToBukkit.NMS_CHUNK_TO_BUKKIT_CHUNK;
-            } else if (MinecraftReflection.isMinecraftObject(single, "WorldServer") ) {
-                converter = ConverterToBukkit.NMS_WORLD_TO_BUKKIT_WORLD;
-            } else if (MinecraftReflection.isMinecraftEntity(single) ) {
-                converter = ConverterToBukkit.NMS_ENTITY_TO_BUKKIT_ENTITY;
-            } else if (MinecraftReflection.isMinecraftObject(single, "ChatComponentText")) {
-                converter = ConverterToUtility.NMS_CHATCOMPONENTTEXT_TO_STRING;
-            } else if (MinecraftReflection.isMinecraftObject(single, "Vec3D")) {
-                converter = ConverterToBukkit.NMS_VEC3D_TO_BUKKIT_VECTOR;
-            }
-            // Vector3f // Vec2D
+        if (array == null || array.length == 0 || array[0] == null) return array;
+        @Nonnull Object single = array[0];
+        Class<?> nmsClass = single.getClass();
+        Converter converter = getConverterToBukkit(nmsClass);
+        if (converter.isArrayInput()) {
+            return converter.convert(array);
         } else {
-            if (single instanceof IntList) {
-                converter = ConverterToUtility.INTLIST_TO_INTEGER_ARRAY;
-            } else if (single instanceof Vector3F) {
-                converter = ConverterToBukkit.PROTOCOLLIB_VECTOR3F_TO_BUKKIT_VECTOR;
-            }
+            return converter.convert(single);
         }
-        if (converter != null) return converter.convert(single);
-        if (SkriptPacket.isReflectAddon) {
-            return (array.length > 1) ? array : ObjectWrapper.unwrapIfNecessary(single);
-        }
-        return (array.length > 1) ? array : single;
     }
 
     public static Object toObject(Object o) {

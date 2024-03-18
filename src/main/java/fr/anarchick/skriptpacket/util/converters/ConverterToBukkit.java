@@ -1,19 +1,21 @@
 package fr.anarchick.skriptpacket.util.converters;
 
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.util.BlockUtils;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.BlockPosition;
 import com.comphenix.protocol.wrappers.BukkitConverters;
 import com.comphenix.protocol.wrappers.Vector3F;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
+import net.kyori.adventure.text.Component;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
+import java.util.Optional;
 
 public enum ConverterToBukkit implements Converter {
 
@@ -21,6 +23,11 @@ public enum ConverterToBukkit implements Converter {
         @Override
         public Object convert(final Object single) {
             return ConverterLogic.callMethod(single, "getWorld");
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return World.class;
         }
     },
 
@@ -31,6 +38,11 @@ public enum ConverterToBukkit implements Converter {
         @Override
         public Object convert(final Object single) {
             return MinecraftReflection.getBukkitEntity(single);
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Entity.class;
         }
     },
 
@@ -43,6 +55,11 @@ public enum ConverterToBukkit implements Converter {
         public Object convert(final Object single) {
             return ConverterLogic.callMethod(single, "getBukkitChunk");
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Chunk.class;
+        }
     },
 
     NMS_BLOCKPOSITION_TO_BUKKIT_LOCATION {
@@ -51,6 +68,11 @@ public enum ConverterToBukkit implements Converter {
             final World world = Bukkit.getWorlds().get(0);
             return BlockPosition.getConverter().getSpecific(single).toLocation(world);
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Location.class;
+        }
     },
 
     NMS_VEC3D_TO_BUKKIT_VECTOR {
@@ -58,26 +80,10 @@ public enum ConverterToBukkit implements Converter {
         public Object convert(final Object single) {
             return BukkitConverters.getVectorConverter().getSpecific(single);
         }
-    },
 
-    NMS_ITEMSTACK_TO_BUKKIT_ITEMSTACK {
         @Override
-        public Object convert(final Object single) {
-            return MinecraftReflection.getBukkitItemStack(single);
-        }
-    },
-
-    NMS_BLOCK_TO_BUKKIT_MATERIAL {
-        @Override
-        public Object convert(final Object single) {
-            return BukkitConverters.getBlockConverter().getSpecific(single);
-        }
-    },
-
-    NMS_IBLOCKDATA_TO_BUKKIT_MATERIAL {
-        @Override
-        public Object convert(final Object single) {
-            return ConverterLogic.callMethod(single, "getBukkitMaterial");
+        public Class<?> getReturnType() {
+            return Vector.class;
         }
     },
 
@@ -89,8 +95,57 @@ public enum ConverterToBukkit implements Converter {
             }
             return single;
         }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Vector.class;
+        }
     },
 
+    NMS_ITEMSTACK_TO_BUKKIT_ITEMSTACK {
+        @Override
+        public Object convert(final Object single) {
+            return MinecraftReflection.getBukkitItemStack(single);
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return ItemStack.class;
+        }
+    },
+
+    // TODO to Skript ItemType ?
+
+    NMS_BLOCK_TO_BUKKIT_MATERIAL {
+        @Override
+        public Object convert(final Object single) {
+            return BukkitConverters.getBlockConverter().getSpecific(single);
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Material.class;
+        }
+    },
+
+    NMS_IBLOCKDATA_TO_BUKKIT_BLOCKDATA {
+        @Override
+        public Object convert(final Object single) {
+            String blockDataString = single.toString();
+            blockDataString = blockDataString.replace("Block{", "");
+            blockDataString = blockDataString.replace("}", "");
+            blockDataString = blockDataString.replace(",", ";");
+            return BlockUtils.createBlockData(blockDataString);
+
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return BlockData.class;
+        }
+    },
+
+    // TODO to Skript ItemType ?
     RELATED_TO_BUKKIT_MATERIAL {
         @Nonnull
         @Override
@@ -120,11 +175,29 @@ public enum ConverterToBukkit implements Converter {
 
                 try {
                     return Material.valueOf(str.toUpperCase());
-                } catch ( IllegalArgumentException ex ) {}
+                } catch ( IllegalArgumentException ignored) {}
 
             }
 
             return Material.AIR;
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Material.class;
+        }
+    },
+
+    STRING_TO_PAPER_COMPONENT {
+        @Override
+        public Object convert(final Object single) {
+            final String text = Optional.ofNullable((String)single).orElse("");
+            return ConverterLogic.MINI_MESSAGE.deserialize(text);
+        }
+
+        @Override
+        public Class<?> getReturnType() {
+            return Component.class;
         }
     }
 
