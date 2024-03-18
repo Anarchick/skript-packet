@@ -7,3 +7,5 @@ main: fr.anarchick.skriptpacket.SkriptPacket
 depend: [Skript, ProtocolLib]
 softdepend: [skript-reflect]
 website: www.github.com/Anarchick/skript-packet
+libraries:
+  - org.json:json:20210307
