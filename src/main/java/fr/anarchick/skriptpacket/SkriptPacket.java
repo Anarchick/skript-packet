@@ -1,12 +1,14 @@
 package fr.anarchick.skriptpacket;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+import ch.njol.skript.Skript;
+import ch.njol.skript.SkriptAddon;
+import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.Expression;
+import ch.njol.skript.util.Version;
+import fr.anarchick.skriptpacket.elements.Types;
+import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
+import fr.anarchick.skriptpacket.util.Scheduling;
+import fr.anarchick.skriptpacket.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
@@ -14,13 +16,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import ch.njol.skript.Skript;
-import ch.njol.skript.SkriptAddon;
-import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
-import ch.njol.skript.util.Version;
-import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
-import fr.anarchick.skriptpacket.util.Scheduling;
-import fr.anarchick.skriptpacket.util.Utils;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SkriptPacket extends JavaPlugin implements Listener {
 
@@ -31,7 +30,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     public static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
     
-    public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(4, 6, 0);
+    public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(5, 1, 0);
     public static final Version PROTOCOLLIB_VERSION =
             new Version(pluginManager.getPlugin("ProtocolLib").getDescription().getVersion());
     
@@ -49,7 +48,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         
         PluginManager pluginManager = Bukkit.getPluginManager();
         isReflectAddon = pluginManager.isPluginEnabled("skript-reflect");
-        if (isReflectAddon) Logging.info("Support of skript-reflect wrapper");
+        if (isReflectAddon) Logging.info("Support of skript-reflect wrapper enabled");
         SKRIPT_VERSION = Skript.getVersion();
         if (SKRIPT_VERSION.isSmallerThan(MINIMUM_SKRIPT_VERSION)) {
             Logging.info("Your version of Skript is " + SKRIPT_VERSION);
@@ -63,17 +62,20 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         }
 
         try {
+
             if (Skript.isAcceptRegistrations()) {
                 ADDON = Skript.registerAddon(this);
+                Class.forName(Types.class.getName()); // Load first
                 ADDON.loadClasses("fr.anarchick.skriptpacket", "elements");
                 //ADDON.loadClasses("fr.anarchick.skriptpacket", "sections");
             }
-        } catch (IOException e) {
+
+        } catch ( Exception e ) {
             e.printStackTrace();
             pluginManager.disablePlugin(this);
             return;
         }
-        
+
         pluginManager.registerEvents(this, this);
 
         int pluginId = 10270;
