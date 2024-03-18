@@ -15,7 +15,7 @@
 //import com.comphenix.protocol.wrappers.WrappedDataWatcher.Serializer;
 //import com.google.common.collect.ImmutableMap;
 //
-//import fr.anarchick.skriptpacket.util.Converter.Auto;
+//import fr.anarchick.skriptpacket.util.converters.ConverterLogic.Auto;
 //
 //public class PJSON {
 //
