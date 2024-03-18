@@ -68,7 +68,6 @@ public enum NumberEnums {
         }
     }
 
-    @SuppressWarnings({"unchecked" })
     private <T> T createPrimitiveArray(int length) {
         return switch (ordinal()) {
             case 0 -> (T) new int[length];

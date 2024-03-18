@@ -28,7 +28,7 @@ public class ExprNewPacket extends SimpleExpression<PacketContainer> {
     private boolean hasDefault = false;
     
     static {
-        Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.SIMPLE,
+        Skript.registerExpression(ExprNewPacket.class, PacketContainer.class, ExpressionType.COMBINED,
                 "new %packettype% packet [(1¦with default values)]");
     }
     

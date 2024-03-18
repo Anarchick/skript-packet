@@ -48,7 +48,7 @@ public class ExprEnum extends SimpleExpression<Object> {
     private static final List<String> packages = new ArrayList<>();
     
     static {
-        Skript.registerExpression(ExprEnum.class, Object.class, ExpressionType.SIMPLE, patterns);
+        Skript.registerExpression(ExprEnum.class, Object.class, ExpressionType.COMBINED, patterns);
         try {
             // MinecraftVersion.class is in root of both before/after 1.17
             Class<?> klass = MinecraftReflection.getMinecraftClass("MinecraftVersion");

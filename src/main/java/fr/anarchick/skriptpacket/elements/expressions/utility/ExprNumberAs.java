@@ -27,7 +27,7 @@ public class ExprNumberAs extends SimpleExpression<Number> {
     private int mark;
 
     static {
-        Skript.registerExpression(ExprNumberAs.class, Number.class, ExpressionType.SIMPLE, 
+        Skript.registerExpression(ExprNumberAs.class, Number.class, ExpressionType.COMBINED,
                 "%number% as [primitive] (0¦int[eger]|1¦float|2¦long|3¦double|4¦short|5¦byte)");
     }
     

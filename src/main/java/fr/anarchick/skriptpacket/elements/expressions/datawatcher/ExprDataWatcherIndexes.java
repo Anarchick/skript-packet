@@ -31,7 +31,7 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     };
 
     static {
-        Skript.registerExpression(ExprDataWatcherIndexes.class, Number.class, ExpressionType.SIMPLE, patterns);
+        Skript.registerExpression(ExprDataWatcherIndexes.class, Number.class, ExpressionType.PROPERTY, patterns);
     }
     
     @Override

@@ -26,7 +26,7 @@ public class ExprDataWatcherIndex extends SimpleExpression<Object> {
     private Expression<DataWatcher> dataWatcherExpr;
 
     static {
-        Skript.registerExpression(ExprDataWatcherIndex.class, Object.class, ExpressionType.SIMPLE,
+        Skript.registerExpression(ExprDataWatcherIndex.class, Object.class, ExpressionType.COMBINED,
                 "[the] datawatcher index %number% of %datawatcher%");
     }
     

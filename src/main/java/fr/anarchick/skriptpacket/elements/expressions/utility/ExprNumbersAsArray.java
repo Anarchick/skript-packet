@@ -40,7 +40,7 @@ public class ExprNumbersAsArray extends SimpleExpression<Object> {
                 "%numbers% as (0¦Int[eger]|1¦Float|2¦Long|3¦Double|4¦Short|5¦Byte) array",
                 "%numbers% as primitive (0¦int|1¦float|2¦long|3¦double|4¦short|5¦byte) array"
         };
-        Skript.registerExpression(ExprNumbersAsArray.class, Object.class, ExpressionType.SIMPLE, patterns);
+        Skript.registerExpression(ExprNumbersAsArray.class, Object.class, ExpressionType.COMBINED, patterns);
     }
     
     @Override

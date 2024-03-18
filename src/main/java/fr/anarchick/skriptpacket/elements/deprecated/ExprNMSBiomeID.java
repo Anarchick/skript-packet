@@ -1,6 +1,6 @@
 package fr.anarchick.skriptpacket.elements.deprecated;
 
-import fr.anarchick.skriptpacket.util.Converter;
+import fr.anarchick.skriptpacket.util.converters.ConverterLogic;
 import org.bukkit.block.Biome;
 
 import ch.njol.skript.doc.Description;
@@ -25,7 +25,7 @@ public class ExprNMSBiomeID extends SimplePropertyExpression<Biome, Number>{
 
     @Override
     public Number convert(Biome biome) {
-        return Converter.getBiomeID(biome);
+        return ConverterLogic.getBiomeID(biome);
     }
     
     @Override

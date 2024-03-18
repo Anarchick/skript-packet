@@ -17,6 +17,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.SkriptPacket;
+import org.jetbrains.annotations.NotNull;
 
 @Name("NMS Pair")
 @Description("Pair object A with object B uning com.mojang.datafixers.util.Pair")
@@ -35,7 +36,7 @@ public class ExprPair extends SimpleExpression<Object>{
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         first = (Expression<Object>) exprs[0];
         second = (Expression<Object>) exprs[1];
         return true;
@@ -43,7 +44,7 @@ public class ExprPair extends SimpleExpression<Object>{
     
     @Override
     @Nullable
-    protected Object[] get(Event e) {
+    protected Object @NotNull [] get(@NotNull Event e) {
         Object _first = first.getSingle(e);
         Object _second = second.getSingle(e);
         if (SkriptPacket.isReflectAddon) {
@@ -58,12 +59,12 @@ public class ExprPair extends SimpleExpression<Object>{
     }
     
     @Override
-    public Class<?> getReturnType() {
+    public @NotNull Class<?> getReturnType() {
         return Object.class;
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
         return "pair %object% with %object%";
     }
     

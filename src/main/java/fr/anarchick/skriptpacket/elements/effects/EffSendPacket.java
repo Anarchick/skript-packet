@@ -29,7 +29,7 @@ import java.util.Arrays;
 })
 @Since("1.0, 1.1 (without calling event)")
 
-public class EffSendPacket extends Effect{
+public class EffSendPacket extends Effect {
     
     private Expression<PacketContainer> packets;
     private Expression<Player> players;

@@ -31,7 +31,7 @@ public class ExprEntityFromID extends SimpleExpression<Entity> {
     private Expression<World> worldExpr;
     
     static {
-        Skript.registerExpression(ExprEntityFromID.class, Entity.class, ExpressionType.SIMPLE,
+        Skript.registerExpression(ExprEntityFromID.class, Entity.class, ExpressionType.COMBINED,
                 "entity from id %number% in %world%");
     }
 

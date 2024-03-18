@@ -42,7 +42,7 @@ public class ExprNewDataWatcher extends SimpleExpression<DataWatcher> {
     };
 
     static {
-        Skript.registerExpression(ExprNewDataWatcher.class, DataWatcher.class, ExpressionType.SIMPLE, patterns);
+        Skript.registerExpression(ExprNewDataWatcher.class, DataWatcher.class, ExpressionType.COMBINED, patterns);
     }
     
     @Override
