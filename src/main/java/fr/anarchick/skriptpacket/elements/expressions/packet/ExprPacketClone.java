@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements.expressions.packet;
 
+import ch.njol.skript.util.LiteralUtils;
 import com.comphenix.protocol.events.PacketContainer;
 
 import ch.njol.skript.doc.Description;
@@ -10,6 +11,7 @@ import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Clone of Packet")
 @Description("Get a full copy (=deep) or a fast copy (=shallow) of a packet")
@@ -22,13 +24,19 @@ public class ExprPacketClone extends SimplePropertyExpression<PacketContainer, P
     private String pattern;
     
     static {
-        register(ExprPacketClone.class, PacketContainer.class, "[packet] (0¦deep|1¦shallow) (clone|copy)", "packet");
+        register(ExprPacketClone.class, PacketContainer.class,
+                "[packet] (0¦deep|1¦shallow) (clone|copy)", "packet");
     }
     
     @Override
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?> @NotNull [] exprs, int matchedPattern, @NotNull Kleenean isDelayed, ParseResult parser) {
         mark = parser.mark;
         pattern = parser.expr;
+        if (LiteralUtils.hasUnparsedLiteral(exprs[0])) {
+            setExpr(LiteralUtils.defendExpression(exprs[0]));
+            return LiteralUtils.canInitSafely(getExpr());
+        }
+        setExpr((Expression<? extends PacketContainer>) exprs[0]);
         return true;
     }
     
@@ -38,12 +46,12 @@ public class ExprPacketClone extends SimplePropertyExpression<PacketContainer, P
     }
     
     @Override
-    public Class<? extends PacketContainer> getReturnType() {
+    public @NotNull Class<? extends PacketContainer> getReturnType() {
         return PacketContainer.class;
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return pattern;
     }
     
