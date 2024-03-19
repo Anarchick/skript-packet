@@ -26,7 +26,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.WorldServerClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return World.class;
         }
     },
@@ -41,15 +46,21 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.EntityClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Entity.class;
         }
     },
 
     /**
      * NMS Chunk to Bukkit chunk
-     *
+     * Not availaible anymore
      */
+    @Deprecated
     NMS_CHUNK_TO_BUKKIT_CHUNK {
         @Override
         public Object convert(final Object single) {
@@ -57,7 +68,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Chunk.class;
         }
     },
@@ -70,7 +86,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.BlockPositionClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Location.class;
         }
     },
@@ -82,7 +103,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.Vec3DClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Vector.class;
         }
     },
@@ -97,7 +123,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Vector3F.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Vector.class;
         }
     },
@@ -109,7 +140,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.ItemStackClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ItemStack.class;
         }
     },
@@ -123,7 +159,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.BlockClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Material.class;
         }
     },
@@ -136,11 +177,15 @@ public enum ConverterToBukkit implements Converter {
             blockDataString = blockDataString.replace("}", "");
             blockDataString = blockDataString.replace(",", ";");
             return BlockUtils.createBlockData(blockDataString);
-
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.IBlockDataClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return BlockData.class;
         }
     },
@@ -183,7 +228,12 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Material.class;
         }
     },
@@ -196,9 +246,20 @@ public enum ConverterToBukkit implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return String.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Component.class;
         }
+    };
+
+
+    @Override
+    public ConverterType getType() {
+        return ConverterType.TO_BUKKIT;
     }
 
 }

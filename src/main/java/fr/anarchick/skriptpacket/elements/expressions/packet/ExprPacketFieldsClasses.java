@@ -75,8 +75,8 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
             if (shouldWrap) {
                 Converter converter = ConverterLogic.getConverterToBukkit(fieldClass);
                 if (ConverterToUtility.HIMSELF != converter
-                        && converter.getReturnType() != Object.class ) {
-                    fieldClass = converter.getReturnType();
+                        && converter.getOutputType() != Object.class ) {
+                    fieldClass = converter.getOutputType();
                 }
             }
 

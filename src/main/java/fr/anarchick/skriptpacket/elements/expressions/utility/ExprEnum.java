@@ -87,23 +87,23 @@ public class ExprEnum extends SimpleExpression<Object> {
     @Override
     @Nullable
     protected Object[] get(Event e) {
-        String original = "";
+        String targetClassName = "";
         if (pattern <= 1) {
-            original = classExpr.getSingle(e);
-            if (original == null || original.isEmpty()) return new Object[0];
+            targetClassName = classExpr.getSingle(e);
+            if (targetClassName == null || targetClassName.isEmpty()) return new Object[0];
         }
 
         Class<?> clazz = null;
         switch (pattern) {
             case 0:
                 try {
-                    clazz = Class.forName(original);
+                    clazz = Class.forName(targetClassName);
                 } catch (ClassNotFoundException e1) {
-                    Skript.error("Failed to find class '" + original + "'");
+                    Skript.error("Failed to find class '" + targetClassName + "'");
                 }
                 break;
             case 1:
-                String className = original.replaceFirst("net\\.minecraft", "");
+                String className = targetClassName.replaceFirst("net\\.minecraft", "");
                 String[] aliases = className.split("\\.");
                 String alias = aliases[aliases.length -1];
                 try {
@@ -114,7 +114,7 @@ public class ExprEnum extends SimpleExpression<Object> {
                         try {
                             clazz = MinecraftReflection.getMinecraftClass(path);
                             if (clazz != null) {
-                                Skript.error("You should replace '"+original+"' by '"+path+"' for better performances");
+                                Skript.error("You should replace '"+targetClassName+"' by '"+path+"' for better performances");
                                 break;
                             }
                         } catch (RuntimeException ignored) {}

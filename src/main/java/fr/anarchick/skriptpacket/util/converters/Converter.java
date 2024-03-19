@@ -12,6 +12,9 @@ public interface Converter {
         return false;
     }
 
-    Class<?> getReturnType();
+    Class<?> getInputType();
+    Class<?> getOutputType();
+
+    ConverterType getType();
 
 }

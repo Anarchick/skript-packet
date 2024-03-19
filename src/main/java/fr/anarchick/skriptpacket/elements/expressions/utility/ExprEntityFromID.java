@@ -64,7 +64,7 @@ public class ExprEntityFromID extends SimpleExpression<Entity> {
     
     @Override
     public String toString(@Nullable Event e, boolean debug) {
-        return "entity from id " + idExpr.getSingle(e) + " in " + worldExpr.getSingle(e);
+        return "entity from id %number% in %world%";
     }
     
 }

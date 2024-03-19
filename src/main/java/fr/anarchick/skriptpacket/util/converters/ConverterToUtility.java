@@ -4,6 +4,7 @@ import ch.njol.skript.Skript;
 import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.wrappers.ComponentConverter;
 import com.comphenix.protocol.wrappers.MinecraftKey;
+import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -24,7 +25,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Object.class;
         }
     },
@@ -39,7 +45,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return (SkriptPacket.isReflectAddon) ? ObjectWrapper.class : Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Object.class;
         }
     },
@@ -62,7 +73,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return IntList.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Integer[].class;
         }
     },
@@ -74,7 +90,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Optional.class;
         }
     },
@@ -96,7 +117,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return UUID.class;
         }
     },
@@ -117,7 +143,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ArrayList.class;
         }
     },
@@ -138,7 +169,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return HashSet.class;
         }
     },
@@ -158,7 +194,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return String.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.MojangsonClass;
         }
     },
@@ -171,7 +212,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return String.class;
         }
     },
@@ -190,7 +236,12 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return String.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return BaseComponent.class;
         }
     },
@@ -202,9 +253,42 @@ public enum ConverterToUtility implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ConverterLogic.MinecraftKeyClass;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return String.class;
         }
+    },
+
+    BUKKIT_VECTOR_TO_PROTOCOLLIB_VECTOR3F {
+        @Override
+        public Object convert(final Object single) {
+            if (single instanceof Vector vec) {
+                float x = (float) vec.getX();
+                float y = (float) vec.getY();
+                float z = (float) vec.getZ();
+                return new Vector3F(x, y, z);
+            }
+            return single;
+        }
+
+        @Override
+        public Class<?> getInputType() {
+            return Vector.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
+            return Vector3F.class;
+        }
+    };
+
+    @Override
+    public ConverterType getType() {
+        return ConverterType.TO_UTILITY;
     }
 
 }

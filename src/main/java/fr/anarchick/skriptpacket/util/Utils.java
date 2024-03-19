@@ -11,14 +11,19 @@ public class Utils {
     
     public static Object getEnum(Class<?> clazz, String enumStr, boolean debug) {
         if (enumStr == null || clazz == null || enumStr.isEmpty()) return new Object[0];
-        try {
-            return clazz.getDeclaredMethod("valueOf", String.class).invoke(null, enumStr);
-        } catch (Exception ex) {
-            if (debug) {
-                Skript.error("Failed to find enum '"+enumStr+"' from "+clazz);
-                Skript.error("Possible enums are : '"+getEnumsNames(clazz)+"'" );
+        if (!clazz.isEnum()) {
+            Skript.error(clazz + " is not an enum Class");
+            return null;
+        }
+
+        for (Object enumConstant : clazz.getEnumConstants()) {
+            if ( ((Enum<?>)enumConstant).name().equals(enumStr) ) {
+                return enumConstant;
             }
         }
+
+        Skript.error("Failed to find enum '"+enumStr+"' from "+clazz);
+        Skript.error("Possible enums are : '"+getEnumsNames(clazz)+"'" );
         return null;
     }
     

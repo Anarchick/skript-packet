@@ -15,9 +15,10 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.iterator.EmptyIterator;
+import org.jetbrains.annotations.NotNull;
 
 @Name("DataWatcher Indexes")
-@Description("Get all indexes of a datawatcher")
+@Description("Get all indexes of a data watcher")
 //@Examples("")
 @Since("2.0")
 
@@ -26,8 +27,8 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     private Expression<DataWatcher> dataWatcherExpr;
     
     private static final String[] patterns = new String[] {
-            "[all] datawatcher (indexes|indices) of %datawatcher%",
-            "[all] %datawatcher%'s datawatcher (indexes|indices)"
+            "[all] data[ ]watcher (indexes|indices) of %datawatcher%",
+            "[all] %datawatcher%'s data[ ]watcher (indexes|indices)"
     };
 
     static {
@@ -36,20 +37,20 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parseResult) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parseResult) {
         dataWatcherExpr = (Expression<DataWatcher>) exprs[0];
         return true;
     }
     
     @Override
-    protected Number[] get(Event event) {
+    protected Number @NotNull [] get(@NotNull Event event) {
         DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
         if (dataWatcher == null) return new Number[0];
-        return dataWatcher.getIndexes().toArray(new Number[0]);
+        return dataWatcher.getIndexes().toArray(Number[]::new);
     }
     
     @Override
-    public Iterator<Integer> iterator(Event event) {
+    public Iterator<Integer> iterator(@NotNull Event event) {
         DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
         if (dataWatcher == null) {
             return new EmptyIterator<>();
@@ -63,13 +64,13 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     }
 
     @Override
-    public Class<? extends Number> getReturnType() {
+    public @NotNull Class<? extends Number> getReturnType() {
         return Number.class;
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
-        return "all datawatcher indexes of " + dataWatcherExpr.toString(e, debug);
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
+        return "all data watcher indexes of " + dataWatcherExpr.toString(e, debug);
     }
     
 }

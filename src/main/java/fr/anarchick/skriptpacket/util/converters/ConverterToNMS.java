@@ -4,7 +4,10 @@ import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.util.slot.Slot;
 import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.BukkitConverters;
+import com.comphenix.protocol.wrappers.MinecraftKey;
+import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -18,8 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 public enum ConverterToNMS implements Converter {
@@ -36,7 +37,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Object.class;
         }
     },
@@ -48,7 +54,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Slot.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -60,7 +71,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Material.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -72,7 +88,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ItemStack.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -84,7 +105,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Block.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -96,7 +122,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return BlockData.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -122,7 +153,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.ItemStackClass;
         }
     },
@@ -149,7 +185,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.BlockPositionClass;
         }
     },
@@ -167,7 +208,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return ItemType.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.IBlockDataClass;
         }
     },
@@ -179,7 +225,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Material.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.IBlockDataClass;
         }
     },
@@ -191,7 +242,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Block.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.IBlockDataClass;
         }
     },
@@ -203,7 +259,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return BlockData.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.IBlockDataClass;
         }
     },
@@ -215,7 +276,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Vector.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.Vec3DClass;
         }
     },
@@ -227,7 +293,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Biome.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return Integer.class;
         }
     },
@@ -242,7 +313,12 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return String.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.IChatBaseComponentClass;
         }
     },
@@ -254,45 +330,28 @@ public enum ConverterToNMS implements Converter {
 
             if (single instanceof Keyed keyed) {
                 namespacedKey = keyed.getKey();
+            } else if (single instanceof String str) {
+
+                if (str.contains(":")) {
+                    String[] split = str.split(":");
+                    namespacedKey = new NamespacedKey(split[0], split[1]);
+                } else {
+                    namespacedKey = new NamespacedKey("minecraft", str);
+                }
+
             }
 
             return MinecraftKey.getConverter().getGeneric(new MinecraftKey(namespacedKey.getNamespace(), namespacedKey.getKey()));
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Keyed.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.MinecraftKeyClass;
-        }
-    },
-
-    // TODO
-    PROTOCOLLIB_WRAPPED_DATA_WATCHER_TO_NMS {
-        @Override
-        public Object convert(final Object single) {
-            WrappedDataWatcher dw = (WrappedDataWatcher) single;
-            List<Object> nmsList = new ArrayList<>();
-            for (WrappedWatchableObject wwo : dw.getWatchableObjects()) {
-                nmsList.add(wwo.getHandle());
-            }
-            return nmsList;
-        }
-
-        @Override
-        public Class<?> getReturnType() {
-            return Object.class;
-        }
-    },
-
-    // TODO
-    PROTOCOLLIB_WRAPPED_WATCHABLE_OBJECT_TO_NMS {
-        @Override
-        public Object convert(final Object single) {
-            return ((WrappedWatchableObject) single).getHandle();
-        }
-
-        @Override
-        public Class<?> getReturnType() {
-            return Object.class;
         }
     },
 
@@ -320,9 +379,19 @@ public enum ConverterToNMS implements Converter {
         }
 
         @Override
-        public Class<?> getReturnType() {
+        public Class<?> getInputType() {
+            return Object.class;
+        }
+
+        @Override
+        public Class<?> getOutputType() {
             return ConverterLogic.EntityTypesClass;
         }
+    };
+
+    @Override
+    public ConverterType getType() {
+        return ConverterType.TO_NMS;
     }
 
 }

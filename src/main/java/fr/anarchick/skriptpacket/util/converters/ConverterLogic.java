@@ -27,15 +27,13 @@ import org.bukkit.util.Vector;
 import javax.annotation.Nonnull;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Pattern;
 
 public class ConverterLogic {
 
-    public static final Pattern regexUUID = Pattern.compile("^[\\da-f]{8}-([\\da-f]{4}-){3}[\\da-f]{12}$", Pattern.CASE_INSENSITIVE);
+
     public static final Class<?> MojangsonClass = MinecraftReflection.getMinecraftClass("MojangsonParser", "nbt.MojangsonParser");
-    public static final Constructor<?> blockPositionConstructor;
     public static final Class<?> NBTTagCompoundClass = MinecraftReflection.getNBTCompoundClass();
     public static final Class<?> IChatBaseComponentClass = MinecraftReflection.getIChatBaseComponentClass();
     public static final Class<?> ItemStackClass = MinecraftReflection.getItemStackClass();
@@ -47,9 +45,13 @@ public class ConverterLogic {
     public static final Class<?> Vec3DClass = MinecraftReflection.getVec3DClass();
     public static final Class<?> WorldServerClass = MinecraftReflection.getWorldServerClass();
     public static final Class<?> EntityClass = MinecraftReflection.getEntityClass();
+
     protected static final MiniMessage MINI_MESSAGE = MiniMessage.miniMessage();
+    private static final List<Converter> CONVERTERS = new LinkedList<>();
     private static final Map<Class<?>, Converter> TO_BUKKIT = new HashMap<>();
     private static final ClassLoader classLoader = SkriptPacket.getInstance().getClass().getClassLoader();
+    public static final Constructor<?> blockPositionConstructor;
+    public static final Pattern regexUUID = Pattern.compile("^[\\da-f]{8}-([\\da-f]{4}-){3}[\\da-f]{12}$", Pattern.CASE_INSENSITIVE);
 
 
     static {
@@ -60,6 +62,11 @@ public class ConverterLogic {
         } catch (Exception e) {
             throw new RuntimeException("Cannot find block position constructor.", e);
         }
+
+        CONVERTERS.addAll(Arrays.stream(ConverterToUtility.values()).toList());
+        CONVERTERS.addAll(Arrays.stream(ConverterToBukkit.values()).toList());
+        CONVERTERS.addAll(Arrays.stream(ConverterToNMS.values()).toList());
+
 
         // If an Exception happens, just replace by Strings
         registerToBukkitConverter(ConverterToUtility.SKRIPTMIRROR_UNWRAPPER, "com.btk5h.skriptmirror.ObjectWrapper");
@@ -101,6 +108,33 @@ public class ConverterLogic {
             TO_BUKKIT.put(clazz, converter);
         }
     }
+
+    @Nonnull
+    public static List<Converter> getConverters(@Nonnull Class<?> toClass) {
+        final List<Converter> list = new ArrayList<>();
+        for (Converter converter : CONVERTERS) {
+            if ( converter.getOutputType().isAssignableFrom(toClass)) {
+                list.add(converter);
+            }
+        }
+        return list;
+    }
+
+    @Nonnull
+    public static Converter getConverter(@Nonnull Class<?> fromClass, @Nonnull Class<?> toClass) {
+        for (Converter converter : CONVERTERS) {
+            Class<?> outputClass = converter.getOutputType();
+            Class<?> inputClass = converter.getInputType();
+            if (outputClass.isAssignableFrom(toClass)
+                    && inputClass.isAssignableFrom(fromClass)
+                    && inputClass != Object.class
+                    && outputClass != Object.class) {
+                return converter;
+            }
+        }
+        return ConverterToUtility.HIMSELF;
+    }
+
     
     @SafeVarargs
     public static <T> Object toNMS(T... array) {
@@ -125,10 +159,6 @@ public class ConverterLogic {
                 converter = ConverterToNMS.BUKKIT_MATERIAL_TO_NMS_ITEMSTACK;
             } else if (single instanceof Slot) {
                 converter = ConverterToNMS.SKRIPT_SLOT_TO_NMS_ITEMSTACK;
-            } else if (single instanceof WrappedWatchableObject) {
-                converter = ConverterToNMS.PROTOCOLLIB_WRAPPED_WATCHABLE_OBJECT_TO_NMS;
-            } else if (single instanceof WrappedDataWatcher) {
-                converter = ConverterToNMS.PROTOCOLLIB_WRAPPED_DATA_WATCHER_TO_NMS;
             } else if (single instanceof Vector) {
                 converter = ConverterToNMS.BUKKIT_VECTOR_TO_NMS_VEC3D;
             } else if (single instanceof Biome) {

@@ -9,6 +9,7 @@ import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.reflect.StructureModifier;
 import fr.anarchick.skriptpacket.SkriptPacket;
+import fr.anarchick.skriptpacket.elements.expressions.datawatcher.DataWatcher;
 import fr.anarchick.skriptpacket.util.NumberEnums;
 import fr.anarchick.skriptpacket.util.Utils;
 import fr.anarchick.skriptpacket.util.converters.*;
@@ -144,7 +145,7 @@ public class PacketManager extends StructureModifier<Object> {
         }
     }
 
-    public static StructureModifier<Object> setField(final PacketContainer packet, final int i, Object[] data) {
+    public static StructureModifier<? extends Object> setField(final PacketContainer packet, final int i, Object[] data) {
         final StructureModifier<Object> modifier = packet.getModifier();
         if (!( (i >= 0 ) && (i < modifier.size()) )) {
             Skript.error("Available indexes for the packketype '"+PacketManager.getPacketName(packet.getType())+"' are from 0 to "+(modifier.size() -1));
@@ -166,6 +167,11 @@ public class PacketManager extends StructureModifier<Object> {
             }
         }
 
+        // Must be called before auto converter
+        if (data[0] instanceof DataWatcher dataWatcher) {
+            return packet.getDataValueCollectionModifier().writeSafely(0, dataWatcher.toList());
+        }
+
         if (FIELD_CONVERTERS.containsKey(fieldClass)) {
             final Converter converter = FIELD_CONVERTERS.get(fieldClass);
             if (converter.isArrayInput()) {
@@ -175,10 +181,9 @@ public class PacketManager extends StructureModifier<Object> {
             }
         }
 
-        if (data instanceof String[]) {
-            String str = Optional.ofNullable((String)data[0]).orElse("");
+        if (data instanceof String[] strings) {
             if (fieldClass.isEnum()) {
-                return modifier.writeSafely(i, Utils.getEnum(fieldClass, str, true));
+                return modifier.writeSafely(i, Utils.getEnum(fieldClass, strings[0], true));
             }
         }
 
