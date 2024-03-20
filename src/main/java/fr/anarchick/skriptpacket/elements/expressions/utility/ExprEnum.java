@@ -25,6 +25,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
 import fr.anarchick.skriptpacket.util.Utils;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Enum")
 @Description("Get an Enum from a class")
@@ -51,14 +52,14 @@ public class ExprEnum extends SimpleExpression<Object> {
         Skript.registerExpression(ExprEnum.class, Object.class, ExpressionType.COMBINED, patterns);
         try {
             // MinecraftVersion.class is in root of both before/after 1.17
-            Class<?> klass = MinecraftReflection.getMinecraftClass("MinecraftVersion");
-            // If you use PAPER , it return the file from '/cache/patched_1.17.1.jar'
-            URL url = klass.getProtectionDomain().getCodeSource().getLocation();
-            File file = Paths.get(url.toURI()).toFile();
-            JarFile jar = new JarFile(file);
+            final Class<?> minecraftVersionClass = MinecraftReflection.getMinecraftClass("MinecraftVersion");
+            // If you use PAPER , it returns the file from '/cache/patched_1.17.1.jar'
+            final URL url = minecraftVersionClass.getProtectionDomain().getCodeSource().getLocation();
+            final File file = Paths.get(url.toURI()).toFile();
+            final JarFile jar = new JarFile(file);
             jar.stream()
                 .map(ZipEntry::getName)
-                // If you use PAPER, a lot of more packages are include
+                // If you use PAPER, a lot of more packages are included
                 .filter(name -> (name.startsWith("net/minecraft") && name.endsWith(".class")))
                 .map(name -> name
                     .substring(0, name.lastIndexOf('/'))
@@ -73,27 +74,34 @@ public class ExprEnum extends SimpleExpression<Object> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         pattern = matchedPattern;
         enumExpr = (Expression<String>) exprs[0];
+
         if (pattern <= 1) {
             classExpr = (Expression<String>) exprs[1];
         } else {
             objExpr = (Expression<Object>) exprs[1];
         }
+
         return true;
     }
     
     @Override
-    @Nullable
-    protected Object[] get(Event e) {
+    protected Object @NotNull [] get(@NotNull Event e) {
         String targetClassName = "";
+
         if (pattern <= 1) {
             targetClassName = classExpr.getSingle(e);
-            if (targetClassName == null || targetClassName.isEmpty()) return new Object[0];
+
+            if (targetClassName == null || targetClassName.isEmpty()) {
+                return new Object[0];
+            }
+
         }
 
         Class<?> clazz = null;
+
         switch (pattern) {
             case 0:
                 try {
@@ -103,34 +111,49 @@ public class ExprEnum extends SimpleExpression<Object> {
                 }
                 break;
             case 1:
-                String className = targetClassName.replaceFirst("net\\.minecraft", "");
-                String[] aliases = className.split("\\.");
-                String alias = aliases[aliases.length -1];
+                final String className = targetClassName.replaceFirst("net\\.minecraft", "");
+                final String[] aliases = className.split("\\.");
+                final String alias = aliases[aliases.length -1];
+
                 try {
                     clazz = MinecraftReflection.getMinecraftClass(className, alias);
                 } catch (RuntimeException e1) {
+
                     for (String str : packages) {
                         String path = str+"."+alias;
+
                         try {
                             clazz = MinecraftReflection.getMinecraftClass(path);
+
                             if (clazz != null) {
                                 Skript.error("You should replace '"+targetClassName+"' by '"+path+"' for better performances");
                                 break;
                             }
+
                         } catch (RuntimeException ignored) {}
+
                     }
                 }
-                if (clazz == null) Skript.error("Failed to find NMS class '" + className + "'");
+
+                if (clazz == null) {
+                    Skript.error("Failed to find NMS class '" + className + "'");
+                }
+
                 break;
             case 2:
-                Object obj = objExpr.getSingle(e);
-                if (obj != null) clazz = obj.getClass();
+                final Object obj = objExpr.getSingle(e);
+
+                if (obj != null) {
+                    clazz = obj.getClass();
+                }
+
                 break;
             default:
                 break;
         }
-        String enumStr = enumExpr.getSingle(e);
-        return CollectionUtils.array(Utils.getEnum(clazz, enumStr, true));
+
+        final String enumStr = enumExpr.getSingle(e);
+        return CollectionUtils.array(Utils.getEnum(clazz, enumStr));
     }
     
     @Override
@@ -139,12 +162,12 @@ public class ExprEnum extends SimpleExpression<Object> {
     }
     
     @Override
-    public Class<?> getReturnType() {
+    public @NotNull Class<?> getReturnType() {
         return Object.class;
     }
     
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
         return patterns[pattern];
     }
     

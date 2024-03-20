@@ -132,11 +132,13 @@ public class Types {
                         @Override
                         public @NotNull String toString(PacketContainer packet, int flags) {
                             String str;
+
                             try {
                                 str = packet.toString();
                             } catch (Exception e) {
                                 str = "PacketContainer[type=" + packet.getType() + ", structureModifier=INVALID_DATA]";
                             }
+
                             return str;
                         }
 

@@ -8,6 +8,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Packettype")
 @Description("Return the packet type of a %packet%")
@@ -21,17 +22,17 @@ public class ExprPacketType extends SimplePropertyExpression<PacketContainer, Pa
     }
 
     @Override
-    public PacketType convert(PacketContainer packet) {
+    public PacketType convert(final PacketContainer packet) {
         return packet.getType();
     }
     
     @Override
-    public Class<? extends PacketType> getReturnType() {
+    public @NotNull Class<? extends PacketType> getReturnType() {
         return PacketType.class;
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "packettype of %packet%";
     }
     

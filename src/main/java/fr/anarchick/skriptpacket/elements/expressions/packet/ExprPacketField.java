@@ -21,12 +21,13 @@ import fr.anarchick.skriptpacket.util.ArrayUtils;
 import fr.anarchick.skriptpacket.util.converters.ConverterLogic;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Packet Field")
 @Description({
     "Get or set a packet field",
     "Field id start from 0 and increase by 1 for each existent field",
-    "This expression has an auto-converter. More informations on the wiki https://github.com/Anarchick/skript-packet/wiki"
+    "This expression has an auto-converter. More information on the wiki https://github.com/Anarchick/skript-packet/wiki"
 })
 @Examples({
     "set field 0 of packet {_packet} to 5",
@@ -41,8 +42,7 @@ public class ExprPacketField extends SimpleExpression<Object> {
     private boolean shouldWrap;
 
     private boolean isSingle = true;
-    private PacketContainer packet;
-    
+
     static {
        Skript.registerExpression(ExprPacketField.class, Object.class, ExpressionType.COMBINED,
                "[packet] field %number% [of %-packet%]",
@@ -52,16 +52,18 @@ public class ExprPacketField extends SimpleExpression<Object> {
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         shouldWrap = ( matchedPattern == 1 );
         indexExpr = (Expression<Number>) exprs[0];
 
         if (indexExpr instanceof Literal<Number> litIndex) {
             int index = litIndex.getSingle().intValue();
+
             if (index < 0) {
                 Skript.error("Indexes starts from 0");
                 return false;
             }
+
         }
 
         if (exprs[1] != null) {
@@ -74,8 +76,8 @@ public class ExprPacketField extends SimpleExpression<Object> {
     
     @Override
     @Nullable
-    protected Object[] get(Event e) {
-        PacketContainer packet;
+    protected Object @NotNull [] get(@NotNull Event e) {
+        final PacketContainer packet;
 
         if (packetExpr == null) {
             packet = ((BukkitPacketEvent) e).getPacket();
@@ -83,22 +85,22 @@ public class ExprPacketField extends SimpleExpression<Object> {
             packet = packetExpr.getSingle(e);
         }
 
-        Number index = indexExpr.getSingle(e);
+        final Number index = indexExpr.getSingle(e);
 
         if ((packet != null) && (index != null)) {
             int i = index.intValue();
-            StructureModifier<Object> modifier = packet.getModifier();
+            final StructureModifier<Object> modifier = packet.getModifier();
             int size = modifier.size();
 
             if ((i < 0 ) || (i >= size)) {
                 Skript.error("Available indexes for the packketype '"+PacketManager.getPacketName(packet.getType())+"' are from 0 to "+(size -1));
-                return null;
+                return new Object[0];
             }
 
-            Object field = modifier.readSafely(i);
+            final Object field = modifier.readSafely(i);
 
             if (field == null) {
-                return null;
+                return new Object[0];
             }
 
             if (field.getClass().isArray()) {
@@ -115,27 +117,35 @@ public class ExprPacketField extends SimpleExpression<Object> {
             return new Object[] {obj};
         }
 
-        return null;
+        return new Object[0];
     }
     
     @Override
     @Nullable
-    public Class<?>[] acceptChange(final ChangeMode mode) {
+    public Class<?> @NotNull [] acceptChange(final @NotNull ChangeMode mode) {
         if ( mode == ChangeMode.SET ) {
             return new Class[] {Number[].class, Object[].class};
         }
-        return null;
+
+        return new Class[0];
     }
     
     @Override
-    public void change(Event e, Object[] delta, ChangeMode mode) {
-        if (mode != ChangeMode.SET) return;
+    public void change(@NotNull Event e, Object @NotNull [] delta, @NotNull ChangeMode mode) {
+        if (mode != ChangeMode.SET) {
+            return;
+        }
+
+        final PacketContainer packet;
+
         if (packetExpr == null) {
             packet = ((BukkitPacketEvent) e).getPacket();
         } else {
             packet = packetExpr.getSingle(e);
         }
-        Number index = indexExpr.getSingle(e);
+
+        final Number index = indexExpr.getSingle(e);
+
         if ((packet != null) && (index != null)) {
             PacketManager.setField(packet, index.intValue(), ArrayUtils.toArray(delta));
         }
@@ -147,12 +157,12 @@ public class ExprPacketField extends SimpleExpression<Object> {
     }
     
     @Override
-    public Class<?> getReturnType() {
+    public @NotNull Class<?> getReturnType() {
         return Object.class;
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
 
         if (shouldWrap) {
             return "(convert|wrap) [packet] field %number% [of %-packet%]";

@@ -41,9 +41,11 @@ public class PacketManager extends StructureModifier<Object> {
     // Init
     static {
         packetTypesByName = createNameToPacketTypeMap();
+
         for (Map.Entry<String, PacketType> entry : packetTypesByName.entrySet()) {
             packetTypesToName.put(entry.getValue(), entry.getKey());
         }
+
         PACKETTYPES = packetTypesByName.values().toArray(new PacketType[0]);
 
         FIELD_CONVERTERS.put(UUID.class, ConverterToUtility.RELATED_TO_UUID);
@@ -113,11 +115,13 @@ public class PacketManager extends StructureModifier<Object> {
     
     public static void onPacketEvent(PacketType packetType, ListenerPriority priority, Mode mode) {
         final SPPacketAdapter SPPacketAdapter = new SPPacketAdapter(priority, packetType, mode);
+
         switch (mode) {
             case ASYNC -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(SPPacketAdapter).start();
             case SYNC -> PROTOCOL_MANAGER.addPacketListener(SPPacketAdapter);
             default -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(SPPacketAdapter).syncStart();
         }
+
     }
     
     public static void removeListeners() {
@@ -127,9 +131,11 @@ public class PacketManager extends StructureModifier<Object> {
 
     public static void sendPacket(PacketContainer packet, Player[] players) {
         try {
+
             for (Player player : players) {
                 PROTOCOL_MANAGER.sendServerPacket(player, packet);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -137,26 +143,32 @@ public class PacketManager extends StructureModifier<Object> {
     
     public static void receivePacket(PacketContainer packet, Player[] players) {
         try {
+
             for (Player player : players) {
                 PROTOCOL_MANAGER.receiveClientPacket(player, packet);
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static StructureModifier<? extends Object> setField(final PacketContainer packet, final int i, Object[] data) {
+    public static StructureModifier<?> setField(final PacketContainer packet, final int i, Object[] data) {
         final StructureModifier<Object> modifier = packet.getModifier();
+
         if (!( (i >= 0 ) && (i < modifier.size()) )) {
             Skript.error("Available indexes for the packketype '"+PacketManager.getPacketName(packet.getType())+"' are from 0 to "+(modifier.size() -1));
             return null;
         }
+
         final Class<?> fieldClass = modifier.getField(i).getType();
+
         if (fieldClass.isInstance(data[0])) {
             return modifier.writeSafely(i, data[0]);
         }
 
         if (NumberEnums.isNumber(fieldClass)) {
+
             if (data instanceof Number[] numbers) {
                 return modifier.writeSafely(i, NumberEnums.convert(fieldClass, numbers));
             } else if (data instanceof Entity[] entities) {
@@ -165,6 +177,7 @@ public class PacketManager extends StructureModifier<Object> {
             } else if (data instanceof Biome[] biome) {
                 return modifier.writeSafely(i, NumberEnums.convert(fieldClass, (Number) ConverterToNMS.BUKKIT_BIOME_TO_NMS_BIOME_ID.convert(biome)));
             }
+
         }
 
         // Must be called before auto converter
@@ -174,16 +187,18 @@ public class PacketManager extends StructureModifier<Object> {
 
         if (FIELD_CONVERTERS.containsKey(fieldClass)) {
             final Converter converter = FIELD_CONVERTERS.get(fieldClass);
+
             if (converter.isArrayInput()) {
                 return modifier.writeSafely(i, converter.convert(data));
             } else {
                 return modifier.writeSafely(i, converter.convert(data[0]));
             }
+
         }
 
         if (data instanceof String[] strings) {
             if (fieldClass.isEnum()) {
-                return modifier.writeSafely(i, Utils.getEnum(fieldClass, strings[0], true));
+                return modifier.writeSafely(i, Utils.getEnum(fieldClass, strings[0]));
             }
         }
 

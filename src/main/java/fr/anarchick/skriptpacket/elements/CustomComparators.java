@@ -25,7 +25,15 @@ public class CustomComparators {
                 (o1, o2) -> Relation.get(o1.getMaterial().equals(o2)));
 
         Comparators.registerComparator(Slot.class, Material.class,
-                (o1, o2) -> Relation.get(o1.getItem().getType().equals(o2)));
+                (o1, o2) -> {
+
+                    if (o1.getItem() == null) {
+                        return Relation.get(Material.AIR.equals(o2));
+                    } else {
+                        return Relation.get(o1.getItem().getType().equals(o2));
+                    }
+
+                });
 
     }
 

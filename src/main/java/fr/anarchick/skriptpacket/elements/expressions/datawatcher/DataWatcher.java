@@ -15,9 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
-public class DataWatcher {
-
-    private final PacketContainer packet;
+public record DataWatcher(PacketContainer packet) {
 
     public DataWatcher(@Nonnull PacketContainer packet) {
         this.packet = packet;
@@ -42,8 +40,12 @@ public class DataWatcher {
     }
 
     public void set(Number index, Object value) {
-        if (index == null || value == null) return;
+        if (index == null || value == null) {
+            return;
+        }
+
         WrappedDataWatcher.Serializer serializer = getSerializer(index.intValue());
+
         if (value instanceof Vector vector) {
             value = ConverterToUtility.BUKKIT_VECTOR_TO_PROTOCOLLIB_VECTOR3F.convert(vector);
         }
@@ -56,15 +58,10 @@ public class DataWatcher {
             if (NumberEnums.isNumber(targetClass) && value instanceof Number number) {
                 value = NumberEnums.convert(serializer.getType(), number);
             } else if (targetClass.isEnum() && value instanceof String enumName) {
-                value = Utils.getEnum(targetClass, enumName, true);
+                value = Utils.getEnum(targetClass, enumName);
             } else {
                 final Converter converter = ConverterLogic.getConverter(value.getClass(), targetClass);
-
-                if (converter != null) {
-                    value = converter.convert(value);
-                }
-
-
+                value = converter.convert(value);
             }
 
         }
@@ -115,10 +112,12 @@ public class DataWatcher {
     }
 
     public Set<Integer> getIndexes() {
-        Set<Integer> indexes = new HashSet<>();
+        final Set<Integer> indexes = new HashSet<>();
+
         for (WrappedDataValue wrappedDataValue : getWrappedDataValues()) {
             indexes.add(wrappedDataValue.getIndex());
         }
+
         return indexes;
     }
 
@@ -128,10 +127,12 @@ public class DataWatcher {
 
     @Nonnull
     public Map<Integer, Object> toMap() {
-        Map<Integer, Object> map = new HashMap<>();
+        final Map<Integer, Object> map = new HashMap<>();
+
         for (WrappedDataValue wrappedDataValue : getWrappedDataValues()) {
             map.put(wrappedDataValue.getIndex(), wrappedDataValue.getValue());
         }
+
         return map;
     }
 

@@ -20,6 +20,7 @@ import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.util.ArrayUtils;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Packet Fields")
 @Description("Get all packet fields, can't be set")
@@ -39,8 +40,9 @@ public class ExprPacketFields extends SimpleExpression<Object> {
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         shouldWrap = ( matchedPattern == 1 );
+
         if (exprs[0] != null) {
             packetExpr = (Expression<PacketContainer>) exprs[0];
             return true;
@@ -51,19 +53,23 @@ public class ExprPacketFields extends SimpleExpression<Object> {
     
     @Override
     @Nullable
-    protected Object[] get(Event e) {
-        PacketContainer packet;
+    protected Object @NotNull [] get(@NotNull Event e) {
+        final PacketContainer packet;
+
         if (packetExpr == null) {
             packet = ((BukkitPacketEvent) e).getPacket();
         } else {
             packet = packetExpr.getSingle(e);
         }
+
         if (packet != null) {
-            StructureModifier<Object> modifier = packet.getModifier();
+            final StructureModifier<Object> modifier = packet.getModifier();
             int size = modifier.getValues().size();
-            Object[] values = new Object[size];
+            final Object[] values = new Object[size];
+
             for (int i = 0; i < size ; i++) {
-                Object field = modifier.readSafely(i);
+                final Object field = modifier.readSafely(i);
+
                 if (field == null) {
                     values[i] = null;
                 } else if (field.getClass().isArray()) {
@@ -77,9 +83,11 @@ public class ExprPacketFields extends SimpleExpression<Object> {
                 }
 
             }
+
             return values;
         }
-        return null;
+
+        return new Object[0];
     }
     
     @Override
@@ -88,12 +96,12 @@ public class ExprPacketFields extends SimpleExpression<Object> {
     }
     
     @Override
-    public Class<?> getReturnType() {
+    public @NotNull Class<?> getReturnType() {
         return Object.class;
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
 
         if (shouldWrap) {
             return "all wrap packet fields of " + packetExpr.toString(e, debug);

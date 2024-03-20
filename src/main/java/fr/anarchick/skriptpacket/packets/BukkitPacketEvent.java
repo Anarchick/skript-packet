@@ -9,6 +9,7 @@ import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
+import org.jetbrains.annotations.NotNull;
 
 public class BukkitPacketEvent extends Event implements Cancellable {
     
@@ -44,6 +45,7 @@ public class BukkitPacketEvent extends Event implements Cancellable {
         return this.packetEvent.getPlayer();
     }
 
+    @NotNull
     @Override
     public HandlerList getHandlers() {
         return handlers;

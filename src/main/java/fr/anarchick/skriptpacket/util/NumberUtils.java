@@ -52,11 +52,18 @@ public class NumberUtils {
     
     @SuppressWarnings("unchecked")
     public static <T> T convert(Class<?> targetClass, Number ...array) {
-        if (array == null || array.length == 0) return null;
-        if (PRIMITIVE_NUMBER_ARRAY.contains(targetClass)) return toPrimitiveArray(targetClass, array);
+        if (array == null || array.length == 0) {
+            return null;
+        }
+
+        if (PRIMITIVE_NUMBER_ARRAY.contains(targetClass)) {
+            return toPrimitiveArray(targetClass, array);
+        }
+
         if (targetClass.equals(IntList.class)) {
             return (T) new IntArrayList(toPrimitiveIntArray(array));
         }
+
         return (targetClass.isArray()) ? (T) toArray(targetClass, array) : (T) toSingle(targetClass, array[0]);
     }
 
@@ -104,49 +111,61 @@ public class NumberUtils {
     
     public static Integer[] toIntegerArray(final Number ...array) {
         final Integer[] result = new Integer[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].intValue();
         }
+
         return result;
     }
 
     public static Float[] toFloatArray(final Number ...array) {
         final Float[] result = new Float[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].floatValue();
         }
+
         return result;
     }
 
     public static Long[] toLongArray(final Number ...array) {
         final Long[] result = new Long[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].longValue();
         }
+
         return result;
     }
     
     public static Short[] toShortArray(final Number ...array) {
         final Short[] result = new Short[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].shortValue();
         }
+
         return result;
     }
     
     public static Double[] toDoubleArray(final Number ...array) {
         final Double[] result = new Double[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].doubleValue();
         }
+
         return result;
     }
     
     public static Byte[] toByteArray(final Number ...array) {
         final Byte[] result = new Byte[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].byteValue();
         }
+
         return result;
     }
     
@@ -155,9 +174,11 @@ public class NumberUtils {
     }
     public static float[] toPrimitiveFloatArray(final Number ...array) {
         final float[] result = new float[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].floatValue();
         }
+
         return result;
     }
     public static long[] toPrimitiveLongArray(final Number ...array) {
@@ -168,22 +189,32 @@ public class NumberUtils {
     }
     public static short[] toPrimitiveShortArray(final Number ...array) {
         final short[] result = new short[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].shortValue();
         }
+
         return result;
     }
     public static byte[] toPrimitiveByteArray(final Number ...array) {
         final byte[] result = new byte[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i].byteValue();
         }
+
         return result;
     }
     
     public static boolean isNumber(Class<?> clazz) {
-        if (clazz == null) return false;
-        if (clazz.isArray()) clazz = clazz.getComponentType();
+        if (clazz == null) {
+            return false;
+        }
+
+        if (clazz.isArray()) {
+            clazz = clazz.getComponentType();
+        }
+
         return NUMBER.contains(clazz);
     }
 

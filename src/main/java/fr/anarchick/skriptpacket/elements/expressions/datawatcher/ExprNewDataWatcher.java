@@ -17,9 +17,11 @@ import org.jetbrains.annotations.NotNull;
 
 @Name("DataWatcher")
 @Description("Create a new datawatcher. Used for metadata packet. The data watcher is linked to the packet and you don't need to set the packet field to it")
-@Examples({"on packet event play_server_entity_metadata:",
-    "\tset {_dw} to new data watcher from event-packet",
-    "\tdatawatcher index 0 of {_dw} exist"})
+@Examples({
+        "on packet event play_server_entity_metadata:",
+        "\tset {_dw} to new data watcher from event-packet",
+        "\tdatawatcher index 0 of {_dw} exist"
+})
 @Since("2.0, 2.2.0 need a packet")
 
 public class ExprNewDataWatcher extends SimpleExpression<DataWatcher> {
@@ -44,7 +46,7 @@ public class ExprNewDataWatcher extends SimpleExpression<DataWatcher> {
     
     @Override
     protected DataWatcher @NotNull [] get(@NotNull Event e) {
-        PacketContainer packet = packetExpr.getSingle(e);
+        final PacketContainer packet = packetExpr.getSingle(e);
 
         if (packet == null) {
             return new DataWatcher[0];

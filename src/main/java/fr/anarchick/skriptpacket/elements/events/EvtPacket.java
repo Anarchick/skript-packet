@@ -1,37 +1,35 @@
 package fr.anarchick.skriptpacket.elements.events;
 
-import ch.njol.skript.config.Config;
-import ch.njol.skript.lang.parser.ParserInstance;
-import ch.njol.skript.util.Version;
-import fr.anarchick.skriptpacket.SkriptPacket;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
-import org.eclipse.jdt.annotation.Nullable;
-
-import com.comphenix.protocol.PacketType;
-import com.comphenix.protocol.events.ListenerPriority;
-import com.comphenix.protocol.events.PacketContainer;
-
 import ch.njol.skript.Skript;
+import ch.njol.skript.config.Config;
 import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
+import ch.njol.skript.lang.parser.ParserInstance;
 import ch.njol.skript.registrations.EventValues;
 import ch.njol.skript.util.Getter;
+import ch.njol.skript.util.Version;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketContainer;
+import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.PacketManager.Mode;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.eclipse.jdt.annotation.Nullable;
+import org.jetbrains.annotations.NotNull;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class EvtPacket extends SkriptEvent {
 
-    private int mark;
     private Mode mode = Mode.DEFAULT;
-    private Literal<PacketType> packetTypeExpr;
+    private Literal<PacketType> packetTypeLit;
     private ListenerPriority priority;
     
     static {
@@ -72,9 +70,9 @@ public class EvtPacket extends SkriptEvent {
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Literal<?>[] literal, int matchedPattern, ParseResult parser) {
-        mark = parser.mark;
-        packetTypeExpr = (Literal<PacketType>) literal[0];
-        switch (mark) {
+        packetTypeLit = (Literal<PacketType>) literal[0];
+
+        switch (parser.mark) {
             case 1 -> priority = ListenerPriority.LOWEST;
             case 2 -> priority = ListenerPriority.LOW;
             case 4 -> priority = ListenerPriority.HIGH;
@@ -83,7 +81,9 @@ public class EvtPacket extends SkriptEvent {
             // include case 3
             default -> priority = ListenerPriority.NORMAL;
         }
-        PacketType packetType = packetTypeExpr.getSingle();
+
+        final PacketType packetType = packetTypeLit.getSingle();
+
         if (parser.expr.startsWith("async")) {
             mode = Mode.ASYNC;
         } else if (parser.expr.startsWith("sync")) {
@@ -96,14 +96,15 @@ public class EvtPacket extends SkriptEvent {
 //                Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' can't be use in SYNC");
 //                return false;
 //            }
-
         }
+
         if (!packetType.isSupported()) {
             Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' is not supported by your server");
             return false;
         }
-        String scriptName = getScriptName();
-        SkriptPacketEventListener.addPacketTypes(packetTypeExpr.getAll(), priority, mode, scriptName);
+
+        final String scriptName = getScriptName();
+        SkriptPacketEventListener.addPacketTypes(packetTypeLit.getAll(), priority, mode, scriptName);
         return true;
     }
 
@@ -113,14 +114,16 @@ public class EvtPacket extends SkriptEvent {
      */
     private String getScriptName() {
         if (SkriptPacket.SKRIPT_VERSION.isSmallerThan(new Version("2.6.5"))) {
-            Config config = null;
+            Config config;
+
             try {
-                Method configMethod = ParserInstance.class.getDeclaredMethod("getCurrentScript");
+                final Method configMethod = ParserInstance.class.getDeclaredMethod("getCurrentScript");
                 config = (Config) configMethod.invoke(getParser());
                 return config.getFileName();
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
             return "UNKNOWN";
         } else {
             return getParser().getCurrentScript().getConfig().getFileName();
@@ -128,21 +131,23 @@ public class EvtPacket extends SkriptEvent {
     }
 
     @Override
-    public boolean check(Event event) {
+    public boolean check(@NotNull Event event) {
         if (event instanceof BukkitPacketEvent e) {
-            if ( packetTypeExpr.getSingle(event).equals(e.getPacketType())
+
+            if (Objects.equals(packetTypeLit.getSingle(event), e.getPacketType())
                     && priority.equals(e.getPriority())
                     && mode.equals(e.getMode()) ) {
-                PacketContainer packet = e.getPacket();
+                final PacketContainer packet = e.getPacket();
                 return packet.getMeta("bypassEvent").isEmpty();
             }
+
         }
         return false;
     }
     
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
-        return mode.name() + " packet event " + packetTypeExpr.toString(e, debug) + " with " + priority.name() + " priority";
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
+        return mode.name() + " packet event " + packetTypeLit.toString(e, debug) + " with " + priority.name() + " priority";
     }
     
 }

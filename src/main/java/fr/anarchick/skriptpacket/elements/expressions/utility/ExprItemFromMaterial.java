@@ -16,8 +16,6 @@ import org.bukkit.inventory.ItemStack;
 import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
-
 @Name("Item from Material")
 @Description("Get the ItemStack from a Material")
 @Examples({
@@ -45,6 +43,10 @@ public class ExprItemFromMaterial extends SimpleExpression<ItemStack> {
     @Override
     @Nullable
     protected ItemStack @NotNull [] get(@NotNull Event e) {
+        if (exprMaterial == null || exprAmount == null) {
+            return new ItemStack[0];
+        }
+
         final Material material = exprMaterial.getSingle(e);
         final int amount = exprAmount.getSingle(e).intValue();
         return new ItemStack[] { new ItemStack(material, amount) };

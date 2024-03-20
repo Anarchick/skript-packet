@@ -7,12 +7,11 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
+import org.jetbrains.annotations.NotNull;
 
 @Name("ID of Entity")
 @Description("Get the ID of an entity. This method return a number and not the UUID")
-@Examples({
-    "broadcast \"%entity id of player%\""
-})
+@Examples({"broadcast \"%entity id of player%\""})
 @Since("1.0")
 
 public class ExprEntityID extends SimplePropertyExpression<Entity, Number>{
@@ -27,12 +26,12 @@ public class ExprEntityID extends SimplePropertyExpression<Entity, Number>{
     }
     
     @Override
-    public Class<? extends Number> getReturnType() {
+    public @NotNull Class<? extends Number> getReturnType() {
         return Number.class;
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "entity id";
     }
     

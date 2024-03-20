@@ -32,13 +32,19 @@ public enum NumberEnums {
 
     public static NumberEnums get(int ordinal) {
         for (NumberEnums e : values()) {
-            if (e.ordinal() == ordinal) return e;
+
+            if (e.ordinal() == ordinal) {
+                return e;
+            }
+
         }
+
         return null;
     }
 
     public static NumberEnums get(Class<?> clazz) {
-        String className = (clazz.isArray()) ? clazz.getComponentType().getSimpleName().toUpperCase(): clazz.getSimpleName().toUpperCase();
+        final String className = (clazz.isArray()) ? clazz.getComponentType().getSimpleName().toUpperCase(): clazz.getSimpleName().toUpperCase();
+
         return switch (className) {
             case "BYTE" -> BYTE;
             case "INT", "INTEGER", "INTLIST" -> INTEGER;
@@ -56,11 +62,16 @@ public enum NumberEnums {
 
     @SuppressWarnings({"unchecked" })
     public static <T> T convert(Class<T> targetClass, Number... input) {
-        if (input == null || input.length == 0) return null;
+        if (input == null || input.length == 0) {
+            return null;
+        }
+
         if (targetClass.equals(IntList.class)) {
             return (T) new IntArrayList((int[]) INTEGER.toPrimitiveArray(input));
         }
-        NumberEnums target = get(targetClass);
+
+        final NumberEnums target = get(targetClass);
+
         if (targetClass.isArray()) {
             return (targetClass.getComponentType().isPrimitive()) ? (T) target.toPrimitiveArray(input) : (T) target.toArray(input);
         } else {
@@ -94,7 +105,11 @@ public enum NumberEnums {
 
     public Number[] toArray(Number... input) {
         int length = (input == null) ? 0 : input.length;
-        if (this.objectArrayClass.isInstance(input)) return input;
+
+        if (this.objectArrayClass.isInstance(input)) {
+            return input;
+        }
+
         final Number[] output = (Number[]) Array.newInstance(this.objectClass, length);
         Arrays.setAll(output, (i) -> toSingle(input[i]));
         return output;
@@ -102,11 +117,17 @@ public enum NumberEnums {
 
     public Object toPrimitiveArray(Number... input) {
         int length = (input == null) ? 0 : input.length;
-        if (this.primitiveArrayClass.isInstance(input)) return input;
+
+        if (this.primitiveArrayClass.isInstance(input)) {
+            return input;
+        }
+
         final Object output = createPrimitiveArray(length);
+
         for (int i = 0; i < length; i++) {
             Array.set(output, i, toSingle(input[i]));
         }
+
         return output;
     }
 

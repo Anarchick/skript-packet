@@ -26,9 +26,11 @@ public class ClassUtils {
         for (final Map.Entry<Class<?>, Class<?>> entry : primitiveWrapperMap.entrySet()) {
             final Class<?> primitiveClass = entry.getKey();
             final Class<?> wrapperClass = entry.getValue();
+
             if (!primitiveClass.equals(wrapperClass)) {
                 wrapperPrimitiveMap.put(wrapperClass, primitiveClass);
             }
+
         }
     }
     

@@ -26,8 +26,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class ExprPair extends SimpleExpression<Object>{
 
-    private Expression<Object> first;
-    private Expression<Object> second;
+    private Expression<Object> firstExpr;
+    private Expression<Object> secondExpr;
     
     static {
         Skript.registerExpression(ExprPair.class, Object.class, ExpressionType.PATTERN_MATCHES_EVERYTHING,
@@ -37,20 +37,24 @@ public class ExprPair extends SimpleExpression<Object>{
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
-        first = (Expression<Object>) exprs[0];
-        second = (Expression<Object>) exprs[1];
+        firstExpr = (Expression<Object>) exprs[0];
+        secondExpr = (Expression<Object>) exprs[1];
         return true;
     }
     
     @Override
     @Nullable
     protected Object @NotNull [] get(@NotNull Event e) {
-        Object _first = first.getSingle(e);
-        Object _second = second.getSingle(e);
+        final Object first = firstExpr.getSingle(e);
+        final Object second = secondExpr.getSingle(e);
+
         if (SkriptPacket.isReflectAddon) {
-            return new Object[] {new Pair<>(ObjectWrapper.unwrapIfNecessary(_first), ObjectWrapper.unwrapIfNecessary(_second))};
+            return new Object[] {new Pair<>(ObjectWrapper.unwrapIfNecessary(first),
+                    ObjectWrapper.unwrapIfNecessary(second)
+            )};
         }
-        return new Object[] {new Pair<>(_first, _second)};
+
+        return new Object[] {new Pair<>(first, second)};
     }
     
     @Override

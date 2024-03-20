@@ -34,7 +34,7 @@ public class ExprBukkitMaterial extends SimplePropertyExpression<Object, Materia
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "Bukkit Material";
     }
 

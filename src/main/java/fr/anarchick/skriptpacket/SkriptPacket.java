@@ -24,8 +24,7 @@ import java.net.URL;
 public class SkriptPacket extends JavaPlugin implements Listener {
 
     private static SkriptPacket INSTANCE;
-    private static SkriptAddon ADDON;
-    
+
     public static boolean isReflectAddon = false;
     
     public static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
@@ -45,16 +44,22 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     public void onEnable() {
         INSTANCE = this;
         VERSION = new Version(getDescription().getVersion());
-        
-        PluginManager pluginManager = Bukkit.getPluginManager();
+
+        final PluginManager pluginManager = Bukkit.getPluginManager();
         isReflectAddon = pluginManager.isPluginEnabled("skript-reflect");
-        if (isReflectAddon) Logging.info("Support of skript-reflect wrapper enabled");
+
+        if (isReflectAddon) {
+            Logging.info("Support of skript-reflect wrapper enabled");
+        }
+
         SKRIPT_VERSION = Skript.getVersion();
+
         if (SKRIPT_VERSION.isSmallerThan(MINIMUM_SKRIPT_VERSION)) {
             Logging.info("Your version of Skript is " + SKRIPT_VERSION);
             Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_SKRIPT_VERSION + " of Skript");
             // Does not disable the plugin, cause some syntaxes can still works
         }
+
         if (PROTOCOLLIB_VERSION.isSmallerThan(MINIMUM_PROTOCOLLIB_VERSION)) {
             Logging.info("Your version of ProtocolLib is " + PROTOCOLLIB_VERSION);
             Logging.info("Skript-Packet requires that you run at least version " + MINIMUM_PROTOCOLLIB_VERSION + " of ProtocolLib");
@@ -64,7 +69,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         try {
 
             if (Skript.isAcceptRegistrations()) {
-                ADDON = Skript.registerAddon(this);
+                final SkriptAddon ADDON = Skript.registerAddon(this);
                 Class.forName(Types.class.getName()); // Load first
                 ADDON.loadClasses("fr.anarchick.skriptpacket", "elements");
                 //ADDON.loadClasses("fr.anarchick.skriptpacket", "sections");
@@ -82,7 +87,8 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         Metrics metrics = new Metrics(this, pluginId);
         metrics.addCustomChart(new Metrics.SimplePie("skript_version", () ->
             SKRIPT_VERSION.toString()));
-        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version", () -> Utils.regexGroup("^((\\d+\\.?)+(-\\w+)?)", PROTOCOLLIB_VERSION.toString(), 1)));
+        metrics.addCustomChart(new Metrics.SimplePie("protocollib_version",
+                () -> Utils.regexGroup("^((\\d+\\.?)+(-\\w+)?)", PROTOCOLLIB_VERSION.toString(), 1)));
         metrics.addCustomChart(new Metrics.SimplePie("skript-reflect_support", () ->
             String.valueOf(isReflectAddon)));
         
@@ -96,21 +102,28 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     private static void checkUpdate() {
         Scheduling.async(() -> {
+
             try {
-                HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/Anarchick/skript-packet/main/build.gradle").openConnection();
+                final HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/Anarchick/skript-packet/main/build.gradle").openConnection();
                 connection.connect();
-                BufferedReader in = new BufferedReader(new InputStreamReader(
+                final BufferedReader in = new BufferedReader(new InputStreamReader(
                         connection.getInputStream()));
                 String inputLine;
+
                 while ((inputLine = in.readLine()) != null) {
+
                     if (inputLine.startsWith("version = ")) {
                         String str = Utils.regexGroup("((\\d+\\.?)+)", inputLine, 1);
-                        Version lastVersion = new Version(str);
-                        if (lastVersion.isLargerThan(VERSION))
+                        final Version lastVersion = new Version(str);
+
+                        if (lastVersion.isLargerThan(VERSION)) {
                             Logging.warn("A new update is available ("+lastVersion+")");
+                        }
+
                         break;
                     }
                 }
+
                 in.close();
                 connection.disconnect();
             } catch (Exception ignored) {}
@@ -123,9 +136,13 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     }
     
     @SuppressWarnings({"unchecked" })
-    public static boolean isCurrentEvent(Expression expr, String error, Class<? extends Event>... clazz) {
+    public static boolean isCurrentEvent(Expression<?> expr, String error, Class<? extends Event>... clazz) {
         boolean result = expr.getParser().isCurrentEvent(clazz);
-        if (!result) Skript.error(error);
+
+        if (!result) {
+            Skript.error(error);
+        }
+
         return result;
     }
     

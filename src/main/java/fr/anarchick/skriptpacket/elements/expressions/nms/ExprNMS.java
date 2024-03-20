@@ -21,7 +21,10 @@ import ch.njol.util.coll.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 @Name("NMS")
-@Description("Get the NMS (net.minecraft.server) from a convertible object or invert")
+@Description({
+        "Get the NMS (net.minecraft.server) from a convertible object or invert",
+        "More information here https://github.com/Anarchick/skript-packet/wiki/ExprNMS"
+})
 @Examples({
     "set {_nms} to nms of player",
     "set {_bukkit} to wrap from {_nms}"
@@ -33,7 +36,7 @@ public class ExprNMS extends SimpleExpression<Object> {
     private Expression<?> expr;
     private int pattern;
     private final static String[] patterns = new String[] {
-            "NMS (of|from) %location/block/blockdata/itemtype/itemstack/material/slot/biome/entity/world/datawatcher/vector/string%",
+            "NMS (of|from) %location/block/blockdata/itemtype/itemstack/material/slot/biome/entity/world/vector/string%",
             "(convert|wrap) from nms %object%"
     };
     private Object result = null;
@@ -52,19 +55,26 @@ public class ExprNMS extends SimpleExpression<Object> {
     @Override
     @Nullable
     protected Object @NotNull [] get(@NotNull Event e) {
-        Object obj = expr.getSingle(e);
+        final Object obj = expr.getSingle(e);
+
         switch (pattern) {
             case 0 -> result = ConverterLogic.toNMS(obj);
             case 1 -> {
                 result = ConverterLogic.toBukkit(obj);
+
                 if (result instanceof Location) {
-                    @Nullable World world = EventValues.getEventValue(e, World.class, 0);
-                    if (world != null) ((Location) result).setWorld(world);
+                    @Nullable final World world = EventValues.getEventValue(e, World.class, 0);
+
+                    if (world != null) {
+                        ((Location) result).setWorld(world);
+                    }
                 }
+
             }
             default -> {
             }
         }
+
         return CollectionUtils.array(result);
     }
     

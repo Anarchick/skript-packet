@@ -21,6 +21,7 @@ import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Packet Fields Classes")
 @Description({
@@ -47,8 +48,9 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         shouldWrap = ( matchedPattern == 1 );
+
         if (exprs[0] != null) {
             packetExpr = (Expression<PacketContainer>) exprs[0];
             return true;
@@ -58,26 +60,33 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
     }
     
     @Override
-    @Nullable
-    protected String[] get(Event e) {
+    protected String @NotNull [] get(@NotNull Event e) {
         final PacketContainer packet;
+
         if (packetExpr == null) {
             packet = ((BukkitPacketEvent) e).getPacket();
         } else {
             packet = packetExpr.getSingle(e);
         }
-        if (packet == null) return null;
+
+        if (packet == null) {
+            return new String[0];
+        }
         
         final StructureModifier<Object> modifier = packet.getModifier();
         final String[] classNames = new String[modifier.size()];
+
         for (int i = 0; i < classNames.length ; i++) {
             Class<?> fieldClass = modifier.getField(i).getType();
+
             if (shouldWrap) {
-                Converter converter = ConverterLogic.getConverterToBukkit(fieldClass);
+                final Converter converter = ConverterLogic.getConverterToBukkit(fieldClass);
+
                 if (ConverterToUtility.HIMSELF != converter
                         && converter.getOutputType() != Object.class ) {
                     fieldClass = converter.getOutputType();
                 }
+
             }
 
             classNames[i] = fieldClass.getName();
@@ -91,12 +100,12 @@ public class ExprPacketFieldsClasses extends SimpleExpression<String> {
     }
     
     @Override
-    public Class<? extends String> getReturnType() {
+    public @NotNull Class<? extends String> getReturnType() {
         return String.class;
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
 
         if (shouldWrap) {
             return "all wrap packets fields classes of " + packetExpr.toString(e, debug);

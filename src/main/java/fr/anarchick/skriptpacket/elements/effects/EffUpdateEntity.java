@@ -17,6 +17,7 @@ import ch.njol.skript.lang.Effect;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Packet Update Entity")
 @Description("Force the update of an entity to a specific player(s)")
@@ -35,23 +36,25 @@ public class EffUpdateEntity extends Effect{
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] expr, int i, Kleenean kleenean, ParseResult parseResult) {
+    public boolean init(Expression<?>[] expr, int i, @NotNull Kleenean kleenean, @NotNull ParseResult parseResult) {
         entitiesExpr = (Expression<Entity>) expr[0];
         playersExpr = (Expression<Player>) expr[1];
         return true;
     }
 
     @Override
-    protected void execute(Event e) {
-        Player[] players = playersExpr.getAll(e);
-        List<Player> list = Arrays.asList(players);
+    protected void execute(@NotNull Event e) {
+        final Player[] players = playersExpr.getAll(e);
+        final List<Player> list = Arrays.asList(players);
+
         for (Entity entity : entitiesExpr.getAll(e)) {
             ProtocolLibrary.getProtocolManager().updateEntity(entity, list);
         }
+
     }
 
     @Override
-    public String toString(Event e, boolean b) {
+    public @NotNull String toString(Event e, boolean b) {
         return "packet update " + Arrays.toString(entitiesExpr.getAll(e)) + " to " + Arrays.toString(playersExpr.getAll(e));
     }
     

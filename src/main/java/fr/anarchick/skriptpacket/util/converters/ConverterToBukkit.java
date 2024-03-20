@@ -119,6 +119,7 @@ public enum ConverterToBukkit implements Converter {
             if (single instanceof Vector3F vec) {
                 return new Vector(vec.getX(), vec.getY(), vec.getZ());
             }
+
             return single;
         }
 

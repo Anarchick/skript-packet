@@ -6,6 +6,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import com.comphenix.protocol.utility.MinecraftReflection;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Is MMS")
 @Description("Check if a given object can be found within the package net.minecraft.server")
@@ -24,7 +25,7 @@ public class IsNMS extends PropertyCondition<Object> {
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "NMS";
     }
 

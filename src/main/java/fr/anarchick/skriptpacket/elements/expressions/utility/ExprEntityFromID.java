@@ -19,6 +19,7 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Entity From ID")
 @Description("Get the entity related to his ID in specified world")
@@ -37,7 +38,7 @@ public class ExprEntityFromID extends SimpleExpression<Entity> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, @NotNull ParseResult parser) {
         idExpr = (Expression<Number>) exprs[0];
         worldExpr = (Expression<World>) exprs[1];
         return true;
@@ -45,10 +46,14 @@ public class ExprEntityFromID extends SimpleExpression<Entity> {
     
     @Override
     @Nullable
-    protected Entity[] get(Event e) {
-        Number id = idExpr.getSingle(e);
-        World world = worldExpr.getSingle(e);
-        if (id == null || world == null) return new Entity[0];
+    protected Entity @NotNull [] get(@NotNull Event e) {
+        final Number id = idExpr.getSingle(e);
+        final World world = worldExpr.getSingle(e);
+
+        if (id == null || world == null) {
+            return new Entity[0];
+        }
+
         return CollectionUtils.array(ProtocolLibrary.getProtocolManager().getEntityFromID(world, id.intValue()));
     }
     
@@ -58,12 +63,12 @@ public class ExprEntityFromID extends SimpleExpression<Entity> {
     }
     
     @Override
-    public Class<? extends Entity> getReturnType() {
+    public @NotNull Class<? extends Entity> getReturnType() {
         return Entity.class;
     }
     
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
         return "entity from id %number% in %world%";
     }
     

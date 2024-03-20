@@ -15,6 +15,9 @@ import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.lang.util.SimpleExpression;
 import ch.njol.util.Kleenean;
 import ch.njol.util.coll.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
 
 @Name("Number As")
 @Description("Convert a %number% to int/float/long/double/short/byte")
@@ -23,7 +26,7 @@ import ch.njol.util.coll.CollectionUtils;
 
 public class ExprNumberAs extends SimpleExpression<Number> {
 
-    private Expression<Number> expr;
+    private Expression<Number> NumberExpr;
     private int mark;
 
     static {
@@ -37,31 +40,35 @@ public class ExprNumberAs extends SimpleExpression<Number> {
     }
     
     @Override
-    public Class<? extends Number> getReturnType() {
+    public @NotNull Class<? extends Number> getReturnType() {
         return Number.class;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] exprs, int matchedPattern, Kleenean isDelayed, ParseResult parser) {
-        expr = (Expression<Number>) exprs[0];
+    public boolean init(Expression<?>[] exprs, int matchedPattern, @NotNull Kleenean isDelayed, ParseResult parser) {
+        NumberExpr = (Expression<Number>) exprs[0];
         mark = parser.mark;
         return true;
     }
     
     @Override
     @Nullable
-    protected Number[] get(Event e) {
-        Number _expr = expr.getSingle(e);
-        if (_expr == null) return null;
+    protected Number @NotNull [] get(@NotNull Event e) {
+        final Number number = NumberExpr.getSingle(e);
+
+        if (number == null) {
+            return new Number[0];
+        }
+
         return CollectionUtils.array(
-                NumberEnums.get(mark).toSingle(_expr)
+                Objects.requireNonNull(NumberEnums.get(mark)).toSingle(number)
         );
     }
 
     @Override
-    public String toString(@Nullable Event e, boolean debug) {
-        return expr.getSingle(e) + " as " + NumberEnums.get(mark).name();
+    public @NotNull String toString(@Nullable Event e, boolean debug) {
+        return NumberExpr.getSingle(e) + " as " + Objects.requireNonNull(NumberEnums.get(mark)).name();
     }
     
 }

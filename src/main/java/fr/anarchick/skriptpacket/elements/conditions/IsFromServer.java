@@ -6,6 +6,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import com.comphenix.protocol.events.PacketContainer;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Is from server")
 @Description("Check if a given packet is sent by the server to the client")
@@ -24,7 +25,7 @@ public class IsFromServer extends PropertyCondition<PacketContainer> {
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "from server";
     }
 

@@ -7,8 +7,6 @@ import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.injector.BukkitUnwrapper;
 import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.Vector3F;
-import com.comphenix.protocol.wrappers.WrappedDataWatcher;
-import com.comphenix.protocol.wrappers.WrappedWatchableObject;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import fr.anarchick.skriptpacket.SkriptPacket;
@@ -67,7 +65,6 @@ public class ConverterLogic {
         CONVERTERS.addAll(Arrays.stream(ConverterToBukkit.values()).toList());
         CONVERTERS.addAll(Arrays.stream(ConverterToNMS.values()).toList());
 
-
         // If an Exception happens, just replace by Strings
         registerToBukkitConverter(ConverterToUtility.SKRIPTMIRROR_UNWRAPPER, "com.btk5h.skriptmirror.ObjectWrapper");
         registerToBukkitConverter(ConverterToBukkit.NMS_ITEMSTACK_TO_BUKKIT_ITEMSTACK, ItemStackClass);
@@ -89,14 +86,17 @@ public class ConverterLogic {
         Class<?> clazz = null;
 
         for (String className : classNames) {
+
             try {
                 clazz = MinecraftReflection.getMinecraftClass(className);
                 break;
             } catch (Exception ignored) {
+
                 try {
                     clazz = Class.forName(className, false, classLoader);
                     break;
                 } catch (ClassNotFoundException ignored2) {}
+
             }
         }
 
@@ -112,25 +112,31 @@ public class ConverterLogic {
     @Nonnull
     public static List<Converter> getConverters(@Nonnull Class<?> toClass) {
         final List<Converter> list = new ArrayList<>();
+
         for (Converter converter : CONVERTERS) {
+
             if ( converter.getOutputType().isAssignableFrom(toClass)) {
                 list.add(converter);
             }
+
         }
+
         return list;
     }
 
     @Nonnull
     public static Converter getConverter(@Nonnull Class<?> fromClass, @Nonnull Class<?> toClass) {
         for (Converter converter : CONVERTERS) {
-            Class<?> outputClass = converter.getOutputType();
-            Class<?> inputClass = converter.getInputType();
+            final Class<?> outputClass = converter.getOutputType();
+            final Class<?> inputClass = converter.getInputType();
+
             if (outputClass.isAssignableFrom(toClass)
                     && inputClass.isAssignableFrom(fromClass)
                     && inputClass != Object.class
                     && outputClass != Object.class) {
                 return converter;
             }
+
         }
         return ConverterToUtility.HIMSELF;
     }
@@ -138,10 +144,16 @@ public class ConverterLogic {
     
     @SafeVarargs
     public static <T> Object toNMS(T... array) {
-        if (array == null || array.length == 0) return array;
+
+        if (array == null || array.length == 0) {
+            return array;
+        }
+
         T single = array[0];
         Converter converter = null;
+
         if (!MinecraftReflection.isMinecraftObject(single)) {
+
             if (single instanceof Entity
                     || single instanceof World) {
                 converter = ConverterToNMS.HANDLE;
@@ -166,11 +178,16 @@ public class ConverterLogic {
             } else if (single instanceof String) {
                 converter = ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT;
             }
+
         }
-        if (converter != null) return converter.convert(single);
+        if (converter != null) {
+            return converter.convert(single);
+        }
+
         if (SkriptPacket.isReflectAddon) {
             return (array.length > 1) ? array : ObjectWrapper.unwrapIfNecessary(single);
         }
+
         return (array.length > 1) ? array : single;
     }
 
@@ -196,15 +213,21 @@ public class ConverterLogic {
 
     @SafeVarargs
     public static <T> Object toBukkit(T... array) {
-        if (array == null || array.length == 0 || array[0] == null) return array;
-        @Nonnull Object single = array[0];
-        Class<?> nmsClass = single.getClass();
-        Converter converter = getConverterToBukkit(nmsClass);
+
+        if (array == null || array.length == 0 || array[0] == null) {
+            return array;
+        }
+
+        @Nonnull final Object single = array[0];
+        final Class<?> nmsClass = single.getClass();
+        final Converter converter = getConverterToBukkit(nmsClass);
+
         if (converter.isArrayInput()) {
             return converter.convert(array);
         } else {
             return converter.convert(single);
         }
+
     }
 
     public static Object toObject(Object o) {
@@ -246,8 +269,12 @@ public class ConverterLogic {
     // https://github.com/dmulloy2/ProtocolLib/pull/984
     @Deprecated
     public static Object toNMSNBTTagCompound(Block block) {
-        if (block == null) return null;
-        NbtCompound nbt = NbtFactory.readBlockState(block);
+
+        if (block == null) {
+            return null;
+        }
+
+        final NbtCompound nbt = NbtFactory.readBlockState(block);
         return (nbt != null) ? nbt.getHandle() : null;
     }
     
@@ -269,8 +296,8 @@ public class ConverterLogic {
     /**
      * Updated for mc 1.20.4
      * https://minecraft.fandom.com/wiki/Biome/ID
-     * @param biome
-     * @return
+     * @param biome Bukkit biome
+     * @return ID of the NMS biome
      */
     public static Number getBiomeID(Biome biome) {
         return switch (biome) {

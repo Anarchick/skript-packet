@@ -51,14 +51,18 @@ public class ExprPacketMeta extends SimpleExpression<Object> {
     
     @Override
     protected Object @NotNull [] get(@NotNull Event e) {
-        String metaID = metaExpr.getSingle(e);
-        PacketContainer packet = packetExpr.getSingle(e);
+        final String metaID = metaExpr.getSingle(e);
+        final PacketContainer packet = packetExpr.getSingle(e);
+
         if ((packet != null) && (metaID != null)) {
-            Optional<Object> meta = packet.getMeta(metaID);
+            final Optional<Object> meta = packet.getMeta(metaID);
+
             if (meta.isPresent()) {
                 return (@Nullable Object[]) meta.get();
             }
+
         }
+
         return new Object[0];
     }
     
@@ -72,9 +76,11 @@ public class ExprPacketMeta extends SimpleExpression<Object> {
     
     @Override
     public void change(@NotNull Event e, Object @NotNull [] delta, @NotNull ChangeMode mode){
-        PacketContainer packet = packetExpr.getSingle(e);
-        String metaID = metaExpr.getSingle(e);
+        final PacketContainer packet = packetExpr.getSingle(e);
+        final String metaID = metaExpr.getSingle(e);
+
         if ((packet != null) && (metaID != null)) {
+
             if (mode == ChangeMode.SET) {
                 packet.setMeta(metaID, delta);
             } else if (mode == ChangeMode.DELETE || mode == ChangeMode.RESET){
@@ -82,6 +88,7 @@ public class ExprPacketMeta extends SimpleExpression<Object> {
             }
                 
         }
+
     }
     
     @Override

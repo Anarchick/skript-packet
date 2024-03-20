@@ -44,17 +44,23 @@ public class ExprDataWatcherIndexes extends SimpleExpression<Number> {
     
     @Override
     protected Number @NotNull [] get(@NotNull Event event) {
-        DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
-        if (dataWatcher == null) return new Number[0];
+        final DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
+
+        if (dataWatcher == null) {
+            return new Number[0];
+        }
+
         return dataWatcher.getIndexes().toArray(Number[]::new);
     }
     
     @Override
     public Iterator<Integer> iterator(@NotNull Event event) {
-        DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
+        final DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
+
         if (dataWatcher == null) {
             return new EmptyIterator<>();
         }
+
         return dataWatcher.getIndexes().iterator();
     }
     

@@ -15,6 +15,7 @@ import ch.njol.skript.lang.Expression;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.util.Kleenean;
 import fr.anarchick.skriptpacket.packets.PacketManager;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -30,8 +31,8 @@ import java.util.Arrays;
 
 public class EffReceivePacket extends Effect{
     
-    private Expression<PacketContainer> packets;
-    private Expression<Player> players;
+    private Expression<PacketContainer> packetsExpr;
+    private Expression<Player> playersExpr;
     private boolean bypassEvent = false;
     
     static {
@@ -41,25 +42,31 @@ public class EffReceivePacket extends Effect{
     
     @Override
     @SuppressWarnings("unchecked")
-    public boolean init(Expression<?>[] expr, int i, Kleenean kleenean, ParseResult parseResult) {
-        packets = (Expression<PacketContainer>) expr[i];
-        players = (Expression<Player>) expr[(i + 1) % 2];
+    public boolean init(Expression<?>[] expr, int i, @NotNull Kleenean kleenean, ParseResult parseResult) {
+        packetsExpr = (Expression<PacketContainer>) expr[i];
+        playersExpr = (Expression<Player>) expr[(i + 1) % 2];
         bypassEvent = parseResult.expr.toLowerCase().endsWith(" without calling event");
         return true;
     }
 
     @Override
-    protected void execute(Event e) {
-        PacketContainer[] _packets = packets.getAll(e); // Size of 1 in most of cases
-        for (PacketContainer packet : _packets) {
-            if (bypassEvent) packet.setMeta("bypassEvent", true);
-            PacketManager.receivePacket(packet, players.getAll(e));
+    protected void execute(@NotNull Event e) {
+        final PacketContainer[] packets = packetsExpr.getAll(e); // Size of 1 in most of the cases
+
+        for (PacketContainer packet : packets) {
+
+            if (bypassEvent) {
+                packet.setMeta("bypassEvent", true);
+            }
+
+            PacketManager.receivePacket(packet, playersExpr.getAll(e));
         }
+
     }
 
     @Override
-    public String toString(Event e, boolean b) {
-        return "receive packet " + Arrays.toString(packets.getAll(e)) + " from " + Arrays.toString(players.getAll(e));
+    public @NotNull String toString(Event e, boolean b) {
+        return "receive packet " + Arrays.toString(packetsExpr.getAll(e)) + " from " + Arrays.toString(playersExpr.getAll(e));
     }
     
 }

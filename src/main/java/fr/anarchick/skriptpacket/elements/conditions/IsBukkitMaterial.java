@@ -6,6 +6,7 @@ import ch.njol.skript.doc.Examples;
 import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import org.bukkit.Material;
+import org.jetbrains.annotations.NotNull;
 
 @Name("Is Bukkit Material")
 @Description("Check if a given object is an instance of org.bukkit.Material")
@@ -24,7 +25,7 @@ public class IsBukkitMaterial extends PropertyCondition<Object> {
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "Bukkit Material";
     }
 

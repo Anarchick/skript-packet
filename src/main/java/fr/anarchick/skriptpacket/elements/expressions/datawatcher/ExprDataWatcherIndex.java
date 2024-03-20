@@ -1,5 +1,6 @@
 package fr.anarchick.skriptpacket.elements.expressions.datawatcher;
 
+import ch.njol.skript.doc.Examples;
 import org.bukkit.event.Event;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -17,8 +18,12 @@ import ch.njol.util.coll.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 @Name("DataWatcher Index")
-@Description("Get or set a datawatcher's index. Used for metadata packet")
-//@Examples("")
+@Description("Get or set a datawatcher's index. Used for metadata packet. More informations here https://github.com/Anarchick/skript-packet/wiki/Data-Watcher")
+@Examples({
+        "set {_dw} to data watcher from {_packet}",
+        "data watcher index 0 of {_dw} is set",
+        "set data watcher index 0 of {_dw} to 64"
+})
 @Since("2.0")
 
 public class ExprDataWatcherIndex extends SimpleExpression<Object> {
@@ -41,9 +46,13 @@ public class ExprDataWatcherIndex extends SimpleExpression<Object> {
     
     @Override
     protected Object @NotNull [] get(@NotNull Event event) {
-        Number index = indexExpr.getSingle(event);
-        DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
-        if (index == null || dataWatcher == null) return new Object[0];
+        final Number index = indexExpr.getSingle(event);
+        final DataWatcher dataWatcher = dataWatcherExpr.getSingle(event);
+
+        if (index == null || dataWatcher == null) {
+            return new Object[0];
+        }
+
         return new Object[] {dataWatcher.getValue(index.intValue())};
     }
 
@@ -52,14 +61,19 @@ public class ExprDataWatcherIndex extends SimpleExpression<Object> {
         if (mode == ChangeMode.SET || mode == ChangeMode.DELETE) {
             return CollectionUtils.array(Object.class);
         }
+
         return super.acceptChange(mode);
     }
     
     @Override
     public void change(@NotNull Event e, Object @NotNull [] delta, @NotNull ChangeMode mode) {
-        Number index = indexExpr.getSingle(e);
-        DataWatcher dataWatcher = dataWatcherExpr.getSingle(e);
-        if (index == null || dataWatcher == null) return;
+        final Number index = indexExpr.getSingle(e);
+        final DataWatcher dataWatcher = dataWatcherExpr.getSingle(e);
+
+        if (index == null || dataWatcher == null) {
+            return;
+        }
+
         if (mode == ChangeMode.SET) {
             dataWatcher.set(index.intValue(), delta[0]);
         } else if (mode == ChangeMode.DELETE) {

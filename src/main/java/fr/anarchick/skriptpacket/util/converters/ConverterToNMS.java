@@ -136,6 +136,7 @@ public enum ConverterToNMS implements Converter {
         @Nonnull
         @Override
         public Object convert(final Object single) {
+
             if (single instanceof ItemStack) {
                 return BUKKIT_ITEMSTACK_TO_NMS_ITEMSTACK.convert(single);
             } else if (single instanceof ItemType itemType) {
@@ -149,6 +150,7 @@ public enum ConverterToNMS implements Converter {
             } else if (single instanceof BlockData) {
                 return BUKKIT_BLOCKDATA_TO_NMS_ITEMSTACK.convert(single);
             }
+
             return BUKKIT_ITEMSTACK_TO_NMS_ITEMSTACK.convert(new ItemStack(Material.AIR));
         }
 
@@ -167,6 +169,7 @@ public enum ConverterToNMS implements Converter {
         @Override
         public Object convert(Object single) {
             Vector v = null;
+
             if (single instanceof Location loc) {
                 v = loc.toVector();
             } else if (single instanceof Entity entity) {
@@ -176,7 +179,11 @@ public enum ConverterToNMS implements Converter {
             } else if (single instanceof Block block) {
                 v = block.getLocation().toVector();
             }
-            if (v == null) return single;
+
+            if (v == null) {
+                return single;
+            }
+
             try {
                 return ConverterLogic.blockPositionConstructor.newInstance(v.getBlockX(), v.getBlockY(), v.getBlockZ());
             } catch (Exception ex) {
@@ -306,9 +313,12 @@ public enum ConverterToNMS implements Converter {
     STRING_TO_NMS_ICHATBASECOMPONENT {
         @Override
         public Object convert(@Nonnull final Object single) {
-            final String text = Optional.ofNullable((String)single).orElse("");
-            if (text.startsWith("{") && text.endsWith("}"))
+            final String text = Optional.ofNullable((String) single).orElse("");
+
+            if (text.startsWith("{") && text.endsWith("}")) {
                 return WrappedChatComponent.fromJson(text).getHandle();
+            }
+
             return WrappedChatComponent.fromText(text).getHandle();
         }
 

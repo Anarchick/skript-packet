@@ -36,13 +36,25 @@ public class ArrayUtils {
     
     @SuppressWarnings("unchecked")
     public static <T> T[] toArray(final T... items) {
-        if (items == null) return null;
-        if (!(items.getClass() == Object[].class)) return items;
-        Class<?> clazz = items[0].getClass();
-        T[] array = (T[]) Array.newInstance(clazz, items.length);
-        for (int i = 0; i<items.length; i++) {
-            if (clazz.isInstance(items[i])) array[i] = items[i];
+        if (items == null) {
+            return null;
         }
+
+        if (!(items.getClass() == Object[].class)) {
+            return items;
+        }
+
+        final Class<?> clazz = items[0].getClass();
+        final T[] array = (T[]) Array.newInstance(clazz, items.length);
+
+        for (int i = 0; i<items.length; i++) {
+
+            if (clazz.isInstance(items[i])) {
+                array[i] = items[i];
+            }
+
+        }
+
         return array;
     }
     /*
@@ -73,10 +85,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_BOOLEAN_OBJECT_ARRAY;
         }
+
         final Boolean[] result = new Boolean[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = (array[i] ? Boolean.TRUE : Boolean.FALSE);
         }
+
         return result;
     }
 
@@ -86,10 +101,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_BYTE_OBJECT_ARRAY;
         }
+
         final Byte[] result = new Byte[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -99,10 +117,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_CHARACTER_OBJECT_ARRAY;
         }
+
         final Character[] result = new Character[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
      }
 
@@ -112,10 +133,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_DOUBLE_OBJECT_ARRAY;
         }
+
         final Double[] result = new Double[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -125,10 +149,12 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_FLOAT_OBJECT_ARRAY;
         }
+
         final Float[] result = new Float[array.length];
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -138,10 +164,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_INTEGER_OBJECT_ARRAY;
         }
+
         final Integer[] result = new Integer[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -151,10 +180,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_LONG_OBJECT_ARRAY;
         }
+
         final Long[] result = new Long[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -164,10 +196,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_SHORT_OBJECT_ARRAY;
         }
+
         final Short[] result = new Short[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -181,32 +216,42 @@ public class ArrayUtils {
         if (array == null) {
             return null;
         }
+
         final Class<?> ct = array.getClass().getComponentType();
         final Class<?> pt = ClassUtils.wrapperToPrimitive(ct);
+
         if (Boolean.TYPE.equals(pt)) {
             return toPrimitive((Boolean[]) array);
         }
+
         if (Character.TYPE.equals(pt)) {
             return toPrimitive((Character[]) array);
         }
+
         if (Byte.TYPE.equals(pt)) {
             return toPrimitive((Byte[]) array);
         }
+
         if (Integer.TYPE.equals(pt)) {
             return toPrimitive((Integer[]) array);
         }
+
         if (Long.TYPE.equals(pt)) {
             return toPrimitive((Long[]) array);
         }
+
         if (Short.TYPE.equals(pt)) {
             return toPrimitive((Short[]) array);
         }
+
         if (Double.TYPE.equals(pt)) {
             return toPrimitive((Double[]) array);
         }
+
         if (Float.TYPE.equals(pt)) {
             return toPrimitive((Float[]) array);
         }
+
         return array;
     }
     
@@ -216,10 +261,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_BOOLEAN_ARRAY;
         }
+
         final boolean[] result = new boolean[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -229,10 +277,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_BYTE_ARRAY;
         }
+
         final byte[] result = new byte[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -242,10 +293,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_CHAR_ARRAY;
         }
+
         final char[] result = new char[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -255,10 +309,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_DOUBLE_ARRAY;
         }
+
         final double[] result = new double[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -268,10 +325,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_FLOAT_ARRAY;
         }
+
         final float[] result = new float[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -281,10 +341,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_INT_ARRAY;
         }
+
         final int[] result = new int[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -294,10 +357,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_LONG_ARRAY;
         }
+
         final long[] result = new long[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 
@@ -307,10 +373,13 @@ public class ArrayUtils {
         } else if (array.length == 0) {
             return EMPTY_SHORT_ARRAY;
         }
+
         final short[] result = new short[array.length];
+
         for (int i = 0; i < array.length; i++) {
             result[i] = array[i];
         }
+
         return result;
     }
 

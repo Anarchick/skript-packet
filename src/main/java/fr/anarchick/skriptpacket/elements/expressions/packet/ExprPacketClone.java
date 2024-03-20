@@ -32,10 +32,12 @@ public class ExprPacketClone extends SimplePropertyExpression<PacketContainer, P
     public boolean init(Expression<?> @NotNull [] exprs, int matchedPattern, @NotNull Kleenean isDelayed, ParseResult parser) {
         mark = parser.mark;
         pattern = parser.expr;
+
         if (LiteralUtils.hasUnparsedLiteral(exprs[0])) {
             setExpr(LiteralUtils.defendExpression(exprs[0]));
             return LiteralUtils.canInitSafely(getExpr());
         }
+
         setExpr((Expression<? extends PacketContainer>) exprs[0]);
         return true;
     }

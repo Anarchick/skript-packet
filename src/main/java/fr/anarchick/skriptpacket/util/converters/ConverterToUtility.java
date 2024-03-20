@@ -64,10 +64,13 @@ public enum ConverterToUtility implements Converter {
         @Override
         public Object convert(final Object single) {
             if (single instanceof IntList intList) {
-                Integer[] array = new Integer[intList.size()];
+                final Integer[] array = new Integer[intList.size()];
+
                 for (int i = 0; i < intList.size(); i++) {
                     array[i] = intList.getInt(i);
                 }
+
+                return array;
             }
             return new Integer[0];
         }
@@ -108,11 +111,16 @@ public enum ConverterToUtility implements Converter {
         @Override
         public Object convert(final Object single) {
             if (single instanceof String uuid) {
-                Matcher matcher = ConverterLogic.regexUUID.matcher(uuid);
-                if (matcher.find()) return UUID.fromString(uuid);
+                final Matcher matcher = ConverterLogic.regexUUID.matcher(uuid);
+
+                if (matcher.find()) {
+                    return UUID.fromString(uuid);
+                }
+
             } else if (single instanceof Entity) {
                 return ((Entity)single).getUniqueId();
             }
+
             return single;
         }
 
@@ -136,9 +144,11 @@ public enum ConverterToUtility implements Converter {
         @Override
         public Object convert(final Object single) {
             final ArrayList<Object> list = new ArrayList<>();
+
             if (single instanceof Object[] array) {
                 Collections.addAll(list, array);
             }
+
             return list;
         }
 
@@ -162,9 +172,11 @@ public enum ConverterToUtility implements Converter {
         @Override
         public Object convert(final Object single) {
             final HashSet<Object> set = new HashSet<>();
+
             if (single instanceof Object[] array) {
                 Collections.addAll(set, array);
             }
+
             return set;
         }
 
@@ -185,11 +197,13 @@ public enum ConverterToUtility implements Converter {
         public Object convert(@Nonnull final Object single) {
             final String nbt = Optional.ofNullable((String)single).orElse("");
             Object nms = null;
+
             try {
                 nms = ConverterLogic.MojangsonClass.getMethod("parse", String.class).invoke(null, nbt);
             } catch (Exception ex) {
                 Skript.exception(ex);
             }
+
             return nms;
         }
 
@@ -227,11 +241,13 @@ public enum ConverterToUtility implements Converter {
         public Object convert(@Nonnull final Object single) {
             final String json = Optional.ofNullable((String)single).orElse("");
             WrappedChatComponent wrapper;
+
             if (json.startsWith("{") && json.endsWith("}")) {
                 wrapper = WrappedChatComponent.fromJson(json);
             } else {
                 wrapper = WrappedChatComponent.fromText(json);
             }
+
             return ComponentConverter.fromWrapper(wrapper);
         }
 
