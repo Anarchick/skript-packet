@@ -29,11 +29,11 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     public static final PluginManager pluginManager = Bukkit.getServer().getPluginManager();
     
-    public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(5, 1, 0);
+    public static final Version MINIMUM_PROTOCOLLIB_VERSION = new Version(5, 0, 0);
     public static final Version PROTOCOLLIB_VERSION =
             new Version(pluginManager.getPlugin("ProtocolLib").getDescription().getVersion());
     
-    public static final Version MINIMUM_SKRIPT_VERSION = new Version(2, 5, 2);
+    public static final Version MINIMUM_SKRIPT_VERSION = new Version(2, 7, 0);
     public static Version SKRIPT_VERSION;
     public static Version VERSION;
     

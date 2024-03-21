@@ -16,7 +16,11 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.jetbrains.annotations.NotNull;
 
 @Name("DataWatcher")
-@Description("Create a new datawatcher. Used for metadata packet. The data watcher is linked to the packet and you don't need to set the packet field to it")
+@Description({
+        "Create a new datawatcher. Used for metadata packet.",
+        "The data watcher is linked to the packet and you don't need to set the packet field to it",
+        "More information at https://github.com/Anarchick/skript-packet/wiki/Data-Watcher"
+})
 @Examples({
         "on packet event play_server_entity_metadata:",
         "\tset {_dw} to new data watcher from event-packet",

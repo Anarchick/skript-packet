@@ -32,7 +32,7 @@ public class PacketManager extends StructureModifier<Object> {
     private static final List<String> allPacketTypesNames = new ArrayList<>(); // Contains unsuported packetTypes
     private static final Map<String, PacketType> packetTypesByName;
     private static final Map<PacketType, String> packetTypesToName = new HashMap<>();
-    public static final PacketType[] PACKETTYPES;
+    public static final PacketType[] PACKET_TYPES;
     public static final ProtocolManager PROTOCOL_MANAGER = ProtocolLibrary.getProtocolManager();
     public static final Map<Class<?>, Converter> FIELD_CONVERTERS = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class PacketManager extends StructureModifier<Object> {
             packetTypesToName.put(entry.getValue(), entry.getKey());
         }
 
-        PACKETTYPES = packetTypesByName.values().toArray(new PacketType[0]);
+        PACKET_TYPES = packetTypesByName.values().toArray(new PacketType[0]);
 
         FIELD_CONVERTERS.put(UUID.class, ConverterToUtility.RELATED_TO_UUID);
         FIELD_CONVERTERS.put(Optional.class, ConverterToUtility.OBJECT_TO_OPTIONAL);

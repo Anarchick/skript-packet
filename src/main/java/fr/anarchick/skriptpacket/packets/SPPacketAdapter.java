@@ -28,6 +28,9 @@ public class SPPacketAdapter extends PacketAdapter {
     @Override
     public void onPacketSending(PacketEvent event) {
         if (event.getPacketType().equals(packetType) && isServer) {
+            System.out.println("SENDING");
+            System.out.println("packetType = " + packetType);
+            System.out.println("mode = " + mode);
             SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, isAsync));
         }
     }
@@ -35,7 +38,9 @@ public class SPPacketAdapter extends PacketAdapter {
     @Override
     public void onPacketReceiving(PacketEvent event) {
         if (event.getPacketType().equals(packetType) && !isServer) {
-
+            System.out.println("RECEIVED");
+            System.out.println("packetType = " + packetType);
+            System.out.println("mode = " + mode);
             if (PacketManager.Mode.SYNC.equals(mode)) {
                 Scheduling.sync(() -> SkriptPacket.pluginManager
                         .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync)));

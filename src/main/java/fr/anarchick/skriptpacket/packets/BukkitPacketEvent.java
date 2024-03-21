@@ -23,6 +23,7 @@ public class BukkitPacketEvent extends Event implements Cancellable {
         this.packetEvent = event;
         this.priority = priority;
         this.mode = mode;
+        System.out.println("1111111111111111111111111111111111 " + event.getPacket().getType().name());
     }
 
     public PacketType getPacketType() {

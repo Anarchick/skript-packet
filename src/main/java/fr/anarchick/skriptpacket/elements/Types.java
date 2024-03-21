@@ -32,7 +32,7 @@ public class Types {
                     .usage(PacketManager.getAllPacketTypeNames())
                     .examples("broadcast all packettypes")
                     .defaultExpression(new EventValueExpression<>(PacketType.class))
-                    .supplier(PacketManager.PACKETTYPES)
+                    .supplier(PacketManager.PACKET_TYPES)
                     .parser(new Parser<>() {
 
                         @Override

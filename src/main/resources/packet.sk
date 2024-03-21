@@ -1,0 +1,513 @@
+# TODO LIST OF CHECKS BEFORE RELEASE
+# [ ] EffUpdateEntity
+# [ ] ExprNewPacket with default values
+
+# scoreboard, chat, title, scoreboard, bossbar, audio, particles, tab, item cooldown, storage gui
+
+function packetSearch(s: string):
+    loop all packettypes:
+        set {_packettype} to lowercase "%loop-value%"
+        {_packettype} contain {_s}
+        send formatted "<sgt:!set {packet} to new %{_packettype}% packet><insertion:%{_packettype}%>%{_packettype}%" to all players
+        send "%{_packettype}%" to console
+
+function packettypesFromFieldClass(className: string):
+    broadcast formatted "<insert:%{_className}%><yellow>Search for packet with field of class <lime>%{_className}%"
+    loop all packettypes:
+        set {_packettype} to loop-value
+        set {_packet} to new {_packettype} packet
+        loop fields classes of {_packet}:
+            if {_className} is loop-value-2:
+                broadcast formatted "<sgt: !set {packet} to new %{_packettype}% packet><insert:%{_packettype}%>%{_packettype}%"
+                add 1 to {_classes}
+                continue
+    broadcast "<lime>%{_classes}% <yellow>class founds"
+
+function allFieldClasses():
+    broadcast "<yellow>All fields classes"
+    loop all packettypes:
+        set {_packettype} to loop-value
+        set {_packet} to new {_packettype} packet
+        loop fields classes of {_packet}:
+            set {_className} to loop-value-2
+            set {_class::%{_className}%} to class {_className}
+            add 1 to {_classesCounter::%{_className}%}
+            {_classes::%{_className}%} is not set
+            set {_classes::%{_className}%} to {_packettype}
+
+    loop {_classesCounter::*}:
+        set {_className} to loop-index
+        add 1 to {_n}
+        set {_id} to ( loop-value * 1000 ) + {_n}
+        set {_classesCounter2::%{_id}%} to {_className}
+
+
+    loop {_classesCounter2::*}:
+        set {_className} to loop-value
+        set {_packettype} to {_classes::%{_className}%}
+        set {_count} to {_classesCounter::%{_className}%}
+        set {_class} to {_class::%{_className}%}
+        if {_class} is set :
+            set {_className} to "%{_class}%"
+        else:
+            set {_className} to loop-value
+            remove 1 from {_classes}
+            continue # skip primitives
+
+        if {_class}.values() is set:
+            add 1 to {_enumClass}
+        else if {_className} contain "$":
+            add 1 to {_subClass}
+        else:
+            add 1 to {_classes}
+            broadcast formatted "<sgt: !packettypesFromFieldClass(""%{_className}%"")>%{_className}% <lime>%{_count}%"
+    broadcast "<lime>%{_classes}% <yellow>class founds"
+    broadcast "<lime>%{_subClass}% <yellow>sub-class founds"
+    broadcast "<lime>%{_enumClass}% <yellow>enum-class founds"
+    broadcast "<lime>%size of all packettypes% <yellow>packets tested"
+
+function success(name: string):
+    broadcast " - <lime>Success test %{testNumber}%: <aqua>%{_name}%"
+    add 1 to {testNumber}
+
+function init():
+    set {player} to random element out of all players
+    set {world} to world of {player}
+    set {loc} to location of {player}
+    set {vector} to vector of {loc}
+    set {block} to block at {player}
+    set tool of {player} to an apple
+    set slot 1 of {player} to air
+    set {slot} to slot 1 of {player}
+    set {itemtype} to 1 of campfire
+    set {itemstack} to (tool of {player}).getItem()
+    set {string} to "<aqua>APPLE"
+    set {blockdata} to campfire[lit=true]
+    set {biome} to biome at {player}
+
+function endTests():
+    delete {world}
+    delete {player}
+    delete {loc}
+    delete {vector}
+    delete {block}
+    delete {slot}
+    delete {itemtype}
+    delete {itemstack}
+    delete {string}
+    delete {itemtype}
+    delete {blockdata}
+    delete {biome}
+    set {testNumber} to 1
+    broadcast "<yellow>All tests have pass"
+
+function tests():
+    set {testNumber} to {testNumber} ? 1
+    testNumber()
+
+# [ ] ExprNumberAs int/float/long/double/short/byte
+# [ ] ExpNumbersAsArray int/float/long/double/short/byte
+# [ ] ExpNumbersAsArray int/float/long/double/short/byte primitive
+function testNumber():
+    init()
+    set {_n} to 1.4 as int
+    "%class of {_n}%" is "java.lang.Integer"
+    set {_n} to 1.4 as float
+    "%class of {_n}%" is "java.lang.Float"
+    set {_n} to 1.4 as long
+    "%class of {_n}%" is "java.lang.Long"
+    set {_n} to 1.4 as double
+    "%class of {_n}%" is "java.lang.Double"
+    set {_n} to 1.4 as short
+    "%class of {_n}%" is "java.lang.Short"
+    set {_n} to 1.4 as byte
+    "%class of {_n}%" is "java.lang.Byte"
+
+    set {_n} to 1.4 as int array
+    "%class of {_n}%" is "[Ljava.lang.Integer;"
+    set {_n} to 1.4 as float array
+    "%class of {_n}%" is "[Ljava.lang.Float;"
+    set {_n} to 1.4 as long array
+    "%class of {_n}%" is "[Ljava.lang.Long;"
+    set {_n} to 1.4 as double array
+    "%class of {_n}%" is "[Ljava.lang.Double;"
+    set {_n} to 1.4 as short array
+    "%class of {_n}%" is "[Ljava.lang.Short;"
+    set {_n} to 1.4 as byte array
+    "%class of {_n}%" is "[Ljava.lang.Byte;"
+
+    set {_n} to 1.4 as primitive int array
+    "%class of {_n}%" is "[I"
+    set {_n} to 1.4 as primitive float array
+    "%class of {_n}%" is "[F"
+    set {_n} to 1.4 as primitive long array
+    "%class of {_n}%" is "[J"
+    set {_n} to 1.4 as primitive double array
+    "%class of {_n}%" is "[D"
+    set {_n} to 1.4 as primitive short array
+    "%class of {_n}%" is "[S"
+    set {_n} to 1.4 as primitive byte array
+    "%class of {_n}%" is "[B"
+
+    "%1.2, 2 and -3.1 as byte array%" is "[1, 2, -3]"
+
+    success("testNumber")
+    testMaterial()
+
+# [ ] ExprBukkitMaterial
+# [ ] IsBukkitMaterial
+# [ ] ComparatorMaterial
+# [ ] ExprItemFromMaterial
+function testMaterial():
+    init()
+    "%material of {blockdata}%" is "CAMPFIRE"
+    "%class of material of uncolored {string}%" ends with "Material"
+    material of {block} is Bukkit Material
+    material of ( tool of {player} ) is Bukkit Material
+    material of {slot} is material of air
+
+    {block} is material of {block}
+    ( tool of {player} ) is material of ( tool of {player} )
+    {slot} is material of {slot}
+    material of {slot} is material of {slot}
+
+    3 of items from (material of stone) is an item
+    success("testMaterial")
+    testNMS()
+    
+
+# [ ] ExprNMS compare to https://github.com/Anarchick/skript-packet/wiki/ExprNMS
+# [ ] IsNMS
+# [ ] ExprNMS wrap compare to https://github.com/Anarchick/skript-packet/wiki/ExprNMS
+function testNMS():
+    init()
+
+    set {_nms} to nms of {world}
+    "%class of {_nms}%" ends with "WorldServer"
+    wrap from nms {_nms} is {world}
+
+    set {_nms} to nms of {loc}
+    "%class of {_nms}%" ends with "BlockPosition"
+    (wrap from nms {_nms}).equals( {loc} )
+
+    nms of {biome} >= 0
+
+    set {_nms} to nms of {vector}
+    "%class of {_nms}%" ends with "Vec3D"
+    wrap from nms {_nms} is {vector}
+
+    set {_nms} to nms of {block}
+    "%class of {_nms}%" ends with "IBlockData"
+    wrap from nms {_nms} is block data of {block}
+    delete {_nms}
+
+    set {_nms} to nms of {blockdata}
+    "%class of {_nms}%" ends with "IBlockData"
+    wrap from nms {_nms} is {blockdata}
+    delete {_nms}
+
+    set {_nms} to nms of {itemtype}
+    "%class of {_nms}%" ends with "IBlockData"
+    wrap from nms {_nms} is {blockdata}
+
+    set {_nms} to nms of 1 of iron axe
+    "%{_nms}%" contain "air" # items must return AIR
+    wrap from nms {_nms} is minecraft:air
+
+    set {_nms} to nms of material of iron axe
+    "%class of {_nms}%" ends with "ItemStack"
+    wrap from nms {_nms} is an item
+    delete {_nms}
+
+    set {_nms} to nms of {itemstack}
+    "%class of {_nms}%" ends with "ItemStack"
+    wrap from nms {_nms} is an item
+    delete {_nms}
+
+    set {_nms} to nms of {slot}
+    "%class of {_nms}%" ends with "ItemStack"
+    wrap from nms {_nms} is an item
+
+    delete {_nms}
+    set {_nms} to nms of {player}
+    {_nms} is NMS
+    {player} is not NMS
+    {_null} is not NMS
+    wrap from nms {player} is {player}
+
+    "%nms of {string}%" contain uncolored {string}
+    nms of {string} is NMS
+
+    success("testNMS")
+    testFields()
+
+# [ ] all packettypes
+# [ ] ExprNewPacket
+# [ ] ExprPacketFields
+# [ ] ExprPacketField get
+# [ ] ExprPacketFieldClasses
+function testFields():
+    init()
+    loop all packettypes:
+        add 1 to {_i}
+        set {_packettype} to loop-value
+        set {_packet} to new {_packettype} packet
+        set {_packets::%{_packettype}%} to {_packet}
+        # broadcast formatted "<insert:%{_packettype}%><yellow>%{_packettype}%"
+        set {_temp::*} to wrap fields of {_packet}
+    if {_i} is not size of all packettypes:
+        broadcast "<pink>See console"
+    wrap field 0 of {_packet} is set
+
+    loop {_packets::*}:
+        set {_packet} to loop-value
+        set {_classNames::*} to wrap fields classes of {_packet}
+        loop {_classNames::*}:
+            if loop-value-2 contain "org.bukkit.Location":
+                set {_validWrap} to true
+    {_validWrap} is true
+    success("testFields")
+    testFieldAutoConverter()
+
+import:
+    fr.anarchick.skriptpacket.util.converters.ConverterLogic
+# [ ] ExprPacketField set Auto-convert
+# UUID.class, ConverterToUtility.RELATED_TO_UUID
+# Optional.class, ConverterToUtility.OBJECT_TO_OPTIONAL
+# List.class, ConverterToUtility.OBJECT_TO_LIST
+# Set.class, ConverterToUtility.OBJECT_TO_SET
+# ConverterLogic.BlockPositionClass, ConverterToNMS.RELATED_TO_NMS_BLOCKPOSITION
+# ConverterLogic.ItemStackClass, ConverterToNMS.RELATED_TO_NMS_ITEMSTACK
+# ConverterLogic.EntityTypesClass, ConverterToNMS.RELATED_TO_NMS_ENTITYTYPE
+# ConverterLogic.MinecraftKeyClass, ConverterToNMS.STRING_TO_NMS_MINECRAFTKEY
+# ConverterLogic.NBTTagCompoundClass, ConverterToUtility.STRING_TO_MOJANGSON
+# ConverterLogic.IChatBaseComponentClass, ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT
+# BaseComponent[].class, ConverterToUtility.STRING_TO_MD5_BASECOMPONENT
+# Component.class, ConverterToBukkit.STRING_TO_PAPER_COMPONENT
+function testFieldAutoConverter():
+    init()
+    set {_inputs::java.util.UUID} to {player}
+    set {_inputs::java.util.Optional} to {player}
+    set {_inputs::java.util.List} to {player}
+    set {_inputs::java.util.Set} to {player}
+    set {_inputs::%ConverterLogic.BlockPositionClass.getName()%} to {player}
+    set {_inputs::%ConverterLogic.ItemStackClass.getName()%} to {blockdata}
+    set {_inputs::%ConverterLogic.EntityTypesClass.getName()%} to {player}
+    set {_inputs::%ConverterLogic.MinecraftKeyClass.getName()%} to {blockdata}
+    set {_inputs::%ConverterLogic.NBTTagCompoundClass.getName()%} to {string}
+    set {_inputs::%ConverterLogic.IChatBaseComponentClass.getName()%} to {string}
+    set {_inputs::net.md_5.bungee.api.chat.BaseComponent[]} to {string}
+    set {_inputs::net.kyori.adventure.text.Component} to raw {string}
+
+    loop {_inputs::*}:
+        set {_classesNames::%loop-index%} to loop-index
+    
+    loop all packettypes:
+        set {_packettype} to loop-value
+        set {_packet} to new {_packettype} packet
+        set {_index} to 0
+        loop all fields classes of {_packet}:
+            set {_className} to loop-value-2 in lowercase
+            if {_classesNames::*} contains {_className}:
+                add {_className} to {_classChecked::*}
+                delete {_before}
+                delete {_after}
+                delete {_input}
+                set {_input} to {_inputs::%{_className}%}
+                set {_before} to "%field {_index} of {_packet}%"
+                set field {_index} of {_packet} to {_input}
+                set {_after} to "%field {_index} of {_packet}%"
+                if {_after} is {_before}:
+                    broadcast "<pink>[testFieldAutoConverter] Error while Auto-convert %class of {_input}% to %{_className}% from %{_packettype}%"
+                    broadcast formatted "<suggest command:!set {packet} to new %{_packettype}% packet>set field %{_index}% of %{_packettype}% to %{_inputs::%{_className}%}%"
+            add 1 to {_index}
+    delete {_packet}
+
+    loop {_classChecked::*}:
+        set {_className} to loop-value
+        delete {_classesNames::%{_className}%}
+
+    if size of {_classesNames::*} > 0:
+        loop {_classesNames::*}:
+            set {_className} to loop-value
+            broadcast "<pink>[testFieldAutoConverter] Can't find class %{_className}%"
+    
+    success("testFieldAutoConverter")
+    testPacketEquipment()
+
+# [ ] ExprEntityID
+# [ ] ExprPair
+# [ ] ExprEnum
+# [ ] ExprPacketType
+# [ ] IsFromServer
+# [ ] IsFromClient
+# [ ] IsJavaList/Set
+# [ ] ExprEntityFromID
+# [ ] EffSendPacket
+# [ ] EvtPacket
+# [ ] ExprPacketMeta set
+# [ ] ExprPacketMeta get
+function testPacketEquipment():
+    init()
+    set {_packet} to new play_server_entity_equipment packet
+    set {_item} to random element out of ...(all wool).containerIterator()
+    set {_nmsItem} to nms of material of {_item}
+    set {_itemSlot} to enum "HEAD" from nms class "EnumItemSlot"
+    set {_pair} to pair {_itemSlot} with {_nmsItem}
+    set field 0 of {_packet} to 0 # Will be listen and modified
+    set field 1 of {_packet} to {_pair} # Auto-convert as List
+    send {player} packet {_packet}
+    
+    wait 2 tick
+    set {_id} to field 0 of {_packet} # Should be modified to id of player
+    entity from id {_id} in {world} is {player}
+    meta "testMeta" of {_packet} is 123
+    packettype of {_packet} is play_server_entity_equipment
+    {_packet} is from server
+    {_packet} is not from client
+    field 1 of {_packet} is java list
+    
+
+    success("testPacketEquipment")
+    testCopy()
+
+on packet event play_server_entity_equipment:
+    field 0 is 0
+    set {_packet} to event-packet
+    set field 0 to id of {player} 
+    set meta "testMeta" of {_packet} to 123
+
+# [ ] ExprPacketClone
+function testCopy():
+    init()
+    set {_packet} to new play_client_window_click packet
+    set field 5 of {_packet} to stone
+    set {_deep} to deep clone of {_packet}
+    set {_shallow} to shallow clone of {_packet}
+    {_packet}.hashCode() is not {_deep}.hashCode()
+    {_packet}.hashCode() is not {_shallow}.hashCode()
+    {_deep}.hashCode() is not {_shallow}.hashCode()
+    (field 5 of {_packet}).hashCode() is (field 5 of {_shallow}).hashCode()
+    (field 5 of {_packet}).hashCode() is not (field 5 of {_deep}).hashCode()
+
+    success("testCopy")
+    testDataWatcher()
+
+
+# [ ] ExprNewDataWatcher
+# [ ] ExprDataWatcherIndex
+# [ ] ExprDataWatcherIndexes
+# [ ] EvtPacket sync
+# [ ] EffSendPacket without calling event
+function testDataWatcher():
+    init()
+    set {_packet} to new play_server_entity_metadata packet
+    set field 0 of {_packet} to {player}
+    set {_dw1} to new datawatcher from {_packet}
+    set datawatcher index 0 of {_dw1} to 32 as byte
+    set {_dw2} to new datawatcher from {_packet}
+    datawatcher index 0 of {_dw2} is 32 # Check link to packet
+    "%class of datawatcher index 0 of {_dw2}%" is "java.lang.Byte"
+    send {player} packet {_packet}
+    wait 1 tick
+    datawatcher index 0 of {_dw1} is 64
+    set datawatcher index 0 of {_dw1} to 8
+    send {player} packet {_packet} without calling event
+    wait 1 tick
+    datawatcher index 0 of {_dw1} is 8 # error if = 16 cause event is fired
+    set datawatcher index 8 of {_dw1} to 123
+    "%all datawatcher indexes of {_dw1}%" is "0 and 8"
+    success("testDataWatcher")
+    testReceivePacket()
+    
+
+on sync packet event play_server_entity_metadata:
+    set {_entity} to entity from id field 0 in {world}
+    {_entity} is {player}
+    set {_dw} to new datawatcher from event-packet
+    if data watcher index 0 of {_dw} is 32:
+        set data watcher index 0 of {_dw} to 64
+    if data watcher index 0 of {_dw} is 0:
+        set data watcher index 0 of {_dw} to 16
+
+# [ ] EffReceivePacket
+# [ ] EffReceivePacket without calling event
+# [ ] EvtPacket async
+function testReceivePacket():
+    init()
+    delete {test::*}
+    set {player}'s selected hotbar slot to slot 4 of {player}
+    set {_packet} to new play_client_held_item_slot packet
+    set field 0 of {_packet} to 0
+    receive {player} packet {_packet}
+    wait 3 tick
+    
+    {test::default} is " false true"
+    {test::sync} is " false true"
+    {test::async} is " true false"
+    index of {player}'s current hotbar slot is 0
+    set {test::without_calling_event} to -1
+    receive {player} packet {_packet} without calling event
+    wait 1 tick
+    {test::without_calling_event} is -1
+    success("testReceivePacket")
+    endTests()
+
+import:
+    org.bukkit.Bukkit
+on packet event play_client_held_item_slot:
+    set {test::default} to "%event.isAsynchronous()% %Bukkit.isPrimaryThread()%"
+on sync packet event play_client_held_item_slot:
+    set {test::sync} to "%event.isAsynchronous()% %Bukkit.isPrimaryThread()%"
+on async packet event play_client_held_item_slot:
+    set {test::async} to "%event.isAsynchronous()% %Bukkit.isPrimaryThread()%"
+    if {test::without_calling_event} is set:
+        set {test::without_calling_event} to 1
+
+
+expression regex replace [all] %string% with %string% in %string%:
+    return type: string
+    get:
+        return expression-3.replaceAll(expression-1, expression-2)
+
+effect new methods of %object% [matching %-strings%]:
+    trigger:
+        set {_methods::*} to methods of expression-1
+        set {_match::*} to expression-2 ? ""
+        loop {_methods::*}:
+            set {_method} to loop-value
+            {_method} contain "("
+            set {_v::*} to regex split {_method} at "^(\w+ )(static)?"
+            loop {_match::*}:
+                {_method} contain loop-value-2
+                set {_list::%{_method}%} to {_v::2}
+                exit loop
+        set {_colors::*} to "<magenta> <pink> <orange> <yellow> <lime> <aqua> <light blue>" split by " "
+        set {_colors::0} to "<white>"
+        loop {_list::*}:
+            set {_i} to 1
+            set {_tooltip} to loop-index
+
+            set {_firstPart::*} to {_tooltip} split by "("
+
+            set {_a::*} to {_firstPart::1} split by " "
+            loop {_a::*}:
+                set {_color} to {_colors::%{_i}%}
+                add 1 to {_i}
+                set {_a::%loop-index-2%} to "%{_color}%%loop-value-2% "
+            set {_firstPart::1} to "%join {_a::*}%("
+            replace first ")" with "%{_color}%)" in {_firstPart::2}
+            
+            set {_color} to {_colors::%{_i}%}
+            set {_b::*} to {_firstPart::2} split by ","
+            loop {_b::*}:
+                set {_color} to {_colors::%{_i}%}
+                set {_i} to mod( {_i} + 1 , 8)
+                set {_b::%loop-index-2%} to "%{_color}%%loop-value-2%, "
+            set {_firstPart::2} to join {_b::*}
+
+
+            set {_tooltip} to join {_firstPart::*}
+            set {_chat} to regex replace all "(\b\w+\.)+" with "" in loop-value
+            replace all "$" with "\$" in {_tooltip}
+            send formatted "<sgt:!set {packet} to new %{_packettype}% packet><tooltip: %{_tooltip}%> - %{_chat}%" to all ops
