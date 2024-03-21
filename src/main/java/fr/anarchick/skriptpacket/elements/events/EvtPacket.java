@@ -34,7 +34,7 @@ public class EvtPacket extends SkriptEvent {
     
     static {
         Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
-                "[(sync|async)] packet event %packettype% [with (1¦lowest|2¦low|3¦normal|4¦high|5¦highest|6¦monitor) priority]")
+                "[(sync|async)] packet event %packettype%")
         .description("Called when a packet of one of the specified types is being sent or"
                 + " received. You can optionally specify a priority triggers with higher"
                 + " priority will be called later (so high priority will come after low"
@@ -71,14 +71,12 @@ public class EvtPacket extends SkriptEvent {
     @SuppressWarnings("unchecked")
     public boolean init(Literal<?>[] literal, int matchedPattern, ParseResult parser) {
         packetTypeLit = (Literal<PacketType>) literal[0];
-
-        switch (parser.mark) {
-            case 1 -> priority = ListenerPriority.LOWEST;
-            case 2 -> priority = ListenerPriority.LOW;
-            case 4 -> priority = ListenerPriority.HIGH;
-            case 5 -> priority = ListenerPriority.HIGHEST;
-            case 6 -> priority = ListenerPriority.MONITOR;
-            // include case 3
+        switch (getEventPriority()) {
+            case LOWEST -> priority = ListenerPriority.LOWEST;
+            case LOW -> priority = ListenerPriority.LOW;
+            case HIGH -> priority = ListenerPriority.HIGH;
+            case HIGHEST -> priority = ListenerPriority.HIGHEST;
+            case MONITOR -> priority = ListenerPriority.MONITOR;
             default -> priority = ListenerPriority.NORMAL;
         }
 
@@ -88,14 +86,12 @@ public class EvtPacket extends SkriptEvent {
             mode = Mode.ASYNC;
         } else if (parser.expr.startsWith("sync")) {
             mode = Mode.SYNC;
-            
-//            if (packetType.isClient()) {
-//                Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' is sent by the client so it can't be use in SYNC");
-//                return false;
-//            } else if (packetType.isAsyncForced()) {
-//                Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' can't be use in SYNC");
-//                return false;
-//            }
+
+            if (packetType.isAsyncForced()) {
+                Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' can't be use in SYNC");
+                return false;
+            }
+
         }
 
         if (!packetType.isSupported()) {
@@ -104,6 +100,11 @@ public class EvtPacket extends SkriptEvent {
         }
 
         final String scriptName = getScriptName();
+        System.out.println("REGISTER PACKET LISTENER");
+        System.out.println("packetTypeLit.getAll() = " + packetTypeLit.getAll());
+        System.out.println("priority = " + priority);
+        System.out.println("mode = " + mode);
+        System.out.println("scriptName = " + scriptName);
         SkriptPacketEventListener.addPacketTypes(packetTypeLit.getAll(), priority, mode, scriptName);
         return true;
     }
@@ -113,36 +114,40 @@ public class EvtPacket extends SkriptEvent {
      * https://github.com/SkriptLang/Skript/pull/4108
      */
     private String getScriptName() {
-        if (SkriptPacket.SKRIPT_VERSION.isSmallerThan(new Version("2.6.5"))) {
-            Config config;
-
-            try {
-                final Method configMethod = ParserInstance.class.getDeclaredMethod("getCurrentScript");
-                config = (Config) configMethod.invoke(getParser());
-                return config.getFileName();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            return "UNKNOWN";
-        } else {
-            return getParser().getCurrentScript().getConfig().getFileName();
-        }
+        return getParser().getCurrentScript().getConfig().getFileName();
     }
 
     @Override
     public boolean check(@NotNull Event event) {
         if (event instanceof BukkitPacketEvent e) {
+            /*
+            System.out.println("Objects.equals(packetTypeLit.getSingle(event), e.getPacketType()) = " + Objects.equals(packetTypeLit.getSingle(event), e.getPacketType()));
+            System.out.println("priority.equals(e.getPriority()) = " + priority.equals(e.getPriority()));
+            System.out.println("mode.equals(e.getMode()) = " + mode.equals(e.getMode()));
 
+            System.out.println("packetTypeLit.getSingle(event) = " + packetTypeLit.getSingle(event));
+            System.out.println("e.getPacketType() = " + e.getPacketType());
+
+            System.out.println("priority = " + priority);
+            System.out.println("e.getPriority() = " + e.getPriority());
+
+
+            System.out.println("mode = " + mode);
+            System.out.println("e.getMode() = " + e.getMode());
+            */
             if (Objects.equals(packetTypeLit.getSingle(event), e.getPacketType())
                     && priority.equals(e.getPriority())
                     && mode.equals(e.getMode()) ) {
-                final PacketContainer packet = e.getPacket();
-                return packet.getMeta("bypassEvent").isEmpty();
+                return e.getPacket().getMeta("bypassEvent").isEmpty();
             }
 
         }
         return false;
+    }
+
+    @Override
+    public boolean canExecuteAsynchronously() {
+        return mode == Mode.ASYNC;
     }
     
     @Override
