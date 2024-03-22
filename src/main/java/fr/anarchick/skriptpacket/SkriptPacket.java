@@ -6,6 +6,7 @@ import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.util.Version;
 import fr.anarchick.skriptpacket.elements.Types;
+import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 import fr.anarchick.skriptpacket.util.Scheduling;
 import fr.anarchick.skriptpacket.util.Utils;
@@ -95,6 +96,12 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         Logging.info("is enable! Enjoy packets :D");
         checkUpdate();
     }
+
+    @Override
+    public void onDisable() {
+        PacketManager.removeListeners();
+        PacketManager.removeAsyncListeners();
+    }
     
     public static SkriptPacket getInstance() {
         return INSTANCE;
@@ -132,7 +139,7 @@ public class SkriptPacket extends JavaPlugin implements Listener {
     
     @EventHandler
     public void onScriptLoad(PreScriptLoadEvent e) {
-        SkriptPacketEventListener.onReload(e);
+        SkriptPacketEventListener.beforeReload(e);
     }
     
     @SuppressWarnings({"unchecked" })

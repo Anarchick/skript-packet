@@ -7,6 +7,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.elements.expressions.datawatcher.DataWatcher;
@@ -126,6 +127,11 @@ public class PacketManager extends StructureModifier<Object> {
     
     public static void removeListeners() {
         PROTOCOL_MANAGER.removePacketListeners(PLUGIN);
+        // Thrown a warning telling to create new listeners instead of removed
+        // PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
+    }
+
+    public static void removeAsyncListeners() {
         PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
     }
 

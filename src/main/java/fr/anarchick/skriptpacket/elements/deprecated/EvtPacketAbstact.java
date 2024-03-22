@@ -1,6 +1,4 @@
-
-package fr.anarchick.skriptpacket.elements.events;
-
+package fr.anarchick.skriptpacket.elements.deprecated;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.lang.Literal;
@@ -23,24 +21,12 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class EvtPacket extends SkriptEvent {
+public abstract class EvtPacketAbstact extends SkriptEvent {
 
-    private Mode mode = Mode.DEFAULT;
     private Literal<PacketType> packetTypeLit;
     private ListenerPriority priority;
-    
+
     static {
-        Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
-                "[(sync|async)] packet event %packettype%")
-        .description("Called when a packet of one of the specified types is being sent or"
-                + " received. You can optionally specify a priority triggers with higher"
-                + " priority will be called later (so high priority will come after low"
-                + " priority, and monitor priority will come last)."
-                + " By default, the priority is normal.")
-        .examples("packet event play_server_entity_equipments:",
-                "\tbroadcast \"equipment changed\"")
-        .since("1.0, 1.1 (priority), 2.0 (sync/async)");
-        
         // event-packet
         EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<>() {
             @Override
@@ -63,7 +49,9 @@ public class EvtPacket extends SkriptEvent {
             }
         }, 0);
     }
-    
+
+    abstract Mode getMode();
+
     @Override
     @SuppressWarnings("unchecked")
     public boolean init(Literal<?>[] literal, int matchedPattern, ParseResult parser) {
@@ -79,56 +67,44 @@ public class EvtPacket extends SkriptEvent {
 
         final PacketType packetType = packetTypeLit.getSingle();
 
-        if (parser.expr.startsWith("async")) {
-            mode = Mode.ASYNC;
-        } else if (parser.expr.startsWith("sync")) {
-            mode = Mode.SYNC;
-
-            if (packetType.isAsyncForced()) {
-                Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' can't be use in SYNC");
-                return false;
-            }
-
-        }
-
         if (!packetType.isSupported()) {
             Skript.error("The packettype '"+PacketManager.getPacketName(packetType)+"' is not supported by your server");
             return false;
         }
 
         final String scriptName = getScriptName();
-        SkriptPacketEventListener.register(packetTypeLit.getAll(), priority, mode, scriptName);
+        SkriptPacketEventListener.register(packetTypeLit.getAll(), priority, getMode(), scriptName);
         return true;
     }
 
+    /**
+     * Since Skript 2.7.0-beta1 , getCurrentScript return Script instead of Config
+     * https://github.com/SkriptLang/Skript/pull/4108
+     */
     private String getScriptName() {
         return getParser().getCurrentScript().getConfig().getFileName();
     }
 
     @Override
     public boolean check(@NotNull Event event) {
-
         if (event instanceof BukkitPacketEvent e) {
+
+            System.out.println("mode = " + getMode());
+            System.out.println("e.getMode() = " + e.getMode());
 
             if (Objects.equals(packetTypeLit.getSingle(event), e.getPacketType())
                     && priority.equals(e.getPriority())
-                    && mode.equals(e.getMode()) ) {
+                    && getMode().equals(e.getMode()) ) {
                 return e.getPacket().getMeta("bypassEvent").isEmpty();
             }
 
         }
-
         return false;
-    }
-
-    @Override
-    public boolean canExecuteAsynchronously() {
-        return mode == Mode.ASYNC;
     }
     
     @Override
     public @NotNull String toString(@Nullable Event e, boolean debug) {
-        return mode.name() + " packet event " + packetTypeLit.toString(e, debug) + " with " + priority.name() + " priority";
+        return getMode().name() + " packet event " + packetTypeLit.toString(e, debug) + " with " + priority.name() + " priority";
     }
     
 }

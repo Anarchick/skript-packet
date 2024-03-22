@@ -8,11 +8,13 @@ import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.util.Scheduling;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.UUID;
+
 public class SPPacketAdapter extends PacketAdapter {
 
     private static final JavaPlugin PLUGIN = SkriptPacket.getInstance();
     private final ListenerPriority priority;
-    private final PacketType packetType;
+    public final PacketType packetType;
     private final PacketManager.Mode mode;
     private final boolean isServer, isAsync;
 
@@ -28,9 +30,6 @@ public class SPPacketAdapter extends PacketAdapter {
     @Override
     public void onPacketSending(PacketEvent event) {
         if (event.getPacketType().equals(packetType) && isServer) {
-            System.out.println("SENDING");
-            System.out.println("packetType = " + packetType);
-            System.out.println("mode = " + mode);
             SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, isAsync));
         }
     }
@@ -38,9 +37,12 @@ public class SPPacketAdapter extends PacketAdapter {
     @Override
     public void onPacketReceiving(PacketEvent event) {
         if (event.getPacketType().equals(packetType) && !isServer) {
-            System.out.println("RECEIVED");
-            System.out.println("packetType = " + packetType);
-            System.out.println("mode = " + mode);
+            /*
+            if (event.getPacket().getMeta("uuid").isEmpty()) {
+                event.getPacket().setMeta("uuid", UUID.randomUUID());
+            }
+            */
+
             if (PacketManager.Mode.SYNC.equals(mode)) {
                 Scheduling.sync(() -> SkriptPacket.pluginManager
                         .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync)));
@@ -49,6 +51,27 @@ public class SPPacketAdapter extends PacketAdapter {
             }
 
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        } else if (o == this) {
+            return true;
+        } else {
+            return o.hashCode() == hashCode();
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return mode.hashCode() + packetType.hashCode() + priority.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("[%s;%s;%s;%s]", packetType.name(), mode.name(), priority.name());
     }
 
 }
