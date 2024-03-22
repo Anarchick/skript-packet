@@ -1,10 +1,12 @@
 [![SkriptHubViewTheDocs](http://skripthub.net/static/addon/ViewTheDocsButton.png)](http://skripthub.net/docs/?addon=skript-packet)
-[![Discord Banner 2](https://discordapp.com/api/guilds/138464183946575874/widget.png?style=banner2)](https://discord.com/channels/138464183946575874/860221632852393996)
+[![Discord Banner 2](https://discordapp.com/api/guilds/138464183946575874/widget.png?style=banner2)](https://discord.com/channels/138464183946575874/860221632852393996)  
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/R6R3VYU8L)
 
-# skript-packet
+# Skript-Packet
 A Skript packet addon to replace ThatPacketAddon (which is not updated) with Skript 2.5.2+
 
 # CAUTIONS
+
 ⚠️ Skript-Packet **is not** a fork of TPA, syntaxes may change ⚠️  
 ⚠️ This plugin **is not** for beginners ⚠️  
 ⚠️ You may have to use java NMS wich is not an API ⚠️  
