@@ -2,6 +2,7 @@ package fr.anarchick.skriptpacket.util.converters;
 
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
+import ch.njol.skript.entity.EntityType;
 import ch.njol.skript.util.slot.Slot;
 import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.injector.BukkitUnwrapper;
@@ -177,6 +178,8 @@ public class ConverterLogic {
                 converter = ConverterToNMS.BUKKIT_BIOME_TO_NMS_BIOME_ID;
             } else if (single instanceof String) {
                 converter = ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT;
+            } else if (single instanceof EntityType || single instanceof org.bukkit.entity.EntityType) {
+                converter = ConverterToNMS.RELATED_TO_NMS_ENTITYTYPES;
             }
 
         }

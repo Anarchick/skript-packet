@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
     "set {_nms} to nms of player",
     "set {_bukkit} to wrap from {_nms}"
 })
-@Since("2.0, 2.2.0 remove %chunk% and add %block data/material/slot/string% + wrap pattern modified")
+@Since("2.0, 2.2.0 -%chunk%  +%block data/material/slot/string% + wrap pattern modified")
 
 public class ExprNMS extends SimpleExpression<Object> {
 
@@ -37,7 +37,10 @@ public class ExprNMS extends SimpleExpression<Object> {
     private int pattern;
     private final static String[] patterns = new String[] {
             "NMS (of|from) %location/block/blockdata/itemtype/itemstack/material/slot/biome/entity/world/vector/string%",
-            "(convert|wrap) from nms %object%"
+            // fix issue https://github.com/SkriptLang/Skript/issues/6541
+            // have to use : nms of type of pig
+            "NMS (of|from) %entitytype%",
+            "(convert|wrap) from nms %object%",
     };
     private Object result = null;
 
@@ -56,10 +59,14 @@ public class ExprNMS extends SimpleExpression<Object> {
     @Nullable
     protected Object @NotNull [] get(@NotNull Event e) {
         final Object obj = expr.getSingle(e);
+        System.out.println("obj = " + obj);
+        if (obj == null) {
+            return new Object[0];
+        }
 
         switch (pattern) {
-            case 0 -> result = ConverterLogic.toNMS(obj);
-            case 1 -> {
+            case 0, 1 -> result = ConverterLogic.toNMS(obj);
+            case 2 -> {
                 result = ConverterLogic.toBukkit(obj);
 
                 if (result instanceof Location) {

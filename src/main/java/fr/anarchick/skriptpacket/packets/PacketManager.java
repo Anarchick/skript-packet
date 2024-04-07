@@ -7,7 +7,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.events.PacketListener;
 import com.comphenix.protocol.reflect.StructureModifier;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import fr.anarchick.skriptpacket.elements.expressions.datawatcher.DataWatcher;
@@ -55,7 +54,7 @@ public class PacketManager extends StructureModifier<Object> {
         FIELD_CONVERTERS.put(Set.class, ConverterToUtility.OBJECT_TO_SET);
         FIELD_CONVERTERS.put(ConverterLogic.BlockPositionClass, ConverterToNMS.RELATED_TO_NMS_BLOCKPOSITION);
         FIELD_CONVERTERS.put(ConverterLogic.ItemStackClass, ConverterToNMS.RELATED_TO_NMS_ITEMSTACK);
-        FIELD_CONVERTERS.put(ConverterLogic.EntityTypesClass, ConverterToNMS.RELATED_TO_NMS_ENTITYTYPE);
+        FIELD_CONVERTERS.put(ConverterLogic.EntityTypesClass, ConverterToNMS.RELATED_TO_NMS_ENTITYTYPES);
         FIELD_CONVERTERS.put(ConverterLogic.MinecraftKeyClass, ConverterToNMS.RELATED_TO_NMS_MINECRAFTKEY);
         FIELD_CONVERTERS.put(ConverterLogic.NBTTagCompoundClass, ConverterToUtility.STRING_TO_MOJANGSON);
         FIELD_CONVERTERS.put(ConverterLogic.IChatBaseComponentClass, ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT);

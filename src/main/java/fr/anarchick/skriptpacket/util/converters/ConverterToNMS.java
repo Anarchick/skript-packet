@@ -366,22 +366,25 @@ public enum ConverterToNMS implements Converter {
     },
 
     // TODO
-    RELATED_TO_NMS_ENTITYTYPE {
+    RELATED_TO_NMS_ENTITYTYPES {
         @Override
         public Object convert(Object single) {
             if (single instanceof EntityData skriptEntityData) {
                 single = skriptEntityData.toString();
+                System.out.println("EntityData = " + single);
+            } else if (single instanceof ch.njol.skript.entity.EntityType entityType) {
+                single = entityType.toString();
+                System.out.println("skript entitytype = " + single);
             }
 
             if (single instanceof String name) {
-                try {
-                    net.minecraft.world.entity.EntityType.byString(name);
-                } catch ( Exception ignored ) {}
+                single = EntityType.fromName(name.replace(" ", "_"));
             } else if (single instanceof Entity entity) {
                 single = entity.getType();
             }
 
             if (single instanceof EntityType entityType) {
+                System.out.println("BukkitConverters = " + BukkitConverters.getEntityTypeConverter().getGeneric(entityType));
                 return BukkitConverters.getEntityTypeConverter().getGeneric(entityType);
             }
 
