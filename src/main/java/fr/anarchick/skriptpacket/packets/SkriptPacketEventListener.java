@@ -90,6 +90,7 @@ public class SkriptPacketEventListener {
         }
 
         PacketManager.removeListeners();
+        PacketManager.removeAsyncListeners();
 
         for (Manager manager : toRegister) {
             PacketManager.onPacketEvent(manager.packetType(), manager.priority, manager.mode);

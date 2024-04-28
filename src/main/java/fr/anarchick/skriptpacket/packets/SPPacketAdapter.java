@@ -42,7 +42,6 @@ public class SPPacketAdapter extends PacketAdapter {
                 event.getPacket().setMeta("uuid", UUID.randomUUID());
             }
             */
-
             if (PacketManager.Mode.SYNC.equals(mode)) {
                 Scheduling.sync(() -> SkriptPacket.pluginManager
                         .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync)));

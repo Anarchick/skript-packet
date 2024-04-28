@@ -37,7 +37,6 @@ public class PacketManager extends StructureModifier<Object> {
     public static final Map<Class<?>, Converter> FIELD_CONVERTERS = new HashMap<>();
 
 
-
     // Init
     static {
         packetTypesByName = createNameToPacketTypeMap();
