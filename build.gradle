@@ -2,12 +2,8 @@ plugins {
     id 'java'
     id 'java-library'
     id 'maven-publish'
+    id("com.github.johnrengelman.shadow") version "7.1.1"
     id("io.papermc.paperweight.userdev") version "1.5.12"
-}
-
-configurations {
-    shade
-    compile.extendsFrom shade
 }
 
 repositories {
@@ -20,6 +16,9 @@ repositories {
     maven { url 'https://repo.skriptlang.org/releases' } // Skript
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
+    maven {
+        url = 'https://hub.jeff-media.com/nexus/repository/jeff-media-public/'
+    }
     mavenCentral()
 }
 
@@ -40,7 +39,6 @@ dependencies {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
-    //compileOnly group: 'org.spigotmc', name: 'spigot-api', version: mcVersion + mcSubVersion + '-R0.1-SNAPSHOT'
     compileOnly group: 'io.papermc.paper', name: 'paper-api', version: mcVersion + mcSubVersion + '-R0.1-SNAPSHOT'
     paperweight.paperDevBundle(mcVersion + mcSubVersion +'-R0.1-SNAPSHOT')
     compileOnly group: 'net.md-5', name: 'bungeecord-api', version: mcVersion + '-R0.1-SNAPSHOT'
@@ -49,7 +47,7 @@ dependencies {
     compileOnly group: 'com.mojang', name: 'datafixerupper', version: '1.0.20' // ExprPair
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: protocolLibVersion
     compileOnly group: 'org.json', name: 'json', version: '20210307'
-    //shade (group: 'org.json', name: 'json', version: '20210307') Now include in plugin.yml
+    implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
 }
 
 java {
@@ -61,12 +59,14 @@ java {
     }
 }
 
-jar {
-    exclude('fr/anarchick/skriptpacket/elements/deprecated/**')
-    configurations.shade.each { dep ->
-        from(project.zipTree(dep)){
-            exclude 'META-INF', 'META-INF/**'
-            exclude '**/*.yml'
+shadowJar {
+    relocate 'com.jeff_media.updatechecker', 'fr.anarchick.skriptpacket.updatechecker'
+}
+
+sourceSets {
+    main {
+        java {
+            exclude 'fr/anarchick/skriptpacket/elements/deprecated/**'
         }
     }
 }
@@ -101,9 +101,9 @@ task export() {
     description = "build gradle into external folder"
     def fromFile = 'build/libs/'+archivesBaseName+'-'+version+'.jar'
     def destinations = [
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.17/plugins',
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.18/plugins',
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/eclipse1.19/plugins',
+            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.17/plugins',
+            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.18/plugins',
+            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.19/plugins',
             'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.20.4/plugins'
     ]
     doLast {

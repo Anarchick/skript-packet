@@ -5,6 +5,8 @@ import ch.njol.skript.SkriptAddon;
 import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.util.Version;
+import com.jeff_media.updatechecker.UpdateCheckSource;
+import com.jeff_media.updatechecker.UpdateChecker;
 import fr.anarchick.skriptpacket.elements.Types;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
@@ -107,34 +109,10 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         return INSTANCE;
     }
     
-    private static void checkUpdate() {
-        Scheduling.async(() -> {
-
-            try {
-                final HttpURLConnection connection = (HttpURLConnection) new URL("https://raw.githubusercontent.com/Anarchick/skript-packet/main/build.gradle").openConnection();
-                connection.connect();
-                final BufferedReader in = new BufferedReader(new InputStreamReader(
-                        connection.getInputStream()));
-                String inputLine;
-
-                while ((inputLine = in.readLine()) != null) {
-
-                    if (inputLine.startsWith("version = ")) {
-                        String str = Utils.regexGroup("((\\d+\\.?)+)", inputLine, 1);
-                        final Version lastVersion = new Version(str);
-
-                        if (lastVersion.isLargerThan(VERSION)) {
-                            Logging.warn("A new update is available ("+lastVersion+")");
-                        }
-
-                        break;
-                    }
-                }
-
-                in.close();
-                connection.disconnect();
-            } catch (Exception ignored) {}
-        });
+    private void checkUpdate() {
+        new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "Anarchick/skript-packet")
+                .setDownloadLink("https://github.com/Anarchick/skript-packet/releases")
+                .checkNow();
     }
     
     @EventHandler
