@@ -32,14 +32,10 @@ public class EvtPacket extends SkriptEvent {
     static {
         Skript.registerEvent("Packet Event - Skript-Packet", EvtPacket.class, BukkitPacketEvent.class,
                 "[(sync|async)] packet event %packettype%")
-        .description("Called when a packet of one of the specified types is being sent or"
-                + " received. You can optionally specify a priority triggers with higher"
-                + " priority will be called later (so high priority will come after low"
-                + " priority, and monitor priority will come last)."
-                + " By default, the priority is normal.")
+        .description("Called when a packet of one of the specified types is being sent or received.")
         .examples("packet event play_server_entity_equipments:",
                 "\tbroadcast \"equipment changed\"")
-        .since("1.0, 1.1 (priority), 2.0 (sync/async)");
+        .since("1.0, 2.0 (sync/async)");
         
         // event-packet
         EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<>() {

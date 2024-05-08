@@ -18,7 +18,7 @@ import ch.njol.util.coll.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 
 @Name("DataWatcher Index")
-@Description("Get or set a datawatcher's index. Used for metadata packet. More informations here https://github.com/Anarchick/skript-packet/wiki/Data-Watcher")
+@Description("Get or set a datawatcher's index. Used for metadata packet. More information at https://github.com/Anarchick/skript-packet/wiki/Data-Watcher")
 @Examples({
         "set {_dw} to data watcher from {_packet}",
         "data watcher index 0 of {_dw} is set",
