@@ -32,10 +32,8 @@ def skriptVersion = '2.9.2'
 def protocolLibVersion = '5.3.0-SNAPSHOT'
 def skriptReflectVersion = '2.4-dev1'
 
-def targetJavaVersion = 21
-
 dependencies {
-	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: skriptVersion) {
+    compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: skriptVersion) {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
@@ -50,11 +48,14 @@ dependencies {
 }
 
 java {
-    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
-    if (JavaVersion.current() < javaVersion) {
-        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+tasks {
+    compileJava {
+        // Set the release flag. This configures what version bytecode the compiler will emit, as well as what JDK APIs are usable.
+        // See https://openjdk.java.net/jeps/247 for more information.
+        options.release = 21
     }
 }
 
@@ -67,12 +68,6 @@ sourceSets {
         java {
             exclude 'fr/anarchick/skriptpacket/elements/deprecated/**'
         }
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
-        options.release = targetJavaVersion
     }
 }
 
