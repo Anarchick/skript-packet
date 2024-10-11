@@ -1,8 +1,9 @@
 plugins {
+    id("com.gradleup.shadow") version "8.3.3"
+    id ("base")
     id("java")
     id("java-library")
     id("maven-publish")
-    id("com.github.johnrengelman.shadow") version "7.1.1"
     id("io.papermc.paperweight.userdev") version "1.7.3"
 }
 
@@ -10,7 +11,7 @@ repositories {
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots' } // Spigot
     maven { url 'https://repo.dmulloy2.net/nexus/repository/public/' } // ProtocolLib
     maven { url 'https://mvnrepository.com/artifact/org.json/json' } // DataWatcher
-    maven { url 'https://libraries.minecraft.net' }
+
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.skriptlang.org/releases' } // Skript
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
@@ -20,9 +21,12 @@ repositories {
         url = uri("https://repo.jeff-media.com/public")
     }
     mavenCentral()
+    maven { url 'https://libraries.minecraft.net' } // must be last to avoid conflicts
 }
 
-archivesBaseName = "Skript-Packet"
+base {
+    archivesName = "Skript-Packet"
+}
 group = 'fr.anarchick.skriptpacket'
 version = '2.2.2'
 
@@ -37,7 +41,6 @@ dependencies {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
-    paperweight.paperDevBundle(mcVersion + mcSubVersion +'-R0.1-SNAPSHOT')
     compileOnly group: 'net.md-5', name: 'bungeecord-api', version: mcVersion + '-R0.1-SNAPSHOT'
     compileOnly group: 'com.github.SkriptLang', name: 'skript-reflect', version: skriptReflectVersion
     compileOnly group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
@@ -45,6 +48,7 @@ dependencies {
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: protocolLibVersion
     compileOnly group: 'org.json', name: 'json', version: '20231013'
     implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
+    paperweight.paperDevBundle(mcVersion + mcSubVersion +'-R0.1-SNAPSHOT')
 }
 
 java {
@@ -59,7 +63,7 @@ tasks {
     }
 }
 
-shadowJar {
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
     relocate 'com.jeff_media.updatechecker', 'fr.anarchick.skriptpacket.updatechecker'
 }
 
@@ -96,17 +100,12 @@ tasks.register('export') {
     group = "other"
     description = "build gradle into external folder"
     def userHome = System.getenv('USERPROFILE').replace('\\', '/')
-    def fromFile = 'build/libs/' + archivesBaseName + '-' + version + '.jar'
-    def destinations = [
-            userHome + '/Documents/minecraft/SkriptPacket/1.17/plugins',
-            userHome + '/Documents/minecraft/SkriptPacket/1.18/plugins',
-            userHome + '/Documents/minecraft/SkriptPacket/1.19/plugins',
-            userHome + '/Documents/minecraft/SkriptPacket/1.20.4/plugins',
-            userHome + '/Documents/minecraft/SkriptPacket/1.21.1/plugins'
-    ]
+    def fromFile = 'build/libs/' + base.archivesName.get() + '-' + version + '.jar'
+    // List of version folder to export the jar
+    def versions = ['1.17', '1.18', '1.19', '1.20.4', '1.21.1']
     doLast {
-        destinations.each { dest ->
-            def destDir = file(dest)
+        versions.each { ver ->
+            def destDir = file(userHome + '/Documents/minecraft/SkriptPacket/' + ver + '/plugins')
             if (destDir.exists()) {
                 copy {
                     from fromFile
@@ -119,5 +118,5 @@ tasks.register('export') {
     }
 }
 
-tasks.build.finalizedBy export
-tasks.reobfJar.finalizedBy export
+tasks.build.finalizedBy(tasks.export)
+tasks.reobfJar.finalizedBy(tasks.export)
