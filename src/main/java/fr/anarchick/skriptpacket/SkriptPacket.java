@@ -10,7 +10,6 @@ import com.jeff_media.updatechecker.UpdateChecker;
 import fr.anarchick.skriptpacket.elements.Types;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
-import fr.anarchick.skriptpacket.util.Scheduling;
 import fr.anarchick.skriptpacket.util.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
@@ -18,11 +17,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class SkriptPacket extends JavaPlugin implements Listener {
 

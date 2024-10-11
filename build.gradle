@@ -1,52 +1,51 @@
 plugins {
-    id 'java'
-    id 'java-library'
-    id 'maven-publish'
+    id("java")
+    id("java-library")
+    id("maven-publish")
     id("com.github.johnrengelman.shadow") version "7.1.1"
-    id("io.papermc.paperweight.userdev") version "1.5.12"
+    id("io.papermc.paperweight.userdev") version "1.7.3"
 }
 
 repositories {
-    maven { url 'https://papermc.io/repo/repository/maven-public/' } // paper
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots' } // Spigot
-    maven { url "https://repo.dmulloy2.net/nexus/repository/public/" } // ProtocolLib
+    maven { url 'https://repo.dmulloy2.net/nexus/repository/public/' } // ProtocolLib
     maven { url 'https://mvnrepository.com/artifact/org.json/json' } // DataWatcher
-    maven { url "https://libraries.minecraft.net" }
+    maven { url 'https://libraries.minecraft.net' }
     maven { url 'https://jitpack.io' }
     maven { url 'https://repo.skriptlang.org/releases' } // Skript
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
     maven {
-        url = 'https://hub.jeff-media.com/nexus/repository/jeff-media-public/'
+        name = "jeffMediaPublic"
+        url = uri("https://repo.jeff-media.com/public")
     }
     mavenCentral()
 }
 
 archivesBaseName = "Skript-Packet"
 group = 'fr.anarchick.skriptpacket'
-version = '2.2.1'
+version = '2.2.2'
 
-def mcVersion = '1.20'
-def mcSubVersion = '.4'
-def skriptVersion = '2.8.3'
-def protocolLibVersion = '5.1.0'
-def skriptReflectVersion = '2.4'
+def mcVersion = '1.21'
+def mcSubVersion = '.1'
+def skriptVersion = '2.9.2'
+def protocolLibVersion = '5.3.0-SNAPSHOT'
+def skriptReflectVersion = '2.4-dev1'
 
-def targetJavaVersion = 17
+def targetJavaVersion = 21
 
 dependencies {
 	compileOnly (group: 'com.github.SkriptLang', name: 'Skript', version: skriptVersion) {
         exclude group: 'com.sk89q.worldguard', module: 'worldguard-legacy'
         exclude group: 'net.milkbowl.vault', module: 'Vault'
     }
-    compileOnly group: 'io.papermc.paper', name: 'paper-api', version: mcVersion + mcSubVersion + '-R0.1-SNAPSHOT'
     paperweight.paperDevBundle(mcVersion + mcSubVersion +'-R0.1-SNAPSHOT')
     compileOnly group: 'net.md-5', name: 'bungeecord-api', version: mcVersion + '-R0.1-SNAPSHOT'
-    compileOnly group: 'com.github.TPGamesNL', name: 'skript-reflect', version: skriptReflectVersion
+    compileOnly group: 'com.github.SkriptLang', name: 'skript-reflect', version: skriptReflectVersion
     compileOnly group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
     compileOnly group: 'com.mojang', name: 'datafixerupper', version: '1.0.20' // ExprPair
     compileOnly group: "com.comphenix.protocol", name: "ProtocolLib", version: protocolLibVersion
-    compileOnly group: 'org.json', name: 'json', version: '20210307'
+    compileOnly group: 'org.json', name: 'json', version: '20231013'
     implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
 }
 
@@ -84,6 +83,8 @@ processResources {
     filesMatching('plugin.yml') {
         expand props
     }
+    // Ensure filtering is applied correctly
+    filter(org.apache.tools.ant.filters.ReplaceTokens, tokens: props)
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -96,18 +97,20 @@ publishing {
     }
 }
 
-task export() {
+tasks.register('export') {
     group = "other"
     description = "build gradle into external folder"
-    def fromFile = 'build/libs/'+archivesBaseName+'-'+version+'.jar'
+    def userHome = System.getenv('USERPROFILE').replace('\\', '/')
+    def fromFile = 'build/libs/' + archivesBaseName + '-' + version + '.jar'
     def destinations = [
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.17/plugins',
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.18/plugins',
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.19/plugins',
-            'C:/Users/aeim/Documents/minecraft/SkriptPacket/1.20.4/plugins'
+            userHome + '/Documents/minecraft/SkriptPacket/1.17/plugins',
+            userHome + '/Documents/minecraft/SkriptPacket/1.18/plugins',
+            userHome + '/Documents/minecraft/SkriptPacket/1.19/plugins',
+            userHome + '/Documents/minecraft/SkriptPacket/1.20.4/plugins',
+            userHome + '/Documents/minecraft/SkriptPacket/1.21.1/plugins'
     ]
     doLast {
-        destinations.each {dest ->
+        destinations.each { dest ->
             def destDir = file(dest)
             if (destDir.exists()) {
                 copy {
@@ -121,5 +124,5 @@ task export() {
     }
 }
 
-build.finalizedBy export
-reobfJar.finalizedBy export
+tasks.build.finalizedBy export
+tasks.reobfJar.finalizedBy export
