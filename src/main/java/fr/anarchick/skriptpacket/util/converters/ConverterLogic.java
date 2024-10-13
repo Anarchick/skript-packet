@@ -31,8 +31,8 @@ import java.util.regex.Pattern;
 
 public class ConverterLogic {
 
-
-    public static final Class<?> MojangsonClass = MinecraftReflection.getMinecraftClass("MojangsonParser", "nbt.MojangsonParser");
+    // remove from SP 2.2.2
+    //public static final Class<?> MojangsonClass = MinecraftReflection.getMinecraftClass("MojangsonParser", "nbt.MojangsonParser");
     public static final Class<?> NBTTagCompoundClass = MinecraftReflection.getNBTCompoundClass();
     public static final Class<?> IChatBaseComponentClass = MinecraftReflection.getIChatBaseComponentClass();
     public static final Class<?> ItemStackClass = MinecraftReflection.getItemStackClass();
@@ -51,7 +51,6 @@ public class ConverterLogic {
     private static final ClassLoader classLoader = SkriptPacket.getInstance().getClass().getClassLoader();
     public static final Constructor<?> blockPositionConstructor;
     public static final Pattern regexUUID = Pattern.compile("^[\\da-f]{8}-([\\da-f]{4}-){3}[\\da-f]{12}$", Pattern.CASE_INSENSITIVE);
-
 
     static {
 
@@ -176,8 +175,13 @@ public class ConverterLogic {
                 converter = ConverterToNMS.BUKKIT_VECTOR_TO_NMS_VEC3D;
             } else if (single instanceof Biome) {
                 converter = ConverterToNMS.BUKKIT_BIOME_TO_NMS_BIOME_ID;
-            } else if (single instanceof String) {
-                converter = ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT;
+            } else if (single instanceof String text) {
+                System.out.println("111 text = " + text);
+                if (text.startsWith("{") && text.endsWith("}")) {
+                    converter = ConverterToNMS.STRING_TO_NMS_NBT_COMPOUND_TAG;
+                } else {
+                    converter = ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT;
+                }
             } else if (single instanceof EntityType || single instanceof org.bukkit.entity.EntityType) {
                 converter = ConverterToNMS.RELATED_TO_NMS_ENTITYTYPES;
             }

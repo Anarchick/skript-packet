@@ -101,7 +101,7 @@ public class SkriptPacketEventListener {
     /**
      * Called once time berfore reload.
      * called for /sk reload scripts or /reload confirm
-     * @param e
+     * @param e PreScriptLoadEvent
      */
     public static void beforeReload(PreScriptLoadEvent e) {
         for (Config config : e.getScripts()) {

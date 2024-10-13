@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
         "set {_enum} to enum \"GAME_INFO\" from nms class \"ChatMessageType\""
 })
 @Since("1.2")
-
+//!send enum "HEAD" from nms class "world.entity.EquipmentSlot"
 public class ExprEnum extends SimpleExpression<Object> {
 
     private Expression<String> enumExpr;
@@ -51,8 +51,7 @@ public class ExprEnum extends SimpleExpression<Object> {
     static {
         Skript.registerExpression(ExprEnum.class, Object.class, ExpressionType.COMBINED, patterns);
         try {
-            // MinecraftVersion.class is in root of both before/after 1.17
-            final Class<?> minecraftVersionClass = MinecraftReflection.getMinecraftClass("MinecraftVersion");
+            final Class<?> minecraftVersionClass = MinecraftReflection.getMinecraftClass("CrashReport");
             // If you use PAPER , it returns the file from '/cache/patched_1.17.1.jar'
             final URL url = minecraftVersionClass.getProtectionDomain().getCodeSource().getLocation();
             final File file = Paths.get(url.toURI()).toFile();
@@ -69,7 +68,11 @@ public class ExprEnum extends SimpleExpression<Object> {
                 .distinct()
                 .forEach(packages::add);
             jar.close();
-        } catch (Exception ignored) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("packages = " + packages);
     }
 
     @Override

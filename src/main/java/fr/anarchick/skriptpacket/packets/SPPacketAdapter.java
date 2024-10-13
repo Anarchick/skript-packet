@@ -12,10 +12,10 @@ import java.util.UUID;
 
 public class SPPacketAdapter extends PacketAdapter {
 
-    private static final JavaPlugin PLUGIN = SkriptPacket.getInstance();
-    private final ListenerPriority priority;
+    public static final JavaPlugin PLUGIN = SkriptPacket.getInstance();
+    public final ListenerPriority priority;
     public final PacketType packetType;
-    private final PacketManager.Mode mode;
+    public final PacketManager.Mode mode;
     private final boolean isServer, isAsync;
 
     public SPPacketAdapter(ListenerPriority priority, PacketType packetType, PacketManager.Mode mode) {
@@ -42,6 +42,7 @@ public class SPPacketAdapter extends PacketAdapter {
                 event.getPacket().setMeta("uuid", UUID.randomUUID());
             }
             */
+
             if (PacketManager.Mode.SYNC.equals(mode)) {
                 Scheduling.sync(() -> SkriptPacket.pluginManager
                         .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync)));
@@ -70,7 +71,7 @@ public class SPPacketAdapter extends PacketAdapter {
 
     @Override
     public String toString() {
-        return String.format("[%s;%s;%s;%s]", packetType.name(), mode.name(), priority.name());
+        return String.format("SPPacketAdapter[%s;%s;%s]", packetType.name(), mode.name(), priority.name());
     }
 
 }

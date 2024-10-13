@@ -19,6 +19,7 @@ import org.bukkit.block.Biome;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nonnull;
 import java.util.*;
@@ -55,7 +56,9 @@ public class PacketManager extends StructureModifier<Object> {
         FIELD_CONVERTERS.put(ConverterLogic.ItemStackClass, ConverterToNMS.RELATED_TO_NMS_ITEMSTACK);
         FIELD_CONVERTERS.put(ConverterLogic.EntityTypesClass, ConverterToNMS.RELATED_TO_NMS_ENTITYTYPES);
         FIELD_CONVERTERS.put(ConverterLogic.MinecraftKeyClass, ConverterToNMS.RELATED_TO_NMS_MINECRAFTKEY);
-        FIELD_CONVERTERS.put(ConverterLogic.NBTTagCompoundClass, ConverterToUtility.STRING_TO_MOJANGSON);
+        // remove since SP2.2.2
+        //FIELD_CONVERTERS.put(ConverterLogic.NBTTagCompoundClass, ConverterToUtility.STRING_TO_MOJANGSON);
+        FIELD_CONVERTERS.put(ConverterLogic.NBTTagCompoundClass, ConverterToNMS.STRING_TO_NMS_NBT_COMPOUND_TAG);
         FIELD_CONVERTERS.put(ConverterLogic.IChatBaseComponentClass, ConverterToNMS.STRING_TO_NMS_ICHATBASECOMPONENT);
         FIELD_CONVERTERS.put(BaseComponent[].class, ConverterToUtility.STRING_TO_MD5_BASECOMPONENT);
         FIELD_CONVERTERS.put(Component.class, ConverterToBukkit.STRING_TO_PAPER_COMPONENT);
@@ -120,7 +123,6 @@ public class PacketManager extends StructureModifier<Object> {
             case SYNC -> PROTOCOL_MANAGER.addPacketListener(SPPacketAdapter);
             default -> PROTOCOL_MANAGER.getAsynchronousManager().registerAsyncHandler(SPPacketAdapter).syncStart();
         }
-
     }
     
     public static void removeListeners() {
@@ -131,6 +133,23 @@ public class PacketManager extends StructureModifier<Object> {
 
     public static void removeAsyncListeners() {
         PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
+    }
+
+    /**
+     * Debug method to print all registered listeners
+     */
+    @ApiStatus.Internal
+    public static void debug() {
+        PROTOCOL_MANAGER.getPacketListeners().forEach(listener -> {
+            if (listener instanceof SPPacketAdapter adapter) {
+                System.out.println("SYNC" + adapter);
+            }
+        });
+        PROTOCOL_MANAGER.getAsynchronousManager().getAsyncHandlers().forEach(listener -> {
+            if (listener instanceof SPPacketAdapter adapter) {
+                System.out.println(adapter.mode.name() + adapter);
+            }
+        });
     }
 
     public static void sendPacket(PacketContainer packet, Player[] players) {

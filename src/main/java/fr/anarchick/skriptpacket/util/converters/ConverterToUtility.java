@@ -191,7 +191,8 @@ public enum ConverterToUtility implements Converter {
         }
     },
 
-    // TODO check
+    // Remove from SP 2.2.2
+    /*
     STRING_TO_MOJANGSON {
         @Override
         public Object convert(@Nonnull final Object single) {
@@ -218,6 +219,8 @@ public enum ConverterToUtility implements Converter {
         }
     },
 
+     */
+
     // TODO check
     NMS_CHATCOMPONENTTEXT_TO_STRING {
         @Override
@@ -239,7 +242,7 @@ public enum ConverterToUtility implements Converter {
     STRING_TO_MD5_BASECOMPONENT {
         @Override
         public Object convert(@Nonnull final Object single) {
-            final String json = Optional.ofNullable((String)single).orElse("");
+            final String json = Optional.of((String) single).orElse("");
             WrappedChatComponent wrapper;
 
             if (json.startsWith("{") && json.endsWith("}")) {

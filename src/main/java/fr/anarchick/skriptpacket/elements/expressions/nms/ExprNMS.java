@@ -59,7 +59,7 @@ public class ExprNMS extends SimpleExpression<Object> {
     @Nullable
     protected Object @NotNull [] get(@NotNull Event e) {
         final Object obj = expr.getSingle(e);
-        System.out.println("obj = " + obj);
+
         if (obj == null) {
             return new Object[0];
         }

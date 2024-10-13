@@ -89,9 +89,6 @@ public abstract class EvtPacketAbstact extends SkriptEvent {
     public boolean check(@NotNull Event event) {
         if (event instanceof BukkitPacketEvent e) {
 
-            System.out.println("mode = " + getMode());
-            System.out.println("e.getMode() = " + e.getMode());
-
             if (Objects.equals(packetTypeLit.getSingle(event), e.getPacketType())
                     && priority.equals(e.getPriority())
                     && getMode().equals(e.getMode()) ) {

@@ -65,4 +65,9 @@ public class BukkitPacketEvent extends Event implements Cancellable {
         this.packetEvent.setCancelled(b);
     }
 
+    @Override
+    public String toString() {
+        return String.format("BukkitPacketEvent[%s;%s;%s;%s]", packetEvent.getPacketType().name(), mode.name(), priority.name(), isAsynchronous());
+    }
+
 }
