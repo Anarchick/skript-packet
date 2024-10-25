@@ -132,7 +132,9 @@ public class PacketManager extends StructureModifier<Object> {
     }
 
     public static void removeAsyncListeners() {
-        PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
+        try {
+            PROTOCOL_MANAGER.getAsynchronousManager().unregisterAsyncHandlers(PLUGIN);
+        } catch (Exception ignored) {}
     }
 
     /**
