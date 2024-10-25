@@ -1,14 +1,12 @@
 package fr.anarchick.skriptpacket.packets;
 
+import ch.njol.skript.util.Task;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketEvent;
 import fr.anarchick.skriptpacket.SkriptPacket;
-import fr.anarchick.skriptpacket.util.Scheduling;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.UUID;
 
 public class SPPacketAdapter extends PacketAdapter {
 
@@ -44,8 +42,12 @@ public class SPPacketAdapter extends PacketAdapter {
             */
 
             if (PacketManager.Mode.SYNC.equals(mode)) {
-                Scheduling.sync(() -> SkriptPacket.pluginManager
-                        .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync)));
+                // Can't use Bukkit scheduler https://discord.com/channels/135877399391764480/154927412394590208/1294976538865045547
+                Task.callSync(() -> {
+                    SkriptPacket.pluginManager
+                            .callEvent(new BukkitPacketEvent(event, priority, mode, isAsync));
+                    return null;
+                }, SkriptPacket.getInstance());
             } else {
                 SkriptPacket.pluginManager.callEvent(new BukkitPacketEvent(event, priority, mode, isAsync));
             }
