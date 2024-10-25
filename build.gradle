@@ -1,7 +1,6 @@
 plugins {
     id("com.gradleup.shadow") version "8.3.3"
     id ("base")
-    id("java")
     id("java-library")
     id("maven-publish")
     id("io.papermc.paperweight.userdev") version "1.7.3"
@@ -33,7 +32,7 @@ version = '2.2.2'
 def mcVersion = '1.21'
 def mcSubVersion = '.1'
 def skriptVersion = '2.9.2'
-def protocolLibVersion = '5.3.0-SNAPSHOT'
+def protocolLibVersion = '5.3.0'
 def skriptReflectVersion = '2.4-dev1'
 
 dependencies {
@@ -100,7 +99,7 @@ tasks.register('export') {
     group = "other"
     description = "build gradle into external folder"
     def userHome = System.getenv('USERPROFILE').replace('\\', '/')
-    def fromFile = 'build/libs/' + base.archivesName.get() + '-' + version + '.jar'
+    def fromFile = 'build/libs/' + base.archivesName.get() + '-' + version + '-dev-all.jar'
     // List of version folder to export the jar
     def versions = ['1.17', '1.18', '1.19', '1.20.4', '1.21.1']
     doLast {
@@ -110,6 +109,9 @@ tasks.register('export') {
                 copy {
                     from fromFile
                     into destDir
+                    rename { String fileName ->
+                        fileName.replace('-dev-all.jar', '.jar')
+                    }
                 }
             } else {
                 println "The folder '" + destDir + "' does not exist"
@@ -119,4 +121,4 @@ tasks.register('export') {
 }
 
 tasks.build.finalizedBy(tasks.export)
-tasks.reobfJar.finalizedBy(tasks.export)
+tasks.shadowJar.finalizedBy(tasks.export)
