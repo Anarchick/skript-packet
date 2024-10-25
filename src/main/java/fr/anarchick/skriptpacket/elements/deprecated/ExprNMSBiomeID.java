@@ -9,6 +9,7 @@ import ch.njol.skript.doc.Name;
 import ch.njol.skript.doc.Since;
 import ch.njol.skript.expressions.base.SimplePropertyExpression;
 import fr.anarchick.skriptpacket.SkriptPacket;
+import org.jetbrains.annotations.NotNull;
 
 @Name("NMS Biome ID")
 @Description({"Get the NMS ID of biome. This method return a number",
@@ -29,12 +30,12 @@ public class ExprNMSBiomeID extends SimplePropertyExpression<Biome, Number>{
     }
     
     @Override
-    public Class<? extends Number> getReturnType() {
+    public @NotNull Class<? extends Number> getReturnType() {
         return Number.class;
     }
 
     @Override
-    protected String getPropertyName() {
+    protected @NotNull String getPropertyName() {
         return "nms biome id of %biome%";
     }
     

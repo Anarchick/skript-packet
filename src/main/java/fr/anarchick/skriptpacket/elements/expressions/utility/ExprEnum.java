@@ -72,7 +72,6 @@ public class ExprEnum extends SimpleExpression<Object> {
             e.printStackTrace();
         }
 
-        System.out.println("packages = " + packages);
     }
 
     @Override

@@ -8,7 +8,6 @@ import ch.njol.skript.util.Version;
 import com.jeff_media.updatechecker.UpdateCheckSource;
 import com.jeff_media.updatechecker.UpdateChecker;
 import fr.anarchick.skriptpacket.elements.Types;
-import fr.anarchick.skriptpacket.packets.BukkitPacketEvent;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 import fr.anarchick.skriptpacket.util.Utils;
@@ -124,11 +123,6 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         }
 
         return result;
-    }
-
-    @EventHandler
-    public void onPacketEvent(BukkitPacketEvent e) {
-        System.out.println("test = " + e);
     }
     
 }

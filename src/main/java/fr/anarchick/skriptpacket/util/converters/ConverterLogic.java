@@ -10,6 +10,7 @@ import com.comphenix.protocol.utility.MinecraftReflection;
 import com.comphenix.protocol.wrappers.Vector3F;
 import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
+import fr.anarchick.skriptpacket.Logging;
 import fr.anarchick.skriptpacket.SkriptPacket;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.kyori.adventure.text.minimessage.MiniMessage;
@@ -176,7 +177,6 @@ public class ConverterLogic {
             } else if (single instanceof Biome) {
                 converter = ConverterToNMS.BUKKIT_BIOME_TO_NMS_BIOME_ID;
             } else if (single instanceof String text) {
-                System.out.println("111 text = " + text);
                 if (text.startsWith("{") && text.endsWith("}")) {
                     converter = ConverterToNMS.STRING_TO_NMS_NBT_COMPOUND_TAG;
                 } else {
@@ -372,9 +372,11 @@ public class ConverterLogic {
             case END_MIDLANDS -> 61;
             case SMALL_END_ISLANDS -> 62;
             case END_BARRENS -> 63;
-            default -> null;
+            default -> {
+                Logging.warn("Missing biome id for '" +biome+"'. You should create an issue on Github.");
+                yield null;
+            }
         };
-        //Logging.warn("Missing biome id for '" +biome+"'. You should create an issue on Github.");
     }
     
 }

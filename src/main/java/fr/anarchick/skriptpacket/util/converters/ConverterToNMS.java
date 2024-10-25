@@ -4,13 +4,14 @@ import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.entity.EntityData;
 import ch.njol.skript.util.slot.Slot;
 import com.comphenix.protocol.utility.MinecraftReflection;
-import com.comphenix.protocol.wrappers.*;
-import com.comphenix.protocol.wrappers.nbt.NbtBase;
+import com.comphenix.protocol.wrappers.BukkitConverters;
+import com.comphenix.protocol.wrappers.MinecraftKey;
+import com.comphenix.protocol.wrappers.WrappedBlockData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import com.comphenix.protocol.wrappers.nbt.NbtWrapper;
 import com.comphenix.protocol.wrappers.nbt.io.NbtTextSerializer;
 import fr.anarchick.skriptpacket.Logging;
-import fr.anarchick.skriptpacket.SkriptPacket;
 import org.bukkit.Keyed;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -22,13 +23,11 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -375,10 +374,8 @@ public enum ConverterToNMS implements Converter {
         public Object convert(Object single) {
             if (single instanceof EntityData skriptEntityData) {
                 single = skriptEntityData.toString();
-                System.out.println("EntityData = " + single);
             } else if (single instanceof ch.njol.skript.entity.EntityType entityType) {
                 single = entityType.toString();
-                System.out.println("skript entitytype = " + single);
             }
 
             if (single instanceof String name) {
@@ -388,7 +385,6 @@ public enum ConverterToNMS implements Converter {
             }
 
             if (single instanceof EntityType entityType) {
-                System.out.println("BukkitConverters = " + BukkitConverters.getEntityTypeConverter().getGeneric(entityType));
                 return BukkitConverters.getEntityTypeConverter().getGeneric(entityType);
             }
 

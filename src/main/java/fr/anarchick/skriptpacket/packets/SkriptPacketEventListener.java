@@ -96,6 +96,8 @@ public class SkriptPacketEventListener {
             PacketManager.onPacketEvent(manager.packetType(), manager.priority, manager.mode);
         }
 
+        //PacketManager.debug();
+
     }
 
     /**
