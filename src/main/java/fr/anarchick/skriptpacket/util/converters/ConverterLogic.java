@@ -12,14 +12,16 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import fr.anarchick.skriptpacket.Logging;
 import fr.anarchick.skriptpacket.SkriptPacket;
+import io.papermc.paper.registry.PaperRegistryAccess;
+import io.papermc.paper.registry.RegistryAccess;
+import io.papermc.paper.registry.RegistryKey;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -300,83 +302,53 @@ public class ConverterLogic {
         }
     }
 
+    private static final Map<NamespacedKey, Integer> BIOME_ID_MAP = new HashMap<>();
+
+    public static void loadBiomeID() {
+        Logging.info("Loading biome ids from config");
+        BIOME_ID_MAP.clear();
+        SkriptPacket sp = SkriptPacket.getInstance();
+        sp.saveDefaultConfig();
+        FileConfiguration config = sp.getConfig();
+
+        for (String ymlKey : config.getConfigurationSection("biome-ids").getKeys(false)) {
+            String key = ymlKey.replace('-', ':');
+            NamespacedKey namespacedKey = NamespacedKey.fromString(key);
+
+            if (namespacedKey == null) {
+                Logging.warn("Invalid key '" + ymlKey + "' in biome-ids section.");
+                continue;
+            }
+
+            int id = config.getInt("biome-ids."+ymlKey);
+            BIOME_ID_MAP.put(namespacedKey, id);
+        }
+
+        RegistryAccess.registryAccess().getRegistry(RegistryKey.BIOME).forEach((key) -> {
+            NamespacedKey namespacedKey = key.getKey();
+
+            if (!BIOME_ID_MAP.containsKey(namespacedKey)) {
+                Logging.warn("Missing biome id for '" + namespacedKey + "'. You should create an entry in config file. (If it's a vanilla biome you should refer to https://minecraft.fandom.com/wiki/Biome/ID)");
+            }
+
+        });
+
+    }
     /**
-     * Updated for mc 1.20.4
      * https://minecraft.fandom.com/wiki/Biome/ID
      * @param biome Bukkit biome
      * @return ID of the NMS biome
      */
     public static Number getBiomeID(Biome biome) {
-        return switch (biome) {
-            case THE_VOID -> 0;
-            case PLAINS -> 1;
-            case SUNFLOWER_PLAINS -> 2;
-            case SNOWY_PLAINS -> 3;
-            case ICE_SPIKES -> 4;
-            case DESERT -> 5;
-            case SWAMP -> 6;
-            case MANGROVE_SWAMP -> 7;
-            case FOREST -> 8;
-            case FLOWER_FOREST -> 9;
-            case BIRCH_FOREST -> 10;
-            case DARK_FOREST -> 11;
-            case OLD_GROWTH_BIRCH_FOREST -> 12;
-            case OLD_GROWTH_PINE_TAIGA -> 13;
-            case OLD_GROWTH_SPRUCE_TAIGA -> 14;
-            case TAIGA -> 15;
-            case SNOWY_TAIGA -> 16;
-            case SAVANNA -> 17;
-            case SAVANNA_PLATEAU -> 18;
-            case WINDSWEPT_HILLS -> 19;
-            case WINDSWEPT_GRAVELLY_HILLS -> 20;
-            case WINDSWEPT_FOREST -> 21;
-            case WINDSWEPT_SAVANNA -> 22;
-            case JUNGLE -> 23;
-            case SPARSE_JUNGLE -> 24;
-            case BAMBOO_JUNGLE -> 25;
-            case BADLANDS -> 26;
-            case ERODED_BADLANDS -> 27;
-            case WOODED_BADLANDS -> 28;
-            case MEADOW -> 29;
-            case CHERRY_GROVE -> 30;
-            case GROVE -> 31;
-            case SNOWY_SLOPES -> 32;
-            case FROZEN_PEAKS -> 33;
-            case JAGGED_PEAKS -> 34;
-            case STONY_PEAKS -> 35;
-            case RIVER -> 36;
-            case FROZEN_RIVER -> 37;
-            case BEACH -> 38;
-            case SNOWY_BEACH -> 39;
-            case STONY_SHORE -> 40;
-            case WARM_OCEAN -> 41;
-            case LUKEWARM_OCEAN -> 42;
-            case DEEP_LUKEWARM_OCEAN -> 43;
-            case OCEAN -> 44;
-            case DEEP_OCEAN -> 45;
-            case COLD_OCEAN -> 46;
-            case DEEP_COLD_OCEAN -> 47;
-            case FROZEN_OCEAN -> 48;
-            case DEEP_FROZEN_OCEAN -> 49;
-            case MUSHROOM_FIELDS -> 50;
-            case DRIPSTONE_CAVES -> 51;
-            case LUSH_CAVES -> 52;
-            case DEEP_DARK -> 53;
-            case NETHER_WASTES -> 54;
-            case WARPED_FOREST -> 55;
-            case CRIMSON_FOREST -> 56;
-            case SOUL_SAND_VALLEY -> 57;
-            case BASALT_DELTAS -> 58;
-            case THE_END -> 59;
-            case END_HIGHLANDS -> 60;
-            case END_MIDLANDS -> 61;
-            case SMALL_END_ISLANDS -> 62;
-            case END_BARRENS -> 63;
-            default -> {
-                Logging.warn("Missing biome id for '" +biome+"'. You should create an issue on Github.");
-                yield null;
-            }
-        };
+        NamespacedKey key = biome.getKey();
+        int id = BIOME_ID_MAP.getOrDefault(key, Integer.MAX_VALUE);
+
+        if (id == Integer.MAX_VALUE) {
+            Logging.warn("Missing biome id for '"+key+"'. You should create an entry in config file. (If it's a vanilla biome you should refer to https://minecraft.fandom.com/wiki/Biome/ID)");
+            return 0;
+        }
+
+        return id;
     }
     
 }
