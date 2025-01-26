@@ -9,15 +9,15 @@ A Skript packet addon to replace ThatPacketAddon (which is not updated) with Skr
 
 ⚠️ Skript-Packet **is not** a fork of TPA, syntaxes may change ⚠️  
 ⚠️ This plugin **is not** for beginners ⚠️  
-⚠️ You may have to use java NMS wich is not an API ⚠️  
-⚠️ You **should not** used packet for the first solution if possible, do not try to use this plugin to do ScoreBoard, BossBars, Particles, or existing things ⚠️
+⚠️ You may have to use java NMS which is not an API ⚠️  
+⚠️ You **should not** use packet for the first solution if possible, do not try to use this plugin to do ScoreBoard, BossBars, Particles, or existing things ⚠️
 
 # Requirements
- - Recent version of Skript
- - Stable [ProtocolLib dev build](https://ci.dmulloy2.net/job/ProtocolLib/) (does not works with v-5.1.0)
- - Java8+
+ - Recent version of Skript 2.10.0+
+ - Stable [ProtocolLib dev build](https://ci.dmulloy2.net/job/ProtocolLib/) (does not work with v-5.1.0)
+ - Java21+
  - It's highly recommended to use skript-reflect
- - I have only tested mc 1.20.4 **but** should works in a lot of mc versions
+ - I have only tested mc 1.21.4 **but** should work in a lot of mc versions
 
 # What is a packet
 The Minecraft server and your Minecraft client share information called "packets".
@@ -44,7 +44,7 @@ on packet event play_server_chat:
 ```
 
 <details>
-  <summary>Example of 1.16.X hight level coding</summary>
+  <summary>Example of 1.16.X high level coding</summary>
  
 ```applescript
 function BiomeStorage(biome: biome) :: object:

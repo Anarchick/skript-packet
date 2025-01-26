@@ -417,7 +417,8 @@ function testPacketEquipment():
     init("testPacketEquipment")
     set {step} to 1
     set {_packet} to new play_server_entity_equipment packet
-    set {_item} to random element out of ...(all wool).containerIterator()
+    set {_tag} to tag "wool"
+    set {_item} to random item out of {_tag}'s tag values
     set {_nmsItem} to nms of material of {_item}
     set {_itemSlot} to enum "HEAD" from nms class "EquipmentSlot"
     set {step} to 2

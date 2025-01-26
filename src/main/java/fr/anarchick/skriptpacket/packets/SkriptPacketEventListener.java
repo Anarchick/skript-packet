@@ -2,7 +2,6 @@ package fr.anarchick.skriptpacket.packets;
 
 import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.config.Config;
-import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import fr.anarchick.skriptpacket.packets.PacketManager.Mode;
@@ -101,12 +100,12 @@ public class SkriptPacketEventListener {
     }
 
     /**
-     * Called once time berfore reload.
+     * Called once time before reload.
      * called for /sk reload scripts or /reload confirm
-     * @param e PreScriptLoadEvent
+     * @param configs PreScriptLoadEvent
      */
-    public static void beforeReload(PreScriptLoadEvent e) {
-        for (Config config : e.getScripts()) {
+    public static void beforeReload(Collection<Config> configs) {
+        for (Config config : configs) {
             final String scriptName = config.getFileName();
             MAP.remove(scriptName);
         }

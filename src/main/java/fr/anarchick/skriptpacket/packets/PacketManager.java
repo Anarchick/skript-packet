@@ -144,12 +144,12 @@ public class PacketManager extends StructureModifier<Object> {
     public static void debug() {
         PROTOCOL_MANAGER.getPacketListeners().forEach(listener -> {
             if (listener instanceof SPPacketAdapter adapter) {
-                System.out.println("SYNC" + adapter);
+                System.out.println(adapter);
             }
         });
         PROTOCOL_MANAGER.getAsynchronousManager().getAsyncHandlers().forEach(listener -> {
             if (listener instanceof SPPacketAdapter adapter) {
-                System.out.println(adapter.mode.name() + adapter);
+                System.out.println(adapter);
             }
         });
     }

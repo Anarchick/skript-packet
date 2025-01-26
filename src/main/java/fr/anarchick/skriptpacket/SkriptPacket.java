@@ -1,8 +1,8 @@
 package fr.anarchick.skriptpacket;
 
+import ch.njol.skript.ScriptLoader;
 import ch.njol.skript.Skript;
 import ch.njol.skript.SkriptAddon;
-import ch.njol.skript.events.bukkit.PreScriptLoadEvent;
 import ch.njol.skript.lang.Expression;
 import ch.njol.skript.util.Version;
 import com.jeff_media.updatechecker.UpdateCheckSource;
@@ -11,14 +11,13 @@ import fr.anarchick.skriptpacket.elements.Types;
 import fr.anarchick.skriptpacket.packets.PacketManager;
 import fr.anarchick.skriptpacket.packets.SkriptPacketEventListener;
 import fr.anarchick.skriptpacket.util.Utils;
+import fr.anarchick.skriptpacket.util.converters.ConverterLogic;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class SkriptPacket extends JavaPlugin implements Listener {
+public class SkriptPacket extends JavaPlugin {
 
     private static SkriptPacket INSTANCE;
 
@@ -78,7 +77,10 @@ public class SkriptPacket extends JavaPlugin implements Listener {
             return;
         }
 
-        pluginManager.registerEvents(this, this);
+        ConverterLogic.loadBiomeID();
+
+        // New Script Event API since https://github.com/SkriptLang/Skript/commit/751c1027d5770079a9242475a86c1bec904f0c33
+        ScriptLoader.eventRegistry().register(ScriptLoader.ScriptPreInitEvent.class, SkriptPacketEventListener::beforeReload);
 
         int pluginId = 10270;
         Metrics metrics = new Metrics(this, pluginId);
@@ -107,11 +109,6 @@ public class SkriptPacket extends JavaPlugin implements Listener {
         new UpdateChecker(this, UpdateCheckSource.GITHUB_RELEASE_TAG, "Anarchick/skript-packet")
                 .setDownloadLink("https://github.com/Anarchick/skript-packet/releases")
                 .checkNow();
-    }
-    
-    @EventHandler
-    public void onScriptLoad(PreScriptLoadEvent e) {
-        SkriptPacketEventListener.beforeReload(e);
     }
     
     @SuppressWarnings({"unchecked" })

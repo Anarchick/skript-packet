@@ -3,7 +3,7 @@ plugins {
     id ("base")
     id("java-library")
     id("maven-publish")
-    id("io.papermc.paperweight.userdev") version "1.7.3"
+    id("io.papermc.paperweight.userdev") version "2.0.0-beta.14"
 }
 
 repositories {
@@ -11,8 +11,9 @@ repositories {
     maven { url 'https://repo.dmulloy2.net/nexus/repository/public/' } // ProtocolLib
     maven { url 'https://mvnrepository.com/artifact/org.json/json' } // DataWatcher
 
-    maven { url 'https://jitpack.io' }
     maven { url 'https://repo.skriptlang.org/releases' } // Skript
+    maven { url 'https://jitpack.io' }
+
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
     maven {
@@ -25,13 +26,16 @@ repositories {
 
 base {
     archivesName = "Skript-Packet"
+    setVersion("3.0.0")
+    setGroup("fr.anarchick.skriptpacket")
 }
-group = 'fr.anarchick.skriptpacket'
-version = '2.2.2'
+
+//version = '3.0.0'
+//group = 'fr.anarchick.skriptpacket'
 
 def mcVersion = '1.21'
-def mcSubVersion = '.1'
-def skriptVersion = '2.9.2'
+def mcSubVersion = '.4'
+def skriptVersion = '2.10.0'
 def protocolLibVersion = '5.3.0'
 def skriptReflectVersion = '2.4-dev1'
 
@@ -99,9 +103,9 @@ tasks.register('export') {
     group = "other"
     description = "build gradle into external folder"
     def userHome = System.getenv('USERPROFILE').replace('\\', '/')
-    def fromFile = 'build/libs/' + base.archivesName.get() + '-' + version + '-dev-all.jar'
+    def fromFile = 'build/libs/' + base.archivesName.get() + '-' + version + '-all.jar'
     // List of version folder to export the jar
-    def versions = ['1.17', '1.18', '1.19', '1.20.4', '1.21.1']
+    def versions = ['1.20.1', '1.21.1', '1.21.4']
     doLast {
         versions.each { ver ->
             def destDir = file(userHome + '/Documents/minecraft/SkriptPacket/' + ver + '/plugins')
@@ -110,7 +114,7 @@ tasks.register('export') {
                     from fromFile
                     into destDir
                     rename { String fileName ->
-                        fileName.replace('-dev-all.jar', '.jar')
+                        fileName.replace('-all.jar', '.jar')
                     }
                 }
             } else {

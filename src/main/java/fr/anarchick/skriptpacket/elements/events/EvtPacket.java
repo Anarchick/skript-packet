@@ -7,7 +7,6 @@ import ch.njol.skript.lang.Literal;
 import ch.njol.skript.lang.SkriptEvent;
 import ch.njol.skript.lang.SkriptParser.ParseResult;
 import ch.njol.skript.registrations.EventValues;
-import ch.njol.skript.util.Getter;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketContainer;
@@ -38,26 +37,11 @@ public class EvtPacket extends SkriptEvent {
         .since("1.0, 2.0 (sync/async)");
         
         // event-packet
-        EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, new Getter<>() {
-            @Override
-            public PacketContainer get(final BukkitPacketEvent e) {
-                return e.getPacket();
-            }
-        }, 0);
+        EventValues.registerEventValue(BukkitPacketEvent.class, PacketContainer.class, BukkitPacketEvent::getPacket);
         // event-player
-        EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, new Getter<>() {
-            @Override
-            public Player get(final BukkitPacketEvent e) {
-                return e.getPlayer();
-            }
-        }, 0);
+        EventValues.registerEventValue(BukkitPacketEvent.class, Player.class, BukkitPacketEvent::getPlayer);
         // event-world
-        EventValues.registerEventValue(BukkitPacketEvent.class, World.class, new Getter<>() {
-            @Override
-            public World get(final BukkitPacketEvent e) {
-                return e.getPlayer().getWorld();
-            }
-        }, 0);
+        EventValues.registerEventValue(BukkitPacketEvent.class, World.class, (e) -> e.getPlayer().getWorld());
     }
     
     @Override
