@@ -3,6 +3,7 @@ package fr.anarchick.skriptpacket.util.converters;
 import ch.njol.skript.Skript;
 import ch.njol.skript.aliases.ItemType;
 import ch.njol.skript.entity.EntityType;
+import ch.njol.skript.util.Version;
 import ch.njol.skript.util.slot.Slot;
 import com.btk5h.skriptmirror.ObjectWrapper;
 import com.comphenix.protocol.injector.BukkitUnwrapper;
@@ -12,12 +13,14 @@ import com.comphenix.protocol.wrappers.nbt.NbtCompound;
 import com.comphenix.protocol.wrappers.nbt.NbtFactory;
 import fr.anarchick.skriptpacket.Logging;
 import fr.anarchick.skriptpacket.SkriptPacket;
-import io.papermc.paper.registry.PaperRegistryAccess;
 import io.papermc.paper.registry.RegistryAccess;
 import io.papermc.paper.registry.RegistryKey;
 import it.unimi.dsi.fastutil.ints.IntList;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import org.bukkit.*;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.block.Biome;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
@@ -303,6 +306,7 @@ public class ConverterLogic {
     }
 
     private static final Map<NamespacedKey, Integer> BIOME_ID_MAP = new HashMap<>();
+    private static final Version PAPER_1_21 = new Version(1, 21);
 
     public static void loadBiomeID() {
         Logging.info("Loading biome ids from config");
@@ -324,14 +328,22 @@ public class ConverterLogic {
             BIOME_ID_MAP.put(namespacedKey, id);
         }
 
-        RegistryAccess.registryAccess().getRegistry(RegistryKey.BIOME).forEach((key) -> {
-            NamespacedKey namespacedKey = key.getKey();
+        if (config.getBoolean("missing-biome-check", true)) {
 
-            if (!BIOME_ID_MAP.containsKey(namespacedKey)) {
-                Logging.warn("Missing biome id for '" + namespacedKey + "'. You should create an entry in config file. (If it's a vanilla biome you should refer to https://minecraft.fandom.com/wiki/Biome/ID)");
+            if (Skript.getMinecraftVersion().isSmallerThan(PAPER_1_21)) {
+                Logging.info("Missing biome checker is not supported in this paper version.");
+                return;
             }
 
-        });
+            RegistryAccess.registryAccess().getRegistry(RegistryKey.BIOME).forEach((key) -> {
+                NamespacedKey namespacedKey = key.getKey();
+
+                if (!BIOME_ID_MAP.containsKey(namespacedKey)) {
+                    Logging.warn("Missing biome id for '" + namespacedKey + "'. You should create an entry in config file. (If it's a vanilla biome you should refer to https://minecraft.fandom.com/wiki/Biome/ID)");
+                }
+
+            });
+        }
 
     }
     /**
@@ -339,7 +351,7 @@ public class ConverterLogic {
      * @param biome Bukkit biome
      * @return ID of the NMS biome
      */
-    public static Number getBiomeID(Biome biome) {
+    public static int getBiomeID(Biome biome) {
         NamespacedKey key = biome.getKey();
         int id = BIOME_ID_MAP.getOrDefault(key, Integer.MAX_VALUE);
 

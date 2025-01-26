@@ -1,3 +1,4 @@
+missing-biome-check: true # If true, the plugin will check missing biomes and warn you in the console
 biome-ids: # https://minecraft.fandom.com/wiki/Biome/ID , Updated for mc 1.20.4
   minecraft-the_void: 0
   minecraft-plains: 1
