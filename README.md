@@ -17,7 +17,7 @@ A Skript packet addon to replace ThatPacketAddon (which is not updated) with Skr
  - Stable [ProtocolLib dev build](https://ci.dmulloy2.net/job/ProtocolLib/) (does not work with v-5.1.0)
  - Java21+
  - It's highly recommended to use skript-reflect
- - I have only tested mc 1.21.4 **but** should work in a lot of mc versions
+ - I have only tested mc 1.20.1 and 1.21.4 **but** should work in a lot of mc versions
 
 # What is a packet
 The Minecraft server and your Minecraft client share information called "packets".
@@ -44,7 +44,7 @@ on packet event play_server_chat:
 ```
 
 <details>
-  <summary>Example of 1.16.X high level coding</summary>
+  <summary>Example of 1.16.X high level coding (does not work in other versions)</summary>
  
 ```applescript
 function BiomeStorage(biome: biome) :: object:
